@@ -1,0 +1,5 @@
+{
+  "name": "ServicePro Dashboard",
+  "description": "A premium, high-end company dashboard for service providers to manage profiles, bookings, services, and availability.",
+  "requestFramePermissions": ["geolocation"]
+}

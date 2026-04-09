@@ -1,0 +1,205 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* =========================
+   THEME TOKENS (BLUE THEME)
+========================= */
+ 
+@theme {
+  /* Fonts */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* PRIMARY (Beige / Warm) */
+  --color-emerald-solid: #D6A85A;   /* warm gold/beige accent */
+  --color-emerald-tint: #FAF3E7;    /* light beige background */
+  --color-emerald-text: #8A6A2F;    /* dark beige text */
+
+  /* Optional accents */
+  --color-primary-deep: #C89B3C;
+  --color-primary-soft: #E6C98A;
+
+  /* Surfaces */
+  --color-bg-surface: #F9F7F3;
+  --color-card-bg: #FFFFFF;
+
+  /* Text */
+  --color-heading-slate: #1C1C1C;
+  --color-text-description: #6B6B6B;
+  --color-carbon-black: #111111;
+  --color-carbon-gray: #4B4B4B;
+  --color-secondary-link: #6B6B6B;
+
+  /* Borders */
+  --color-border-light: #F1EDE6;
+  --color-border-thin: #E5DED3;
+
+  /* Status (تفضل تبقى واضحة ومش مرتبطة بالـ theme) */
+  --color-status-success-bg: #DCFCE7;
+  --color-status-success-text: #166534;
+
+  --color-status-error-bg: #FEE2E2;
+  --color-status-error-text: #991B1B;
+
+  --color-status-warning-bg: #FEF9C3;
+  --color-status-warning-text: #854D0E;
+
+  --color-status-info-bg: #DBEAFE;
+  --color-status-info-text: #1E3A8A;
+}
+/* =========================
+   GLOBAL
+========================= */
+
+/* Scrollbar utility */
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 20px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8;
+  }
+}
+
+/* Base body */
+body {
+  @apply font-sans antialiased text-text-description bg-bg-surface;
+}
+
+/* Headings */
+@layer base {
+  h1 { @apply font-semibold text-carbon-black tracking-tight; }
+  h2, h3, h4 { @apply font-semibold text-heading-slate tracking-tight; }
+
+  th {
+    @apply font-bold text-carbon-black tracking-wider uppercase text-[12px];
+  }
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn-emerald {
+  @apply bg-emerald-solid text-white transition-all duration-200 
+         hover:brightness-110 active:scale-95 shadow-sm 
+         disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-outline-gray {
+  @apply border border-border-thin text-secondary-link bg-white transition-all duration-200 
+         hover:bg-emerald-tint hover:text-emerald-text hover:border-emerald-solid/20 
+         active:scale-95;
+}
+
+/* =========================
+   ACTION ICONS
+========================= */
+
+.btn-action-icon {
+  @apply p-2 rounded-lg border border-border-thin text-secondary-link transition-all 
+         hover:bg-white hover:shadow-sm hover:text-emerald-solid active:scale-90;
+}
+
+.btn-action-delete {
+  @apply hover:text-red-600 hover:border-red-200 hover:bg-red-50;
+}
+
+/* =========================
+   LAYOUT
+========================= */
+
+.card-minimal {
+  @apply bg-card-bg rounded-xl border border-border-light shadow-[0_1px_3px_0_rgba(0,0,0,0.02)];
+}
+
+.page-container {
+  @apply p-8 min-h-screen bg-bg-surface space-y-8;
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+.input-minimal {
+  @apply border border-border-thin rounded-lg px-4 py-2 text-sm 
+         focus:ring-4 focus:ring-emerald-solid/10 focus:border-emerald-solid 
+         outline-none transition-all placeholder:text-slate-400 bg-white;
+}
+
+/* =========================
+   TABLES
+========================= */
+
+.table-header {
+  @apply bg-bg-surface/80 backdrop-blur-sm border-b border-border-thin 
+         px-6 py-4 sticky top-0 z-10;
+  white-space: nowrap;
+}
+
+.table-main-container {
+  @apply relative w-full overflow-hidden rounded-xl border border-border-light bg-white;
+}
+
+.table-scroll-area {
+  @apply overflow-x-auto w-full scrollbar-thin;
+}
+
+.sticky-action-column {
+  @apply sticky right-0 z-10 bg-white border-l border-border-thin;
+  box-shadow: -6px 0 10px -5px rgba(0,0,0,0.08);
+}
+
+.table-header-sticky {
+  @apply sticky top-0 z-20 bg-slate-50/95 backdrop-blur-sm border-b border-border-thin px-6 py-4;
+  white-space: nowrap;
+}
+
+.table-wrapper {
+  @apply relative overflow-auto rounded-b-xl;
+  max-height: calc(100vh - 250px);
+}
+
+.table-image-preview {
+  @apply w-12 h-12 rounded-lg object-cover border border-border-light 
+         cursor-zoom-in transition-transform hover:scale-105 active:scale-95 shadow-sm;
+}
+
+.table-row {
+  @apply bg-white border-b border-border-light transition-all duration-200 cursor-default relative;
+}
+
+.table-row:hover {
+  background-color: var(--color-emerald-tint) !important;
+  box-shadow: inset 4px 0 0 0 var(--color-emerald-solid) !important;
+}
+
+.table-cell {
+  @apply px-6 py-4 text-sm text-carbon-gray align-middle;
+}
+
+/* =========================
+   BADGES
+========================= */
+
+.badge {
+  @apply px-2.5 py-0.5 rounded-full text-xs font-semibold border;
+}
+
+
+.badge-success { @apply bg-status-success-bg text-status-success-text border-status-success-text/10; }
+.badge-error   { @apply bg-status-error-bg text-status-error-text border-status-error-text/10; }
+.badge-warning { @apply bg-status-warning-bg text-status-warning-text border-status-warning-text/10; }
+.badge-gray    { @apply bg-slate-100 text-slate-600 border-slate-200; }
