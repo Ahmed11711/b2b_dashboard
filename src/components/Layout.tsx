@@ -1,34 +1,16 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import {
-  LayoutDashboard,
-  Briefcase,
-  Calendar,
-  Clock,
-  Settings,
-  LogOut,
-  Menu,
-  X,
-  Bell,
-  User,
-  Star,
-  Users,
-  Tag,
-} from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, X, Bell, User } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Button } from "./Button";
 import { motion, AnimatePresence } from "motion/react";
 import { NotificationPopover } from "./NotificationPopover";
 import { Notification } from "../types";
- 
+
 const adminNavItems = [
+  
   { icon: LayoutDashboard, label: "Overview", path: "/" },
-  { icon: Calendar, label: "Bookings", path: "/bookings" },
-  { icon: Briefcase, label: "Services", path: "/services" },
-  { icon: Tag, label: "Offers", path: "/offers" },
-  { icon: Users, label: "Staff", path: "/staff" },
-  { icon: Clock, label: "Availability", path: "/availability" },
-  { icon: User, label: "Profile", path: "/profile" },
+
   { icon: User, label: "Ads", path: "/ads" },
 ];
 
@@ -206,7 +188,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
           </div>
 
           <div className="flex flex-1 items-center justify-end gap-2 lg:gap-4">
- 
             <div className="relative">
               <Button
                 variant="ghost"
