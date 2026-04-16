@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://api.cleany.qa/api/v1/company/'; // استبدله برابط الباك اند الخاص بك
+const API_BASE_URL = 'http://127.0.0.1:8000/api/v1/';  
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -9,8 +9,7 @@ const axiosInstance = axios.create({
   },
 });
 
-// إضافة interceptor لإرسال التوكن مع كل طلب بشكل تلقائي
-axiosInstance.interceptors.request.use(
+ axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token && config.headers) {
@@ -21,13 +20,11 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// إضافة interceptor للتعامل مع الأخطاء (مثل 401 Unauthorized)
-axiosInstance.interceptors.response.use(
+ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // إذا انتهت صلاحية التوكن، امسح البيانات ووجه المستخدم لتسجيل الدخول
-      localStorage.removeItem('token');
+       localStorage.removeItem('token');
       localStorage.removeItem('role');
       window.location.href = '/login';
     }

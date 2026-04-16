@@ -4,7 +4,6 @@ import { Mail, Lock, ArrowRight } from "lucide-react";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 import { toast, Toaster } from "sonner";
-// استيراد الخدمة والأنواع
 import { authService } from "../services/authService";
 import { LoginCredentials } from "../types";
 
@@ -18,26 +17,21 @@ const Login: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    const credentials: LoginCredentials = { email, password };
+    const credentials: LoginCredentials = { login:email, password };
 
     try {
-      // المناداة على الـ API الحقيقي عبر الخدمة
-      const data = await authService.login(credentials);
+       const data = await authService.login(credentials);
 
-      // تخزين التوكن والبيانات الأساسية (تأكد من مطابقة المسميات مع الباك اند الخاص بك)
-      // عادة الباك اند يرسل access_token أو token
-      localStorage.setItem("token", data.access_token || (data as any).token);
+        localStorage.setItem("token", data.access_token || (data as any).token);
 
-      localStorage.setItem("role", data.user.role);
+      localStorage.setItem("role", "admin");
       localStorage.setItem("user_name", data.user.name);
 
       toast.success(`Welcome back, ${data.user.name}!`);
 
-      // التوجيه للوحة التحكم بعد نجاح الدخول
-      navigate("/");
+       navigate("/");
     } catch (error: any) {
-      // معالجة الخطأ القادم من السيرفر
-      const message =
+       const message =
         error.response?.data?.message ||
         "Login failed. Please check your credentials.";
       toast.error(message);
@@ -49,8 +43,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-bg-surface p-6">
-      {/* التنبيهات المنبثقة */}
-      <Toaster position="top-right" expand={false} richColors />
+       <Toaster position="top-right" expand={false} richColors />
 
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
@@ -74,9 +67,8 @@ const Login: React.FC = () => {
           <form className="space-y-6" onSubmit={handleLogin}>
             <div className="space-y-4">
               <Input
-                label="Email Address"
-                type="email"
-                placeholder="name@company.com"
+                label="Email Address Or Phone"
+                 placeholder="name@company.com || 01016158010"
                 className="h-11 rounded-lg"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

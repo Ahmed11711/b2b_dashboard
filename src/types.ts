@@ -73,14 +73,13 @@ export interface Staff {
   password?: string;
   role?: 'admin' | 'staff';
 }
-// أضف هذه التعريفات
-export interface LoginCredentials {
-  email: string;
-  password?: string; // علامة الاستفهام تجعلها اختيارية إذا لزم الأمر، لكن للأمان يفضل إبقاؤها إجبارية في الغالب
-}
+ export interface LoginCredentials {
+  login: string;
+  password?: string;
+ }
 
 export interface AuthResponse {
-  access_token: string; // أو 'token' حسب ما يرجعه الباك اند الخاص بك
+  access_token: string;  
   token_type: string;
   user: {
     id: number;

@@ -8,12 +8,20 @@ export default function DynamicForm({ fields, onSubmit, title, initialData, mode
   const [loading, setLoading] = useState(false);
 
   // 🛠️ أهم جزء للـ Edit: تحديث الـ formData لما الـ initialData توصل
-  useEffect(() => {
-    if (initialData) {
-      setFormData(initialData);
-    }
-  }, [initialData]);
-
+useEffect(() => {
+  if (initialData) {
+    setFormData(initialData);
+  } else {
+    // ✅ لو Create، حدد قيم افتراضية من الـ fields
+    const defaults = {};
+    fields.forEach(f => {
+      if (f.type === "checkbox" || f.type === "boolean") {
+        defaults[f.key] = 0; // ← افتراضي = 0 (Inactive)
+      }
+    });
+    setFormData(defaults);
+  }
+}, [initialData]);
   if (!fields || fields.length === 0) {
     return (
       <div className="p-10 text-center border-2 border-dashed rounded-3xl text-slate-400">

@@ -184,7 +184,7 @@ const FormFieldRenderer = memo(({ field, value, onChange, error, disabled = fals
 
   // منطق الاختيار
   const lowerKey = key?.toLowerCase() || "";
-  const isImage = type === "file" || type === "img" || lowerKey.includes("image") || lowerKey.includes("logo");
+  const isImage = type === "file" || type === "img" || type === "icon"|| lowerKey.includes("image") || lowerKey.includes("logo");
   const isDescription = type === "textarea" || lowerKey.includes("desc") || lowerKey.includes("content");
   const isBoolean = type === "boolean" || type === "checkbox" || lowerKey.startsWith("is_") || lowerKey.startsWith("has_");
 

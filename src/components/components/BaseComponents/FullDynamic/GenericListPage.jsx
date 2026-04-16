@@ -72,28 +72,41 @@ import DynamicForm from "../DynamicForm";
 // 2. مكون مودل الإنشاء (كما هو بدون تغيير)
 function CreateRecordModal({ isOpen, onClose, endpoint, headers, onRefresh, title }) {
   if (!isOpen) return null;
-   const handleFormSubmit = async (formData) => {
-    try {
-      const payload = new FormData();
-      Object.keys(formData).forEach((key) => {
-        const value = formData[key];
-        if (value !== null && value !== undefined) {
-          payload.append(key, value);
-        }
-      });
-
-      await createItem(endpoint, payload); 
-      onRefresh();
-      onClose();
-      return { success: true };
-    } catch (error) {
-      console.error("❌ Submission Error:", error.response?.data || error.message);
-      if (error.response?.data?.errors) {
-        return { success: false, errors: error.response.data.errors };
+// في handleFormSubmit جوه CreateRecordModal
+const handleFormSubmit = async (formData) => {
+  try {
+    const payload = new FormData();
+    
+    // ✅ تأكد إن الـ boolean/checkbox بيتبعت حتى لو 0
+    headers.forEach(h => {
+      if (h.type === "checkbox" || h.type === "boolean") {
+        const val = formData[h.key];
+        payload.append(h.key, val === undefined ? 0 : val ? 1 : 0);
       }
-      return { success: false, message: "Error occurred" };
+    });
+
+    Object.keys(formData).forEach((key) => {
+      const value = formData[key];
+      // تجاهل الـ boolean لأنا عملناهم فوق
+      const field = headers.find(h => h.key === key);
+      if (field?.type === "checkbox" || field?.type === "boolean") return;
+      
+      if (value !== null && value !== undefined) {
+        payload.append(key, value);
+      }
+    });
+
+    await createItem(endpoint, payload);
+    onRefresh();
+    onClose();
+    return { success: true };
+  } catch (error) {
+    if (error.response?.data?.errors) {
+      return { success: false, errors: error.response.data.errors };
     }
-  };
+    return { success: false, message: "Error occurred" };
+  }
+};
 
   return (
     <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
@@ -117,49 +130,55 @@ function CreateRecordModal({ isOpen, onClose, endpoint, headers, onRefresh, titl
   );
 }
 
-// 3. المكون الرئيسي (GenericListPage) مع إضافة الفلترة والبحث
-export default function GenericListPage({ endpoint, headers, title, params = {} }) {
+ export default function GenericListPage({ endpoint, headers, title, params = {} }) {
   const [data, setData] = useState([]);
   const [meta, setMeta] = useState({ current_page: 1, last_page: 1, total: 0 });
   const [loading, setLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, item: null });
   const [createModalOpen, setCreateModalOpen] = useState(false);
   
-  // ✅ States للبحث والفلترة
-  const [searchTerm, setSearchTerm] = useState("");
+   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilters, setActiveFilters] = useState({});
 
   const navigate = useNavigate();
 
-  const loadData = useCallback(async (page = 1) => {
-    setLoading(true);
-    try {
-      // ✅ إرسال البحث والفلترة للسيرفر
-      const queryParams = { 
-        ...params, 
-        page, 
-        search: searchTerm, 
-        ...activeFilters 
-      };
+const loadData = useCallback(async (page = 1) => {
+  setLoading(true);
+  try {
+    // 1. تجميع كل الـ Parameters
+    const rawParams = { 
+      ...params, 
+      page, 
+      search: searchTerm, 
+      ...activeFilters 
+    };
 
-      const response = await getAll(endpoint, queryParams);
-      if (response) {
-        const fetchedData = response.data || (Array.isArray(response) ? response : []);
-        setMeta({
-          current_page: parseInt(response.meta?.current_page || page),
-          last_page: parseInt(response.meta?.last_page || 1),
-          total: parseInt(response.meta?.total || fetchedData.length),
-          per_page: parseInt(response.meta?.per_page || 10)
-        });
-        setData(fetchedData);
-      }
-    } catch (error) {
-      console.error("❌ API Error:", error);
-    } finally {
-      setLoading(false);
+    // 2. تنظيف الـ Parameters: حذف أي Key قيمته فارغة تماماً
+    const cleanParams = Object.fromEntries(
+      Object.entries(rawParams).filter(([_, value]) => {
+        return value !== "" && value !== null && value !== undefined;
+      })
+    );
+
+    // 3. مناداة الـ API بالـ Params النظيفة فقط
+    const response = await getAll(endpoint, cleanParams);
+
+    if (response) {
+      const fetchedData = response.data || (Array.isArray(response) ? response : []);
+      setMeta({
+        current_page: parseInt(response.meta?.current_page || page),
+        last_page: parseInt(response.meta?.last_page || 1),
+        total: parseInt(response.meta?.total || fetchedData.length),
+        per_page: parseInt(response.meta?.per_page || 10)
+      });
+      setData(fetchedData);
     }
-  }, [endpoint, searchTerm, JSON.stringify(activeFilters), JSON.stringify(params)]);
-
+  } catch (error) {
+    console.error("❌ API Error:", error);
+  } finally {
+    setLoading(false);
+  }
+}, [endpoint, searchTerm, JSON.stringify(activeFilters), JSON.stringify(params)]);
   // ✅ Debounce البحث لتقليل الـ API Requests
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {

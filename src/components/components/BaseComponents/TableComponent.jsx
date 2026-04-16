@@ -25,6 +25,10 @@ export default function TableComponent({ headers, data, onEdit, onDelete, onView
     const bValue = b[sortConfig.key];
     return sortConfig.direction === 'asc' ? (aValue > bValue ? 1 : -1) : (aValue < bValue ? 1 : -1);
   });
+      const resolveValue = (obj, path) => {
+  if (!path || !obj) return null;
+  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+};
 
   const requestSort = (key) => {
     setSortConfig({ key, direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc' });
@@ -99,13 +103,13 @@ export default function TableComponent({ headers, data, onEdit, onDelete, onView
                           alt=""
                         />
                       ) : (
-                        <TableCellRenderer
-                          cell_type={header.cell_type}
-                          value={header.display_field 
-                            ? header.display_field.split('.').reduce((acc, part) => acc && acc[part], row) 
-                            : row[header.key]}
-                          options={Array.isArray(header.options) ? header.options : null}
-                        />
+                   <TableCellRenderer
+    cell_type={header.cell_type}
+    value={header.display_field 
+      ? resolveValue(row, header.display_field) 
+      : resolveValue(row, header.key)} 
+    options={Array.isArray(header.options) ? header.options : null}
+  />
                       )}
                     </div>
                   </td>
@@ -150,6 +154,7 @@ export default function TableComponent({ headers, data, onEdit, onDelete, onView
       }
       return pages;
     };
+
 
     // ===== Variants =====
     const navButtonStyle = `

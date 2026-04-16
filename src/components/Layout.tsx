@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, LogOut, Menu, X, Bell, User } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, X, Bell, User, } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Button } from "./Button";
 import { motion, AnimatePresence } from "motion/react";
@@ -8,16 +8,20 @@ import { NotificationPopover } from "./NotificationPopover";
 import { Notification } from "../types";
 
 const adminNavItems = [
+  { icon: User, label: "Bags_categories", path: "/bags_categories" },
+  { icon: User, label: "Bag", path: "/Bag" },
   
   { icon: LayoutDashboard, label: "Overview", path: "/" },
+  { icon: User, label: "Packages", path: "/Packages" },
+  { icon: User, label: "Ads", path: "/Ads" },
 
-  { icon: User, label: "Ads", path: "/ads" },
+
+  // { icon: User, label: "Ads", path: "/ads" },
 ];
 
 const staffNavItems = [
   { icon: LayoutDashboard, label: "My Tasks", path: "/" },
-  // { icon: User, label: "My Company", path: "/profile" },
-];
+ ];
 
 const INITIAL_NOTIFICATIONS: Notification[] = [
   {
@@ -103,7 +107,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
                 </span>
               </div>
               <span className="text-lg font-bold tracking-tight text-carbon-black">
-                Cleany
+                b2b
               </span>
             </div>
             <Button
@@ -183,7 +187,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
               </span>
             </div>
             <span className="text-base font-bold tracking-tight text-carbon-black">
-              Cleany
+              b2b
             </span>
           </div>
 

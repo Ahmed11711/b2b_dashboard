@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getAll } from "../../../service/services/apiService";
+  import MultiSelectField from "../../components/BaseComponents/MultiSelectField"
 
 export default function FormFieldRendererLayout({ field, value, onChange, error, disabled }) {
   const [options, setOptions] = useState(Array.isArray(field?.options) ? field.options : []);
@@ -119,40 +120,30 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
             />
           );
         }
-        // لو text عادي يكمل للـ default تحت
-        break;
+         break;
 
       // ================= CHECKBOX =================
-      case "checkbox":
-      case "boolean":
-        return (
-          <div
-            className={`flex items-center justify-between px-5 h-14 rounded-2xl border transition-all
-            ${value ? "bg-emerald-tint border-border-thin" : "bg-white border-slate-200"}
-            shadow-sm`}
-          >
-            <span className="font-semibold text-slate-600">
-              {value ? "Active" : "Inactive"}
-            </span>
-
-            <div className="relative">
-              <input
-                type="checkbox"
-                checked={!!value}
-                onChange={(e) => onChange(field.key, e.target.checked ? 1 : 0)}
-                className="sr-only peer"
-              />
-
-              <div className="w-12 h-6 bg-slate-200 rounded-full peer-checked:peer-checked:bg-emerald-solid transition"></div>
-
-              <div
-                className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow 
-                peer-checked:translate-x-6 transition"
-              ></div>
-            </div>
-          </div>
-        );
-
+     case "checkbox":
+case "boolean":
+  return (
+    <div className={`flex items-center justify-between px-5 h-14 rounded-2xl border transition-all
+      ${value ? "bg-emerald-tint border-border-thin" : "bg-white border-slate-200"} shadow-sm`}
+    >
+      <span className="font-semibold text-slate-600">
+        {value ? "Active" : "Inactive"}
+      </span>
+      <div className="relative" onClick={() => onChange(field.key, value ? 0 : 1)}>
+        {/* Track */}
+        <div className={`w-12 h-6 rounded-full transition-colors duration-300 cursor-pointer
+          ${value ? "bg-emerald-500" : "bg-slate-200"}`}
+        />
+        {/* Thumb */}
+        <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all duration-300
+          ${value ? "left-7" : "left-1"}`}
+        />
+      </div>
+    </div>
+  );
       // ================= FILE =================
       case "file":
         return (
@@ -190,8 +181,17 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
             )}
           </div>
         );
+    
+case "multi-select":
+  return (
+    <MultiSelectField
+      field={field}
+      value={value}
+      onChange={onChange}
+      error={error}
+    />
+  );
     }
-
     // ================= DEFAULT (للحالات العادية) =================
     return (
       <div className="relative group">

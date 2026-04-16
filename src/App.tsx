@@ -12,8 +12,15 @@ import GenericFormPage from "./components/components/BaseComponents/FullDynamic/
 import GenericViewPage from "./components/components/BaseComponents/FullDynamic/GenericViewPage";
 import { AdsFields } from "./schemas/adsSchema";
 import AppPage from "./pages/app/AppPage";
+import PackagesPage from "./pages/Packages/PackagesPage";
+import AdsPage from "./pages/Ads/AdsPage";
+import {PackagesFields} from "./schemas/PackagesSchema"
+import {BagFields} from "./schemas/BagSchema"
+import BagPage from "./pages/Bag/BagPage";
+import Bags_categoriesPage from "./pages/bags_categories/Bags_categoriesPage";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+   
   const token = localStorage.getItem("token");
   if (!token) {
     return <Navigate to="/login" replace />;
@@ -60,9 +67,9 @@ export default function App() {
           path="/ads/edit/:id"
           element={
             <GenericFormPage
-              endpoint="ads" // اسم الـ API اللي هنكلمه
-              fields={AdsFields} // الخريطة اللي انت لسه باعتها دي
-              mode="edit" // عشان يفهم إنه هيعمل Get للبيانات الأول
+              endpoint="ads"  
+              fields={AdsFields}  
+              mode="edit"  
               title="Edit Advertisement"
             />
           }
@@ -77,7 +84,6 @@ export default function App() {
             />
           }
         />
-        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
       <Routes>
@@ -96,18 +102,101 @@ export default function App() {
 
   {/* AUTO ROUTE: User */}
 
-  <Route
-    path="/User"
-    element={
-      <ProtectedRoute>
-        <UserPage />
-      </ProtectedRoute>
-    }
-  />
+ 
+
+
+{/* AUTO ROUTE: Packages */}
+<Route
+  path="/Packages"
+  element={
+    <ProtectedRoute>
+      <PackagesPage />
+    // </ProtectedRoute>
+  }
+/>
+ <Route
+          path="/Packages/edit/:id"
+          element={
+            <GenericFormPage
+              endpoint="packages"  
+              fields={PackagesFields}  
+              mode="edit"  
+              title="Edit Advertisement"
+            />
+          }
+        />
+ 
+        <Route
+          path="/Packages/view/:id"
+          element={
+            <GenericViewPage
+              entityName="packages"
+              title="packages Details"
+              fields={PackagesFields}
+            />
+          }
+        />
+
+{/* AUTO ROUTE: Ads */}
+<Route
+  path="/Ads"
+  element={
+    <ProtectedRoute>
+      <AdsPage />
+    </ProtectedRoute>
+  }
+/>
+
+
+{/* AUTO ROUTE: Bag */}
+<Route
+  path="/Bag"
+  element={
+    <ProtectedRoute>
+      <BagPage />
+    </ProtectedRoute>
+  }
+/>
+ <Route
+          path="/bags/edit/:id"
+          element={
+            <GenericFormPage
+              endpoint="bags"  
+              fields={BagFields}  
+              mode="edit"  
+              title="Edit Advertisement"
+            />
+          }
+        />
+ 
+        <Route
+          path="/bags/view/:id"
+          element={
+            <GenericViewPage
+              entityName="bags"
+              title="packages Details"
+              fields={BagFields}
+            />
+          }
+        />
+
+
+{/* AUTO ROUTE: bags_categories */}
+<Route
+  path="/bags_categories"
+  element={
+    <ProtectedRoute>
+      <Bags_categoriesPage />
+    </ProtectedRoute>
+  }
+/>
 
 {/* AUTO ROUTES START */}
         {/* AUTO ROUTES END */}
       </Routes>
     </BrowserRouter>
+
+
+
   );
 }

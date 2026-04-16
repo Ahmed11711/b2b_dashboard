@@ -4,7 +4,6 @@ import {
   DollarSign,
   Briefcase,
   Clock,
-  TrendingUp,
   ArrowUpRight,
   Calendar as CalendarIcon,
   Loader2,
@@ -12,8 +11,7 @@ import {
 import { StatCard } from "../components/StatCard";
 import { DataTable } from "../components/DataTable";
 import { Button } from "../components/Button";
-import { dashboardApi } from "../services/dashboardApi"; // السيرفيس الجديد
-import { Booking, DashboardStats } from "../types";
+import { Booking } from "../types";
 import { formatCurrency } from "../lib/utils";
 import { Badge } from "../components/Badge";
 import {
@@ -27,34 +25,69 @@ import {
 } from "recharts";
 
 const Dashboard: React.FC = () => {
-  const [data, setData] = useState<{ stats: any; chartData: any[] } | null>(
-    null,
-  );
+  const [data, setData] = useState<{ stats: any; chartData: any[] } | null>(null);
   const [recentBookings, setRecentBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const role = localStorage.getItem("role") || "admin";
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
-    try {
+     const loadMockData = () => {
       setIsLoading(true);
-      // تنفيذ الطلبين بالتوازي لسرعة الأداء
-      const [statsRes, bookingsRes] = await Promise.all([
-        dashboardApi.getAdminStats(),
-        dashboardApi.getRecentBookings(5),
-      ]);
+      
+       const mockStats = {
+        totalRevenue: 154.3,
+        totalBookings: 124,
+        activeServices: 12,
+        pendingBookings: 8,
+      };
 
-      setData(statsRes.data || statsRes);
-      setRecentBookings(bookingsRes.data || bookingsRes);
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+       const mockChartData = [
+        { name: "Mon", revenue: 4000 },
+        { name: "Tue", revenue: 3000 },
+        { name: "Wed", revenue: 5000 },
+        { name: "Thu", revenue: 2780 },
+        { name: "Fri", revenue: 1890 },
+        { name: "Sat", revenue: 2390 },
+        { name: "Sun", revenue: 3490 },
+      ];
+
+      // بيانات الحجوزات الوهمية
+      const mockBookings: any[] = [
+        {
+          id: "1",
+          customer_name: "Ahmed Ali",
+          service: { service_name: "Full Car Wash" },
+          booking_date: new Date().toISOString(),
+          status: "confirmed",
+          total_price: 150,
+        },
+        {
+          id: "2",
+          customer_name: "Sara Smith",
+          service: { service_name: "Engine Checkup" },
+          booking_date: new Date().toISOString(),
+          status: "pending",
+          total_price: 300,
+        },
+        {
+          id: "3",
+          customer_name: "John Doe",
+          service: { service_name: "Oil Change" },
+          booking_date: new Date().toISOString(),
+          status: "error",
+          total_price: 80,
+        }
+      ];
+
+      setTimeout(() => {
+        setData({ stats: mockStats, chartData: mockChartData });
+        setRecentBookings(mockBookings);
+        setIsLoading(false);
+      }, 800); // تأخير بسيط لمحاكاة تجربة المستخدم
+    };
+
+    loadMockData();
+  }, []);
 
   const columns = [
     {
@@ -231,7 +264,6 @@ const Dashboard: React.FC = () => {
             variant="ghost"
             size="sm"
             className="text-xs"
-            onClick={fetchDashboardData}
           >
             Refresh
           </Button>

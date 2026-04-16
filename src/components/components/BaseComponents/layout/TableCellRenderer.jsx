@@ -63,7 +63,7 @@ export default function TableCellRenderer({ cell_type, value, options, onImageCl
       );
 
     // 2. الصور (Images) مع Fallback في حالة الخطأ
-    case "image":
+    case "image ":
       return (
         <div className="relative w-10 h-10 group">
           <img
