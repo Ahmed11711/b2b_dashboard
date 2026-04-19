@@ -20,20 +20,20 @@ export const BagsCategoryFields = [
   },
   { 
     key: "bag_id", 
-    label: "Bag Id", 
+    label: "Bag Name",
     type: "select", 
     cell_type: "relation",
-    display_field: "bag.name",
+    display_field: "bag_name.title",
     required: 1, 
     placeholder: "Enter Bag Id",
-    searchable: false,
-    filterable: false,
+    searchable: true,
+    filterable: true,
     sortable: true,
-    table_show: false,
+    table_show: true,
     form_show: true,
     endpoint: 'bags',
-    relation_fields: 'id,name',
-    options: { label: 'name', value: 'id' }
+    relation_fields: 'id,title',
+    options: { label: 'title', value: 'id' }
   },
   { 
     key: "title", 

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, LogOut, Menu, X, Bell, User, } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, X, Bell, User,LayoutGrid,ShoppingBag } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Button } from "./Button";
 import { motion, AnimatePresence } from "motion/react";
@@ -8,12 +8,13 @@ import { NotificationPopover } from "./NotificationPopover";
 import { Notification } from "../types";
 
 const adminNavItems = [
-  { icon: User, label: "Bags_categories", path: "/bags_categories" },
-  { icon: User, label: "Bag", path: "/Bag" },
   
   { icon: LayoutDashboard, label: "Overview", path: "/" },
   { icon: User, label: "Packages", path: "/Packages" },
   { icon: User, label: "Ads", path: "/Ads" },
+{ icon: ShoppingBag, label: "Bag", path: "/Bag" },
+{ icon: LayoutGrid, label: "Bags Categories", path: "/bags_categories" },
+
 
 
   // { icon: User, label: "Ads", path: "/ads" },

@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TableCellRenderer from "./layout/TableCellRenderer";
+import { getAll } from "../../../service/services/apiService";
 
 function ImagePreviewModal({ src, onClose }) {
   if (!src) return null;
@@ -18,6 +19,32 @@ function ImagePreviewModal({ src, onClose }) {
 export default function TableComponent({ headers, data, onEdit, onDelete, onView, meta, onPageChange, onSearchChange, onFilterChange }) {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [selectedImg, setSelectedImg] = useState(null);
+  // ✅ جديد
+  const [relationOptions, setRelationOptions] = useState({});
+
+  // ✅ جديد - جلب الـ options من الـ API
+  useEffect(() => {
+    const relationFields = headers.filter(
+      h => h.filterable && h.cell_type === "relation" && h.endpoint
+    );
+
+    relationFields.forEach(async (field) => {
+      try {
+        const res = await getAll(field.endpoint, { fields: field.relation_fields });
+        const data = res.data || [];
+
+        setRelationOptions(prev => ({
+          ...prev,
+          [field.key]: data.map(item => ({
+            label: item[field.options.label],
+            value: item[field.options.value]
+          }))
+        }));
+      } catch (err) {
+        console.error(`Failed to load options for ${field.key}`, err);
+      }
+    });
+  }, [headers]);
 
   const sortedData = [...data].sort((a, b) => {
     if (!sortConfig.key) return 0;
@@ -25,10 +52,11 @@ export default function TableComponent({ headers, data, onEdit, onDelete, onView
     const bValue = b[sortConfig.key];
     return sortConfig.direction === 'asc' ? (aValue > bValue ? 1 : -1) : (aValue < bValue ? 1 : -1);
   });
-      const resolveValue = (obj, path) => {
-  if (!path || !obj) return null;
-  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
-};
+
+  const resolveValue = (obj, path) => {
+    if (!path || !obj) return null;
+    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+  };
 
   const requestSort = (key) => {
     setSortConfig({ key, direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc' });
@@ -40,26 +68,29 @@ export default function TableComponent({ headers, data, onEdit, onDelete, onView
       {/* 1. Toolbar */}
       <div className="p-5 border-b border-border-light flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="relative w-full md:w-80">
-       <input
-  type="text"
-  placeholder="Search records..."
-  className="input-minimal w-full pl-12 h-11"
-  onChange={(e) => onSearchChange(e.target.value)}
-/>
+          <input
+            type="text"
+            placeholder="Search records..."
+            className="input-minimal w-full pl-12 h-11"
+            onChange={(e) => onSearchChange(e.target.value)}
+          />
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
           </span>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end text-right">
-          {headers.filter(h => h.filterable && h.options && Array.isArray(h.options)).map((header) => (
+          {/* ✅ جديد - بيعرض الـ filter لكل filterable field */}
+          {headers.filter(h => h.filterable).map((header) => (
             <select
               key={header.key}
               className="input-minimal py-2 px-3 text-xs min-w-[140px] h-10 cursor-pointer"
               onChange={(e) => onFilterChange(header.key, e.target.value)}
             >
               <option value="">All {header.label}</option>
-              {header.options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+              {(relationOptions[header.key] || []).map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
             </select>
           ))}
         </div>
@@ -103,13 +134,13 @@ export default function TableComponent({ headers, data, onEdit, onDelete, onView
                           alt=""
                         />
                       ) : (
-                   <TableCellRenderer
-    cell_type={header.cell_type}
-    value={header.display_field 
-      ? resolveValue(row, header.display_field) 
-      : resolveValue(row, header.key)} 
-    options={Array.isArray(header.options) ? header.options : null}
-  />
+                        <TableCellRenderer
+                          cell_type={header.cell_type}
+                          value={header.display_field 
+                            ? resolveValue(row, header.display_field) 
+                            : resolveValue(row, header.key)} 
+                          options={Array.isArray(header.options) ? header.options : null}
+                        />
                       )}
                     </div>
                   </td>
@@ -128,125 +159,92 @@ export default function TableComponent({ headers, data, onEdit, onDelete, onView
         </table>
       </div>
 
-  {/* 3. Pagination Footer */}
-{meta && (
-<div className="px-8 py-6 bg-card-bg border-t border-border-light flex flex-col md:flex-row justify-between items-center gap-6">
-  {(() => {
-    const currentPage = Number(meta.current_page) || 1;
-    const lastPage = Number(meta.last_page) || 1;
-    const perPage = Number(meta.per_page) || 10;
-    const total = Number(meta.total) || 0;
+      {/* 3. Pagination Footer */}
+      {meta && (
+        <div className="px-8 py-6 bg-card-bg border-t border-border-light flex flex-col md:flex-row justify-between items-center gap-6">
+          {(() => {
+            const currentPage = Number(meta.current_page) || 1;
+            const lastPage = Number(meta.last_page) || 1;
+            const perPage = Number(meta.per_page) || 10;
+            const total = Number(meta.total) || 0;
 
-    const getPageNumbers = () => {
-      const pages = [];
-      const range = 1;
+            const getPageNumbers = () => {
+              const pages = [];
+              const range = 1;
+              for (let i = 1; i <= lastPage; i++) {
+                if (i === 1 || i === lastPage || (i >= currentPage - range && i <= currentPage + range)) {
+                  pages.push(i);
+                } else if (pages[pages.length - 1] !== "...") {
+                  pages.push("...");
+                }
+              }
+              return pages;
+            };
 
-      for (let i = 1; i <= lastPage; i++) {
-        if (
-          i === 1 ||
-          i === lastPage ||
-          (i >= currentPage - range && i <= currentPage + range)
-        ) {
-          pages.push(i);
-        } else if (pages[pages.length - 1] !== "...") {
-          pages.push("...");
-        }
-      }
-      return pages;
-    };
+            const navButtonStyle = `
+              w-10 h-10 flex items-center justify-center rounded-xl border
+              border-border-thin bg-card-bg text-carbon-gray
+              hover:border-emerald-solid hover:text-emerald-solid
+              transition-all duration-300 shadow-sm
+              disabled:opacity-30 disabled:cursor-not-allowed
+              disabled:hover:border-border-thin disabled:hover:text-carbon-gray
+            `;
 
+            const pageButtonBase = `
+              min-w-[40px] h-10 rounded-xl font-bold text-sm transition-all duration-300
+              border border-border-light
+            `;
 
-    // ===== Variants =====
-    const navButtonStyle = `
-      w-10 h-10 flex items-center justify-center rounded-xl border
-      border-border-thin bg-card-bg text-carbon-gray
-      hover:border-emerald-solid hover:text-emerald-solid
-      transition-all duration-300 shadow-sm
-      disabled:opacity-30 disabled:cursor-not-allowed
-      disabled:hover:border-border-thin disabled:hover:text-carbon-gray
-    `;
+            const activePageStyle = `bg-emerald-solid text-white shadow-lg scale-110`;
+            const inactivePageStyle = `bg-card-bg text-carbon-gray hover:border-emerald-solid/30 hover:bg-emerald-tint`;
 
-    const pageButtonBase = `
-      min-w-[40px] h-10 rounded-xl font-bold text-sm transition-all duration-300
-      border border-border-light
-    `;
+            return (
+              <>
+                {/* Counter */}
+                <div className="flex items-center gap-2 text-sm font-semibold text-text-description">
+                  <span className="flex items-center justify-center bg-bg-surface text-carbon-gray px-3 py-1 rounded-full text-xs">
+                    {(currentPage - 1) * perPage + 1} - {Math.min(currentPage * perPage, total)}
+                  </span>
+                  <span>of</span>
+                  <span className="text-carbon-black">{total.toLocaleString()} records</span>
+                </div>
 
-    const activePageStyle = `
-      bg-emerald-solid text-white shadow-lg
-      scale-110
-    `;
+                {/* Navigation */}
+                <div className="flex items-center gap-3">
+                  <button disabled={currentPage === 1} onClick={() => onPageChange(currentPage - 1)} className={navButtonStyle}>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                  </button>
 
-    const inactivePageStyle = `
-      bg-card-bg text-carbon-gray
-      hover:border-emerald-solid/30 hover:bg-emerald-tint
-    `;
+                  <div className="flex items-center gap-2">
+                    {getPageNumbers().map((p, idx) =>
+                      p === "..." ? (
+                        <span key={`dots-${idx}`} className="text-border-thin font-bold px-1">...</span>
+                      ) : (
+                        <button
+                          key={p}
+                          onClick={() => onPageChange(p)}
+                          className={`${pageButtonBase} ${currentPage === p ? activePageStyle : inactivePageStyle}`}
+                        >
+                          {p}
+                        </button>
+                      )
+                    )}
+                  </div>
 
-    return (
-      <>
-        {/* Counter */}
-        <div className="flex items-center gap-2 text-sm font-semibold text-text-description">
-          <span className="flex items-center justify-center bg-bg-surface text-carbon-gray px-3 py-1 rounded-full text-xs">
-            {(currentPage - 1) * perPage + 1} -{" "}
-            {Math.min(currentPage * perPage, total)}
-          </span>
-          <span>of</span>
-          <span className="text-carbon-black">
-            {total.toLocaleString()} records
-          </span>
+                  <button disabled={currentPage === lastPage} onClick={() => onPageChange(currentPage + 1)} className={navButtonStyle}>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </button>
+                </div>
+              </>
+            );
+          })()}
         </div>
+      )}
 
-        {/* Navigation */}
-        <div className="flex items-center gap-3">
-          {/* Prev */}
-          <button
-            disabled={currentPage === 1}
-            onClick={() => onPageChange(currentPage - 1)}
-            className={navButtonStyle}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-          </button>
-
-          {/* Pages */}
-          <div className="flex items-center gap-2">
-            {getPageNumbers().map((p, idx) =>
-              p === "..." ? (
-                <span key={`dots-${idx}`} className="text-border-thin font-bold px-1">
-                  ...
-                </span>
-              ) : (
-                <button
-                  key={p}
-                  onClick={() => onPageChange(p)}
-                  className={`${pageButtonBase} ${
-                    currentPage === p
-                      ? activePageStyle
-                      : inactivePageStyle
-                  }`}
-                >
-                  {p}
-                </button>
-              )
-            )}
-          </div>
-
-          {/* Next */}
-          <button
-            disabled={currentPage === lastPage}
-            onClick={() => onPageChange(currentPage + 1)}
-            className={navButtonStyle}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
-            </svg>
-          </button>
-        </div>
-      </>
-    );
-  })()}
-</div>
-)}
       <ImagePreviewModal src={selectedImg} onClose={() => setSelectedImg(null)} />
     </div>
   );
