@@ -71,38 +71,31 @@ const handleSubmit = async (formData) => {
   );
 
   return (
-    // الـ Container ده هو اللي هيظبط شكل الصفحة ويخليها في النص وبمساحة معقولة
-    <div className="max-w-5xl mx-auto p-4 md:p-6 animate-in fade-in duration-500">
-      <div className="bg-white rounded-[2.5rem] shadow-sm border border-border-light overflow-hidden transition-all hover:shadow-md">
-        
-        {/* Header الصفحة */}
-        <div className="px-6 md:px-8 py-5 md:py-6 border-b border-border-light bg-slate-50/50 flex justify-between items-start md:items-center flex-col md:flex-row gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-carbon-black tracking-tight capitalize">{title}</h1>
-            <p className="text-slate-500 text-sm font-medium mt-1">
-              {mode === "edit" ? `Modifying item ` : "Fill in the details below "} 
-              {mode === "edit" && <span className="text-emerald-solid font-black">#{id}</span>}
-            </p>
-          </div>
+    <div className="max-w-6xl mx-auto p-4 md:p-6 animate-in fade-in duration-500">
+      
+      {/* Header الصفحة */}
+      <div className="flex justify-between items-center mb-8 gap-4">
+        <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 px-5 py-2.5 bg-white border border-border-light hover:border-emerald-solid/20 hover:bg-emerald-tint text-carbon-gray hover:text-emerald-text font-bold rounded-2xl transition-all duration-300 active:scale-[0.98] shadow-sm"
+            className="flex items-center justify-center w-10 h-10 bg-card-bg hover:bg-emerald-tint text-carbon-gray rounded-full transition-all duration-300 shadow-sm border border-border-thin"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"/></svg>
-            Back
           </button>
+          <h1 className="text-2xl md:text-3xl font-bold text-heading-slate tracking-tight capitalize">
+            {mode === "edit" ? ` ${title}` : `Create ${title}`}
+          </h1>
         </div>
+      </div>
 
-        {/* منطقة الفورم */}
-        <div className="p-6 md:p-8 bg-white">
-          <DynamicForm 
+      {/* منطقة الفورم */}
+      <div className="w-full">
+        <DynamicForm 
           fields={visibleFields}  // 👈 بنبعت الحقول المفلترة هنا
-             initialData={initialData} // دي أهم قطعة عشان الداتا تظهر
-            onSubmit={handleSubmit}
-            mode={mode}
-          />
-        </div>
-
+          initialData={initialData} // دي أهم قطعة عشان الداتا تظهر
+          onSubmit={handleSubmit}
+          mode={mode}
+        />
       </div>
     </div>
   );

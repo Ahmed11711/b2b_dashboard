@@ -269,18 +269,30 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Recent Bookings Table */}
-      <div className="space-y-5">
-        <div className="flex items-center justify-between">
-          <h3 className="text-base font-semibold text-carbon-black">
-            Recent Bookings
-          </h3>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-xs"
-          >
-            Refresh
-          </Button>
+      <div className="overflow-hidden rounded-2xl border border-border-light bg-white px-4 pb-3 pt-4 shadow-sm sm:px-6">
+        <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-carbon-black">
+              Recent Bookings
+            </h3>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs"
+              onClick={() => window.location.reload()}
+            >
+              Refresh
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs"
+            >
+              See all
+            </Button>
+          </div>
         </div>
         <DataTable
           columns={columns}

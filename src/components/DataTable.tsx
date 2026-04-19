@@ -21,7 +21,7 @@ export function DataTable<T extends { id: string | number }>({
   onRowClick,
 }: DataTableProps<T>) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-border-light bg-white shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
+    <div className="overflow-x-auto rounded-xl border border-border-light bg-white shadow-sm">
       <table className="w-full text-left text-sm border-collapse">
         <thead className="bg-bg-surface border-b border-border-light">
           <tr>
@@ -29,7 +29,7 @@ export function DataTable<T extends { id: string | number }>({
               <th 
                 key={idx} 
                 className={cn(
-                  'px-6 py-4 text-[48px] font-bold uppercase tracking-widest text-carbon-black', 
+                  'px-6 py-4 text-[12px] font-bold uppercase tracking-widest text-secondary-link', 
                   column.className
                 )}
               >

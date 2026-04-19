@@ -47,39 +47,37 @@ useEffect(() => {
   };
 
   return (
-    // التحكم في المساحة: max-w-4xl يخلي الفورم في النص بشكل احترافي
-  <div className="max-w-4xl mx-auto py-8 px-4">
-  <form onSubmit={handleSubmit} className="space-y-10 animate-in fade-in duration-500">
-    {title && (
-      <div className="mb-10">
-        <h2 className="text-4xl font-black text-carbon-black tracking-tight">
-          {title}
-        </h2>
-
-        <div className="h-1.5 w-20 bg-emerald-solid rounded-full mt-4"></div>
-      </div>
-    )}
-
-        {/* تقسيم الحقول بشكل متوازن */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
-          {fields.map((field) => (
-            <FormFieldRendererLayout
-              key={field.key}
-              field={field}
-              value={formData[field.key]}
-              error={errors[field.key]}
-              onChange={handleChange}
-              disabled={loading}
-            />
-          ))}
+  <div className="w-full">
+    <form onSubmit={handleSubmit} className="space-y-6 animate-in fade-in duration-500">
+      
+      <div className="bg-card-bg rounded-2xl shadow-sm border border-border-light overflow-hidden">
+        <div className="px-6 py-5 border-b border-border-light bg-card-bg">
+          <h3 className="text-lg font-bold text-heading-slate capitalize">Basic Information</h3>
         </div>
+        
+        <div className="p-6 md:p-8">
+          {/* تقسيم الحقول بشكل متوازن */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            {fields.map((field) => (
+              <FormFieldRendererLayout
+                key={field.key}
+                field={field}
+                value={formData[field.key]}
+                error={errors[field.key]}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
 
-        {/* زرار الأكشن */}
-      <div className="flex justify-end pt-10 border-t border-border-light mt-12 gap-4">
+      {/* زرار الأكشن */}
+      <div className="flex justify-end gap-4 mt-6">
         <button
           type="submit"
           disabled={loading}
-          className="btn-emerald min-w-[160px] relative overflow-hidden"
+          className="btn-emerald min-w-[160px] relative overflow-hidden rounded-full py-2.5 px-6 font-semibold"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
@@ -87,13 +85,14 @@ useEffect(() => {
               Processing...
             </span>
           ) : (
-            <span className="flex items-center justify-center gap-2 font-bold tracking-wide">
-              {mode === "edit" ? "Save Changes" : "Create Record"}
+            <span className="flex items-center justify-center gap-2">
+              {mode === "edit" ? "Publish" : "Create"}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
             </span>
           )}
         </button>
       </div>
-      </form>
-    </div>
+    </form>
+  </div>
   );
 }
