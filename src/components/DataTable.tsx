@@ -29,7 +29,7 @@ export function DataTable<T extends { id: string | number }>({
               <th 
                 key={idx} 
                 className={cn(
-                  'px-6 py-4 text-[12px] font-bold uppercase tracking-widest text-carbon-black', 
+                  'px-6 py-4 text-[48px] font-bold uppercase tracking-widest text-carbon-black', 
                   column.className
                 )}
               >

@@ -76,16 +76,16 @@ function RelationSection({ label, items, navigateTo }) {
 
   return (
     <>
-      <div className="space-y-5">
-        <div className="flex items-center gap-3 px-1">
-          <div className="w-2 h-7 bg-emerald-500 rounded-full"></div>
-          <h3 className="text-sm font-black uppercase tracking-widest text-slate-600">{label}</h3>
-          <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-xs font-black rounded-full border border-emerald-100">
+      <div className="space-y-4 md:space-y-5">
+        <div className="flex flex-wrap items-center gap-3 px-1">
+          <div className="w-2 h-6 md:h-7 bg-emerald-solid rounded-full shadow-sm"></div>
+          <h3 className="text-xs md:text-sm font-bold uppercase tracking-widest text-heading-slate">{label}</h3>
+          <span className="px-2.5 py-1 md:px-3 md:py-1.5 bg-emerald-tint text-emerald-text text-[10px] md:text-xs font-bold rounded-full border border-emerald-solid/20 shadow-sm">
             {items.length} items
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
           {items.map((item, idx) => {
             const imageEntry = Object.entries(item).find(([k, v]) => isImageValue(v));
             const titleVal = item.title || item.name || item.label || `Item #${item.id}`;
@@ -101,49 +101,43 @@ function RelationSection({ label, items, navigateTo }) {
               <div
                 key={item.id || idx}
                 onClick={() => handleCardClick(item)}
-                className="group bg-white rounded-[1.75rem] border border-slate-100 shadow-sm hover:shadow-xl hover:border-emerald-200 transition-all duration-300 cursor-pointer overflow-hidden active:scale-95"
+                className="group bg-white rounded-3xl border border-border-light shadow-[0_2px_8px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgb(0,0,0,0.08)] hover:border-emerald-solid/30 transition-all duration-300 cursor-pointer overflow-hidden active:scale-[0.98] flex flex-col"
               >
                 {/* صورة الـ Card */}
                 {imageEntry ? (
-                  <div className="relative h-44 overflow-hidden bg-slate-50">
+                  <div className="relative h-40 md:h-44 overflow-hidden bg-slate-50 shrink-0">
                     <img
-                      src={String(imageEntry[1])}
-                      alt={titleVal}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      src={imageEntry[1]}
+                      alt="Thumbnail"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
-                    <div className="absolute bottom-3 left-4 right-4">
-                      <p className="text-white font-black text-sm drop-shadow-lg truncate">{titleVal}</p>
-                      <p className="text-white/70 text-[11px] font-medium">ID: #{item.id}</p>
-                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-carbon-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
                 ) : (
-                  <div className="h-16 bg-gradient-to-r from-emerald-50 to-slate-50 flex items-center px-5">
-                    <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center">
-                      <div className="w-2 h-4 bg-emerald-400 rounded-full"></div>
-                    </div>
-                  </div>
+                  <div className="h-2 bg-emerald-solid/10 shrink-0"></div>
                 )}
 
-                {/* Card Body */}
-                <div className="p-5">
-                  {!imageEntry && (
-                    <div className="mb-3">
-                      <p className="font-black text-slate-800 truncate text-sm">{titleVal}</p>
-                      <p className="text-[11px] text-slate-400 font-medium mt-0.5">ID: #{item.id}</p>
-                    </div>
-                  )}
+                {/* محتوى الـ Card */}
+                <div className="p-5 flex-1 flex flex-col">
+                  <div className="flex justify-between items-start gap-2 mb-3">
+                    <h4 className="font-bold text-carbon-black text-base line-clamp-1 group-hover:text-emerald-solid transition-colors">{titleVal}</h4>
+                    <span className="text-[10px] font-black text-slate-400 bg-slate-50 px-2 py-1 rounded-lg border border-border-light shrink-0 shadow-sm">
+                      #{item.id}
+                    </span>
+                  </div>
 
-                  {extraFields.slice(0, 2).map(([k, v]) => (
-                    <div key={k} className="mt-2 pt-2 border-t border-slate-50 first:border-0 first:mt-0 first:pt-0">
-                      <p className="text-[10px] font-black uppercase text-slate-300 mb-1">{k.replace(/_/g, ' ')}</p>
-                      <DynamicValueRenderer value={v} labelKey={k} />
-                    </div>
-                  ))}
+                  <div className="flex-1">
+                    {extraFields.slice(0, 2).map(([k, v]) => (
+                      <div key={k} className="mt-2 pt-2 border-t border-border-light/50 first:border-0 first:mt-0 first:pt-0">
+                        <p className="text-[9px] md:text-[10px] font-bold uppercase text-slate-400 mb-1">{k.replace(/_/g, ' ')}</p>
+                        <DynamicValueRenderer value={v} labelKey={k} />
+                      </div>
+                    ))}
+                  </div>
 
-                  <div className="mt-4 flex items-center justify-end">
-                    <div className="w-7 h-7 rounded-xl bg-slate-50 group-hover:bg-emerald-50 flex items-center justify-center transition-colors">
-                      <svg className="w-3.5 h-3.5 text-slate-300 group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="mt-4 flex items-center justify-end shrink-0">
+                    <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-slate-50 border border-border-light group-hover:bg-emerald-solid group-hover:border-emerald-solid flex items-center justify-center transition-all duration-300 shadow-sm group-hover:shadow-md group-hover:-translate-y-0.5">
+                      <svg className="w-4 h-4 md:w-4 md:h-4 text-slate-400 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
                       </svg>
                     </div>
@@ -192,28 +186,27 @@ export default function GenericViewPage({ entityName, title, fields }) {
   const regularFields = mainFields.filter(f => f.type !== 'file' && f.cell_type !== 'image');
 
   return (
-    <div className="min-h-screen bg-[#f8f9fb] py-10 px-4 md:px-10">
+    <div className="min-h-screen bg-bg-surface py-10 px-4 md:px-10">
       <div className="max-w-6xl mx-auto space-y-8">
 
         {/* ===== Header ===== */}
-        <div className="flex justify-between items-center bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
-          <div className="flex items-center gap-5">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center shrink-0">
-              <div className="w-3 h-8 bg-emerald-500 rounded-full"></div>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-border-light transition-all hover:shadow-md">
+          <div className="flex items-center gap-4 md:gap-5">
+            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-emerald-tint flex items-center justify-center shrink-0 shadow-inner">
+              <div className="w-2.5 md:w-3 h-6 md:h-8 bg-emerald-solid rounded-full"></div>
             </div>
             <div>
-              {/* ✅ إزالة تكرار Details */}
-              <h2 className="text-3xl font-black text-slate-900 capitalize">{title}</h2>
-              <p className="text-slate-400 font-medium mt-1">
-                Record ID: <span className="text-emerald-600 font-black">#{id}</span>
+              <h2 className="text-2xl md:text-3xl font-bold text-carbon-black capitalize tracking-tight">{title}</h2>
+              <p className="text-slate-500 font-medium mt-1 text-sm md:text-base">
+                Record ID: <span className="text-emerald-solid font-black">#{id}</span>
               </p>
             </div>
           </div>
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-2xl transition-all active:scale-95"
+            className="flex items-center gap-2 px-5 py-2.5 md:px-6 md:py-3 bg-slate-50 hover:bg-emerald-tint text-carbon-gray hover:text-emerald-text font-bold rounded-2xl transition-all duration-300 active:scale-[0.98] border border-border-light hover:border-emerald-solid/20 shadow-sm"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
             </svg>
             Back
@@ -221,34 +214,34 @@ export default function GenericViewPage({ entityName, title, fields }) {
         </div>
 
         {/* ===== Main Details ===== */}
-        <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-          <div className="px-10 py-6 border-b border-slate-100 flex items-center gap-3">
-            <div className="w-2 h-6 bg-emerald-500 rounded-full"></div>
-            <h3 className="text-sm font-black uppercase tracking-widest text-slate-600">Main Details</h3>
+        <div className="bg-white rounded-[2.5rem] shadow-sm border border-border-light overflow-hidden transition-all hover:shadow-md">
+          <div className="px-6 md:px-10 py-5 md:py-6 border-b border-border-light flex items-center gap-3 bg-slate-50/50">
+            <div className="w-2 h-6 bg-emerald-solid rounded-full shadow-sm"></div>
+            <h3 className="text-xs md:text-sm font-bold uppercase tracking-widest text-heading-slate">Main Details</h3>
           </div>
 
-          <div className="p-10 space-y-10">
+          <div className="p-6 md:p-10 space-y-8 md:space-y-10">
             {/* الصور في الأعلى */}
             {imageFields.length > 0 && (
-              <div className="flex flex-wrap gap-8">
+              <div className="flex flex-wrap gap-6 md:gap-8">
                 {imageFields.map(field => (
                   <div key={field.key} className="space-y-3">
-                    <label className="block text-[11px] font-black uppercase text-slate-400 tracking-widest">{field.label}</label>
+                    <label className="block text-[10px] md:text-[11px] font-bold uppercase text-slate-500 tracking-widest">{field.label}</label>
                     {data[field.key] ? (
                       <div className="relative group w-fit">
                         <img
                           src={data[field.key]}
                           alt={field.label}
-                          className="w-36 h-36 rounded-3xl object-cover border-4 border-white shadow-lg group-hover:scale-105 transition-transform duration-300"
+                          className="w-32 h-32 md:w-36 md:h-36 rounded-3xl object-cover border-4 border-white shadow-md group-hover:shadow-xl group-hover:scale-[1.02] transition-all duration-300"
                         />
                         <a href={data[field.key]} target="_blank" rel="noreferrer"
-                          className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl text-white text-[10px] font-black uppercase">
-                          View
+                          className="absolute inset-0 flex items-center justify-center bg-carbon-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-3xl text-white text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
+                          View Image
                         </a>
                       </div>
                     ) : (
-                      <div className="w-36 h-36 rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center">
-                        <span className="text-slate-300 text-xs font-bold">No Image</span>
+                      <div className="w-32 h-32 md:w-36 md:h-36 rounded-3xl bg-slate-50 border-2 border-dashed border-border-thin flex items-center justify-center transition-colors hover:bg-slate-100">
+                        <span className="text-slate-400 text-xs font-bold">No Image</span>
                       </div>
                     )}
                   </div>
@@ -257,11 +250,11 @@ export default function GenericViewPage({ entityName, title, fields }) {
             )}
 
             {/* باقي الحقول */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {regularFields.map(field => (
-                <div key={field.key} className={field.type === 'textarea' ? 'md:col-span-3' : ''}>
-                  <label className="block text-[11px] font-black uppercase text-slate-400 mb-3 tracking-widest">{field.label}</label>
-                  <div className="bg-slate-50 rounded-2xl px-5 py-3 border border-slate-100 min-w-[100px] w-fit">
+                <div key={field.key} className={field.type === 'textarea' ? 'sm:col-span-2 lg:col-span-3' : ''}>
+                  <label className="block text-[10px] md:text-[11px] font-bold uppercase text-slate-500 mb-2 md:mb-3 tracking-widest">{field.label}</label>
+                  <div className="bg-slate-50 rounded-2xl px-4 py-3 md:px-5 md:py-3.5 border border-border-light min-w-[100px] w-full sm:w-fit transition-colors hover:bg-white hover:border-emerald-solid/20 shadow-sm hover:shadow">
                     <DynamicValueRenderer value={data[field.key]} labelKey={field.key} />
                   </div>
                 </div>
@@ -301,7 +294,7 @@ export default function GenericViewPage({ entityName, title, fields }) {
 
 // ================= Dynamic Value Renderer =================
 function DynamicValueRenderer({ value, labelKey }) {
-  if (value === null || value === undefined) return <span className="text-slate-300">N/A</span>;
+  if (value === null || value === undefined || value === "") return <span className="text-slate-400 font-medium italic">Not specified</span>;
 
   const stringValue = String(value);
   const keyName = labelKey ? labelKey.toLowerCase() : "";
@@ -309,9 +302,9 @@ function DynamicValueRenderer({ value, labelKey }) {
   if (isImageValue(value)) {
     return (
       <div className="relative group w-fit">
-        <img src={stringValue} alt="img" className="w-24 h-24 rounded-2xl object-cover border-2 border-white shadow hover:scale-105 transition-all duration-300" />
+        <img src={stringValue} alt="img" className="w-24 h-24 rounded-2xl object-cover border-2 border-border-light shadow-sm hover:scale-105 transition-all duration-300" />
         <a href={stringValue} target="_blank" rel="noreferrer"
-          className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl text-white text-[9px] font-black uppercase">
+          className="absolute inset-0 flex items-center justify-center bg-carbon-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl text-white text-[10px] font-bold uppercase tracking-widest backdrop-blur-[2px]">
           View
         </a>
       </div>
@@ -321,8 +314,8 @@ function DynamicValueRenderer({ value, labelKey }) {
   if (value === 0 || value === 1 || value === true || value === false) {
     const isActive = value == 1 || value === true;
     return (
-      <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase border ${
-        isActive ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-rose-100 text-rose-700 border-rose-200"
+      <span className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider border shadow-sm ${
+        isActive ? "bg-emerald-tint text-emerald-text border-emerald-solid/20" : "bg-rose-50 text-rose-700 border-rose-200"
       }`}>
         {isActive ? "Yes" : "No"}
       </span>
@@ -331,37 +324,37 @@ function DynamicValueRenderer({ value, labelKey }) {
 
   if (keyName.includes('status')) {
     const statusColors = {
-      pending: "bg-amber-100 text-amber-700 border-amber-200",
-      active: "bg-emerald-100 text-emerald-700 border-emerald-200",
-      confirmed: "bg-emerald-100 text-emerald-700 border-emerald-200",
-      canceled: "bg-rose-100 text-rose-700 border-rose-200",
-      expired: "bg-slate-100 text-slate-400 border-slate-200"
+      pending: "bg-amber-50 text-amber-700 border-amber-200",
+      active: "bg-emerald-tint text-emerald-text border-emerald-solid/20",
+      confirmed: "bg-emerald-tint text-emerald-text border-emerald-solid/20",
+      canceled: "bg-rose-50 text-rose-700 border-rose-200",
+      expired: "bg-slate-50 text-slate-500 border-slate-200"
     };
-    const colorClass = statusColors[stringValue.toLowerCase()] || "bg-blue-100 text-blue-700 border-blue-200";
+    const colorClass = statusColors[stringValue.toLowerCase()] || "bg-blue-50 text-blue-700 border-blue-200";
     return (
-      <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase border ${colorClass}`}>
+      <span className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider border shadow-sm ${colorClass}`}>
         {stringValue}
       </span>
     );
   }
 
   if (stringValue.length > 60) {
-    return <p className="text-slate-600 text-sm leading-relaxed max-w-xs">{stringValue}</p>;
+    return <p className="text-carbon-gray text-sm leading-relaxed max-w-full whitespace-pre-wrap">{stringValue}</p>;
   }
 
-  return <span className="text-slate-700 font-bold">{stringValue}</span>;
+  return <span className="text-carbon-black font-semibold text-base">{stringValue}</span>;
 }
 
 function LoadingSkeleton() {
   return (
-    <div className="min-h-screen bg-[#f8f9fb] py-10 px-4 md:px-10">
+    <div className="min-h-screen bg-bg-surface py-10 px-4 md:px-10">
       <div className="max-w-6xl mx-auto space-y-8 animate-pulse">
-        <div className="h-28 bg-white rounded-[2.5rem] border border-slate-100"></div>
-        <div className="h-64 bg-white rounded-[2.5rem] border border-slate-100"></div>
-        <div className="grid grid-cols-3 gap-5">
-          <div className="h-48 bg-white rounded-[2rem] border border-slate-100"></div>
-          <div className="h-48 bg-white rounded-[2rem] border border-slate-100"></div>
-          <div className="h-48 bg-white rounded-[2rem] border border-slate-100"></div>
+        <div className="h-28 bg-white rounded-[2.5rem] border border-border-light shadow-sm"></div>
+        <div className="h-64 bg-white rounded-[2.5rem] border border-border-light shadow-sm"></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="h-48 bg-white rounded-[2rem] border border-border-light shadow-sm"></div>
+          <div className="h-48 bg-white rounded-[2rem] border border-border-light shadow-sm"></div>
+          <div className="h-48 bg-white rounded-[2rem] border border-border-light shadow-sm"></div>
         </div>
       </div>
     </div>
@@ -370,14 +363,20 @@ function LoadingSkeleton() {
 
 function NotFound() {
   return (
-    <div className="min-h-screen bg-[#f8f9fb] flex items-center justify-center">
-      <div className="text-center space-y-4">
-        <div className="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center mx-auto">
-          <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+    <div className="min-h-screen bg-bg-surface flex items-center justify-center">
+      <div className="text-center space-y-5 bg-white p-12 rounded-[2.5rem] border border-border-light shadow-sm">
+        <div className="w-24 h-24 bg-rose-50 rounded-full flex items-center justify-center mx-auto shadow-inner">
+          <svg className="w-12 h-12 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </div>
-        <p className="text-xl font-black text-slate-400">Record not found.</p>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-carbon-black tracking-tight">Record Not Found</h2>
+          <p className="text-base font-medium text-slate-500">The item you are looking for doesn't exist or has been removed.</p>
+        </div>
+        <button onClick={() => window.history.back()} className="mt-4 px-6 py-3 bg-slate-50 hover:bg-slate-100 text-carbon-gray font-bold rounded-2xl transition-all border border-border-light shadow-sm">
+          Go Back
+        </button>
       </div>
     </div>
   );

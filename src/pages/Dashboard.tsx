@@ -191,33 +191,47 @@ const Dashboard: React.FC = () => {
               <AreaChart data={data?.chartData || []}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#DC143C" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#DC143C" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid
                   strokeDasharray="3 3"
                   vertical={false}
-                  stroke="#F1F5F9"
+                  stroke="#F2E6E6"
                 />
                 <XAxis
                   dataKey="name"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 11, fill: "#94A3B8" }}
+                  tick={{ fill: "#594A4A", fontSize: 12 }}
+                  dy={10}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 11, fill: "#94A3B8" }}
+                  tick={{ fill: "#594A4A", fontSize: 12 }}
+                  tickFormatter={(value) => `$${value}`}
+                  dx={-10}
                 />
-                <Tooltip />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#FFFFFF",
+                    borderRadius: "8px",
+                    border: "none",
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                  }}
+                  itemStyle={{ color: "#0F0505" }}
+                  cursor={{ stroke: "#F2E6E6", strokeWidth: 1, strokeDasharray: "4 4" }}
+                />
                 <Area
                   type="monotone"
                   dataKey="revenue"
-                  stroke="#10b981"
-                  strokeWidth={2}
+                  stroke="#B22222"
+                  strokeWidth={3}
+                  fillOpacity={1}
                   fill="url(#colorRevenue)"
+                  animationDuration={1000}
                 />
               </AreaChart>
             </ResponsiveContainer>

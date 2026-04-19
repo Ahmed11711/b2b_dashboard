@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { getAll } from "../../../service/services/apiService";
-  import MultiSelectField from "../../components/BaseComponents/MultiSelectField"
+import MultiSelectField from "../../components/BaseComponents/MultiSelectField";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 export default function FormFieldRendererLayout({ field, value, onChange, error, disabled }) {
   const [options, setOptions] = useState(Array.isArray(field?.options) ? field.options : []);
@@ -55,7 +57,7 @@ export default function FormFieldRendererLayout({ field, value, onChange, error,
   // ================= STYLES =================
 
  const baseInputStyle = `
-w-full h-14 px-5 rounded-2xl border
+w-full min-h-[56px] px-5 rounded-2xl border
 bg-card-bg/80 backdrop-blur-sm
 border-border-thin
 focus:border-emerald-solid focus:ring-4 focus:ring-emerald-solid/10
@@ -67,7 +69,7 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
 `;
   const labelStyle = `
   text-[11px] font-extrabold text-text-description
-  uppercase tracking-widest ml-1 mb-1
+  uppercase tracking-widest ml-1 mb-1.5
   `;
 
   // ================= INPUT RENDER =================
@@ -98,52 +100,63 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
               ))}
             </select>
 
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-text-description group-focus-within:text-emerald-solid transition">
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-description group-focus-within:text-emerald-solid transition">
               ▼
             </div>
           </div>
         );
 
-      // ================= TEXTAREA & SMART DESCRIPTION =================
+      // ================= TEXTAREA / RICH TEXT =================
       case "textarea":
       case "text":
-        // لو الحقل وصف (Description) حتى لو نوعه text، هنخليه textarea وياخد صف لوحده
         if (isFullWidth) {
+          const modules = {
+            toolbar: [
+              [{ 'header': [1, 2, 3, false] }],
+              ['bold', 'italic', 'underline', 'strike'],
+              [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+              [{ 'align': [] }],
+              ['link'],
+              ['clean']
+            ],
+          };
+
           return (
-            <textarea
-              name={field.key}
-              value={displayValue}
-              disabled={disabled}
-              placeholder={field.placeholder}
-              onChange={(e) => onChange(field.key, e.target.value)}
-              className={`${baseInputStyle} h-32 py-4 resize-none`}
-            />
+            <div className="bg-white rounded-2xl border border-border-light overflow-hidden transition-all duration-300 hover:shadow-md focus-within:border-emerald-solid focus-within:ring-4 focus-within:ring-emerald-solid/10">
+              <ReactQuill
+                theme="snow"
+                value={displayValue}
+                onChange={(content) => onChange(field.key, content)}
+                readOnly={disabled}
+                modules={modules}
+                placeholder={field.placeholder || `Enter ${field.label}...`}
+                className="quill-editor"
+              />
+            </div>
           );
         }
          break;
 
       // ================= CHECKBOX =================
-     case "checkbox":
-case "boolean":
-  return (
-    <div className={`flex items-center justify-between px-5 h-14 rounded-2xl border transition-all
-      ${value ? "bg-emerald-tint border-border-thin" : "bg-white border-slate-200"} shadow-sm`}
-    >
-      <span className="font-semibold text-slate-600">
-        {value ? "Active" : "Inactive"}
-      </span>
-      <div className="relative" onClick={() => onChange(field.key, value ? 0 : 1)}>
-        {/* Track */}
-        <div className={`w-12 h-6 rounded-full transition-colors duration-300 cursor-pointer
-          ${value ? "bg-emerald-500" : "bg-slate-200"}`}
-        />
-        {/* Thumb */}
-        <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all duration-300
-          ${value ? "left-7" : "left-1"}`}
-        />
-      </div>
-    </div>
-  );
+      case "checkbox":
+      case "boolean":
+        return (
+          <div className="flex items-center justify-between p-4 md:p-5 bg-slate-50 rounded-2xl border border-border-light hover:border-emerald-solid/20 transition-all duration-300 shadow-sm hover:shadow">
+            <div className="flex flex-col">
+              <span className="text-xs md:text-sm font-bold tracking-tight text-carbon-black capitalize">{field.label}</span>
+              <span className={`text-[10px] md:text-xs font-bold uppercase mt-1 tracking-widest ${value ? "text-emerald-solid" : "text-slate-400"}`}>
+                {value ? "Enabled / Active" : "Disabled / Inactive"}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => !disabled && onChange(field.key, value ? 0 : 1)}
+              className={`relative inline-flex h-8 w-14 md:h-9 md:w-16 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-emerald-solid/20 shadow-inner ${value ? "bg-emerald-solid" : "bg-slate-300"}`}
+            >
+              <span className={`inline-block h-6 w-6 md:h-7 md:w-7 transform rounded-full bg-white shadow-sm transition-transform duration-300 ${value ? "translate-x-7 md:translate-x-8" : "translate-x-1"}`} />
+            </button>
+          </div>
+        );
       // ================= FILE =================
       case "file":
         return (
@@ -214,15 +227,17 @@ case "multi-select":
 
   return (
     // 👇 استخدام isFullWidth عشان يفرش الحقل في الـ Grid لو هو وصف
-    <div className={`flex flex-col gap-1.5 animate-in fade-in slide-in-from-bottom-1 duration-300 ${isFullWidth ? "md:col-span-2" : ""}`}>
-      <label className={labelStyle}>
-        {field.label}
-        {field.required ? (
-          <span className="text-red-400 text-lg ml-1">*</span>
-        ) : (
-          <span className="text-slate-300 normal-case font-medium ml-2">(Optional)</span>
-        )}
-      </label>
+    <div className={`flex flex-col gap-1.5 animate-in fade-in slide-in-from-bottom-1 duration-500 ${isFullWidth ? "md:col-span-2" : ""} ${field.type === 'multi-select' ? 'relative z-10 focus-within:z-20' : ''}`}>
+      {field.type !== "checkbox" && field.type !== "boolean" && field.type !== "multi-select" && (
+        <label className={labelStyle}>
+          {field.label}
+          {field.required ? (
+            <span className="text-red-400 text-lg ml-1">*</span>
+          ) : (
+            <span className="text-slate-400 normal-case font-medium ml-2">(Optional)</span>
+          )}
+        </label>
+      )}
 
       {renderInput()}
 

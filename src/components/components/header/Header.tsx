@@ -59,7 +59,7 @@ const Header: React.FC<HeaderProps> = ({ onClick, onToggle }) => {
           </button>
           <button
             onClick={onClick}
-            className="items-center justify-center hidden w-10 h-10 text-gray-500 border-gray-200 rounded-lg z-99999 dark:border-gray-800 lg:flex dark:text-gray-400 lg:h-11 lg:w-11 lg:border"
+            className="items-center justify-center hidden w-11 h-11 text-gray-500 border-gray-200 rounded-lg z-99999 dark:border-gray-800 lg:flex dark:text-gray-400 lg:h-12 lg:w-12 lg:border transition-all hover:bg-gray-50 hover:text-brand-600 active:scale-[0.98]"
           >
             <svg
               className="hidden fill-current lg:block"
@@ -93,7 +93,7 @@ const Header: React.FC<HeaderProps> = ({ onClick, onToggle }) => {
 
           <button
             onClick={toggleApplicationMenu}
-            className="flex items-center justify-center w-10 h-10 text-gray-700 rounded-lg z-99999 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 lg:hidden"
+            className="flex items-center justify-center w-11 h-11 text-gray-700 rounded-lg z-99999 hover:bg-brand-50 hover:text-brand-600 dark:text-gray-400 dark:hover:bg-gray-800 lg:hidden transition-all active:scale-[0.98]"
           >
             <svg
               width="24"

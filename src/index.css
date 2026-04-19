@@ -2,36 +2,55 @@
 @import "tailwindcss";
 
 /* =========================
-   THEME TOKENS (BLUE THEME)
+   THEME TOKENS (ROYAL RED THEME)
 ========================= */
  
 @theme {
   /* Fonts */
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
-  /* PRIMARY (Beige / Warm) */
-  --color-emerald-solid: #D6A85A;   /* warm gold/beige accent */
-  --color-emerald-tint: #FAF3E7;    /* light beige background */
-  --color-emerald-text: #8A6A2F;    /* dark beige text */
+  /* PRIMARY (Royal Red) */
+  --color-royal-dark: #8B0000;      /* Dark Red */
+  --color-royal-base: #B22222;      /* Fire Brick */
+  --color-royal-light: #DC143C;     /* Crimson */
+  --color-royal-tint: #FFF0F2;      /* Light Red Background */
+  --color-royal-text: #8B0000;      /* Dark Red Text */
+
+  /* Brand Colors */
+  --color-brand-50: #FFF0F2;
+  --color-brand-100: #FFE1E6;
+  --color-brand-200: #FFC4CD;
+  --color-brand-300: #FFA3B1;
+  --color-brand-400: #FF7D91;
+  --color-brand-500: #DC143C; /* Crimson */
+  --color-brand-600: #B22222; /* Fire Brick */
+  --color-brand-700: #99161D;
+  --color-brand-800: #8B0000; /* Dark Red */
+  --color-brand-900: #6B0000;
+
+  /* Legacy variable mappings (for compatibility) */
+  --color-emerald-solid: #B22222;   /* Mapped to Fire Brick */
+  --color-emerald-tint: #FFF0F2;    /* Mapped to Light Red */
+  --color-emerald-text: #8B0000;    /* Mapped to Dark Red */
 
   /* Optional accents */
-  --color-primary-deep: #C89B3C;
-  --color-primary-soft: #E6C98A;
+  --color-primary-deep: #8B0000;
+  --color-primary-soft: #DC143C;
 
   /* Surfaces */
-  --color-bg-surface: #F9F7F3;
+  --color-bg-surface: #FCFAFA;
   --color-card-bg: #FFFFFF;
 
   /* Text */
-  --color-heading-slate: #1C1C1C;
-  --color-text-description: #6B6B6B;
-  --color-carbon-black: #111111;
-  --color-carbon-gray: #4B4B4B;
-  --color-secondary-link: #6B6B6B;
+  --color-heading-slate: #1A0F0F;
+  --color-text-description: #594A4A;
+  --color-carbon-black: #0F0505;
+  --color-carbon-gray: #403333;
+  --color-secondary-link: #594A4A;
 
   /* Borders */
-  --color-border-light: #F1EDE6;
-  --color-border-thin: #E5DED3;
+  --color-border-light: #F2E6E6;
+  --color-border-thin: #E6D5D5;
 
   /* Status (تفضل تبقى واضحة ومش مرتبطة بالـ theme) */
   --color-status-success-bg: #DCFCE7;
@@ -75,27 +94,36 @@
 
 /* Base body */
 body {
-  @apply font-sans antialiased text-text-description bg-bg-surface;
+  @apply font-sans antialiased text-text-description bg-bg-surface transition-colors duration-300;
 }
 
 /* Headings */
 @layer base {
-  h1 { @apply font-semibold text-carbon-black tracking-tight; }
-  h2, h3, h4 { @apply font-semibold text-heading-slate tracking-tight; }
+  h1 { @apply font-bold text-carbon-black tracking-tight text-3xl md:text-4xl lg:text-5xl; }
+  h2 { @apply font-semibold text-heading-slate tracking-tight text-2xl md:text-3xl; }
+  h3 { @apply font-medium text-heading-slate tracking-tight text-xl md:text-2xl; }
+  h4 { @apply font-medium text-heading-slate tracking-tight text-lg md:text-xl; }
 
   th {
-    @apply font-bold text-carbon-black tracking-wider uppercase text-[12px];
+    @apply font-bold text-carbon-black tracking-wider uppercase text-[12px] py-3 px-4;
   }
 }
+
+/* =========================
+   SPACING & GRID (8px)
+========================= */
+.spacing-section { @apply py-8 md:py-16; }
+.spacing-container { @apply gap-4 md:gap-8; }
+.spacing-element { @apply p-4 md:p-6; }
 
 /* =========================
    BUTTONS
 ========================= */
 
 .btn-emerald {
-  @apply bg-emerald-solid text-white transition-all duration-200 
-         hover:brightness-110 active:scale-95 shadow-sm 
-         disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply bg-emerald-solid text-white transition-all duration-300 
+         hover:brightness-110 hover:shadow-lg active:scale-[0.98] shadow-md 
+         disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] md:min-h-[40px] px-4 py-2 rounded-lg;
 }
 
 .btn-outline-gray {
@@ -105,8 +133,31 @@ body {
 }
 
 /* =========================
-   ACTION ICONS
+   REACT QUILL OVERRIDES
 ========================= */
+.quill-editor .ql-container.ql-snow {
+  border: none !important;
+  font-family: var(--font-sans) !important;
+  min-height: 150px;
+}
+.quill-editor .ql-toolbar.ql-snow {
+  border: none !important;
+  border-bottom: 1px solid var(--color-border-light) !important;
+  background-color: var(--color-bg-surface);
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  font-family: var(--font-sans) !important;
+}
+.quill-editor .ql-editor {
+  min-height: 150px;
+  font-size: 14px;
+  color: var(--color-carbon-gray);
+  padding: 1rem;
+}
+.quill-editor .ql-editor.ql-blank::before {
+  font-style: normal;
+  color: var(--color-text-description);
+}
 
 .btn-action-icon {
   @apply p-2 rounded-lg border border-border-thin text-secondary-link transition-all 

@@ -49,7 +49,7 @@ useEffect(() => {
   return (
     // التحكم في المساحة: max-w-4xl يخلي الفورم في النص بشكل احترافي
   <div className="max-w-4xl mx-auto py-8 px-4">
-  <form onSubmit={handleSubmit} className="space-y-10">
+  <form onSubmit={handleSubmit} className="space-y-10 animate-in fade-in duration-500">
     {title && (
       <div className="mb-10">
         <h2 className="text-4xl font-black text-carbon-black tracking-tight">
@@ -75,23 +75,24 @@ useEffect(() => {
         </div>
 
         {/* زرار الأكشن */}
-      <div className="flex justify-end pt-10 border-t border-border-light mt-12">
-  <button
-    type="submit"
-    disabled={loading}
-    className="
-      w-full md:w-auto px-16 py-5 
-      bg-emerald-solid text-white 
-      rounded-[2rem] font-black text-xl 
-      shadow-lg 
-      hover:bg-primary-deep hover:-translate-y-1 
-      transition-all active:scale-95 
-      disabled:opacity-50
-    "
-  >
-    {loading ? "Saving Changes..." : mode === "edit" ? "Update Record" : "Create Record"}
-  </button>
-</div>
+      <div className="flex justify-end pt-10 border-t border-border-light mt-12 gap-4">
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn-emerald min-w-[160px] relative overflow-hidden"
+        >
+          {loading ? (
+            <span className="flex items-center justify-center gap-2">
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              Processing...
+            </span>
+          ) : (
+            <span className="flex items-center justify-center gap-2 font-bold tracking-wide">
+              {mode === "edit" ? "Save Changes" : "Create Record"}
+            </span>
+          )}
+        </button>
+      </div>
       </form>
     </div>
   );
