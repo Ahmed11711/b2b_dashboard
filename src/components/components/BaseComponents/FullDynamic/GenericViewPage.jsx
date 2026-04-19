@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getOne } from "../../../../service/services/apiService";
 
+// دالة لجلب القيم المتداخلة
 const getValueByPath = (obj, path) => {
   if (!path || !obj) return null;
   return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : null), obj);
@@ -147,8 +148,7 @@ export default function GenericViewPage({ entityName, title, fields }) {
   if (loading) return <LoadingSkeleton />;
   if (!data) return <NotFound />;
 
-  const mainFields = fields.filter(f => f.cell_type !== 'relation_list' && f.cell_type !== 'relation');
-  const relationListFields = fields.filter(f => f.cell_type === 'relation_list');
+  const mainFields = fields.filter(f => f.cell_type !== 'relation');
 
   // Identify fields
   const imageFields = mainFields.filter(f => f.type === 'file' || f.cell_type === 'image');
@@ -267,32 +267,35 @@ export default function GenericViewPage({ entityName, title, fields }) {
             navigateTo={relField.navigate_to || null}
           />
         ))}
-
-        {/* ===== Auto-detect Relations ===== */}
-        {Object.entries(data).map(([key, val]) => {
-          if (!Array.isArray(val) || val.length === 0) return null;
-          if (relationListFields.find(f => f.key === key)) return null;
-          return (
-            <RelationSection
-              key={key}
-              label={key.replace(/_/g, ' ')}
-              items={val}
-              navigateTo={null}
-            />
-          );
-        })}
-
       </div>
     </div>
   );
 }
 
-// ================= Dynamic Value Renderer =================
+// ================= Value Renderer Components =================
+
+function ValueRenderer({ field, value }) {
+    if (value === null || value === undefined) return <span className="text-slate-300">N/A</span>;
+    if (field.type === 'file' || field.type === 'image') {
+        return <img src={value} alt="main" className="w-32 h-32 rounded-3xl object-cover border-4 border-white shadow-md" />;
+    }
+    return <span className="text-slate-700 font-bold">{String(value)}</span>;
+}
+
+// --- تم إصلاح الدالة هنا باستقبال labelKey ---
 function DynamicValueRenderer({ value, labelKey }) {
   if (value === null || value === undefined || value === "") return <span className="text-secondary-link font-medium italic">-</span>;
 
-  const stringValue = String(value);
-  const keyName = labelKey ? labelKey.toLowerCase() : "";
+    // 1. التخمين الذكي للصور
+    const isImageUrl = stringValue.match(/\.(jpeg|jpg|gif|png|webp|svg)$|unsplash\.com/i);
+    if (stringValue.startsWith('http') && isImageUrl) {
+        return (
+            <div className="relative group">
+                <img src={stringValue} alt="rel" className="w-24 h-24 rounded-2xl object-cover border-2 border-white shadow hover:scale-105 transition-all duration-300" />
+                <a href={stringValue} target="_blank" rel="noreferrer" className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl text-white text-[9px] font-black uppercase">View</a>
+            </div>
+        );
+    }
 
   if (isImageValue(value)) {
     return (
