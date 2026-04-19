@@ -1,12 +1,11 @@
 // src/services/apiService.js
 import axios from "axios";
 
-const BASE_URL = "http://127.0.0.1:8000/api/admin/v1/";
+const BASE_URL = "https://b2bpartnership.com/api/api/admin/v1/";
 
 const api = axios.create({
   baseURL: BASE_URL,
-  // ❌ لا تضع Content-Type هنا بشكل ثابت إذا كنت سترسل ملفات
-});
+ });
 
 // 🟢 Get All
 export const getAll = async (endpoint, params = {}) => {
@@ -22,12 +21,9 @@ export const getOne = async (endpoint, id) => {
 
 // 🟡 Create
 export const createItem = async (endpoint, data) => {
-  // ✅ نستخدم api (الـ instance الذي عرفناه فوق) وليس axiosInstance
-  const response = await api.post(`/${endpoint}`, data, {
+   const response = await api.post(`/${endpoint}`, data, {
     headers: {
-      // ✅ عندما نرسل FormData، يفضل ترك Axios يحدد الـ Content-Type والـ Boundary تلقائياً
-      // أو نكتبها صراحة إذا كان الباك اند يتطلب ذلك:
-      'Content-Type': data instanceof FormData ? 'multipart/form-data' : 'application/json',
+       'Content-Type': data instanceof FormData ? 'multipart/form-data' : 'application/json',
     },
   });
   return response.data;
@@ -38,7 +34,6 @@ export const updateItem = async (endpoint, id, data) => {
   const isFormData = data instanceof FormData;
 
   if (isFormData) {
-    // لارايفل بتحب الـ _method يكون داخل الـ Body مع الملفات
     if (!data.has('_method')) {
       data.append('_method', 'PUT');
     }
@@ -49,7 +44,6 @@ export const updateItem = async (endpoint, id, data) => {
     return response.data.data || response.data;
   }
 
-  // لو JSON عادي، استخدم PUT مباشرة (أنضف وأسرع)
   const response = await api.put(`/${endpoint}/${id}`, data);
   return response.data.data || response.data;
 };
