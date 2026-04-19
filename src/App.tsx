@@ -18,6 +18,7 @@ import {PackagesFields} from "./schemas/PackagesSchema"
 import {BagFields} from "./schemas/BagSchema"
 import BagPage from "./pages/Bag/BagPage";
 import Bags_categoriesPage from "./pages/bags_categories/Bags_categoriesPage";
+import {BagsCategoryFields} from "./schemas/bags_categoriesSchema"
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
    
@@ -190,6 +191,28 @@ export default function App() {
     </ProtectedRoute>
   }
 />
+ <Route
+          path="/bags_categories/edit/:id"
+          element={
+            <GenericFormPage
+              endpoint="bags_categories"  
+              fields={BagsCategoryFields}  
+              mode="edit"  
+              title="Edit Advertisement"
+            />
+          }
+        />
+ 
+        <Route
+          path="/bags_categories/view/:id"
+          element={
+            <GenericViewPage
+              entityName="bags_categories"
+              title="packages Details"
+              fields={BagsCategoryFields}
+            />
+          }
+        />
 
 {/* AUTO ROUTES START */}
         {/* AUTO ROUTES END */}

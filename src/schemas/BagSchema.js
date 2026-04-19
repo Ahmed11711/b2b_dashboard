@@ -78,6 +78,17 @@ export const BagFields = [
     form_show: true,
     options: [{ label: 'Active', value: 1, color: 'success' }, { label: 'Inactive', value: 0, color: 'danger' }]
   },
+  {
+  key: "bagCategory",
+  label: "Bag Categories", 
+  cell_type: "relation_list",
+  relation_columns: ["title", "image"],
+  navigate_to: "/bags_categories/view/:id", 
+  // أو
+  navigate_to: null,
+  table_show: false,
+  form_show: false,
+},
   { 
     key: "created_at", 
     label: "Created At", 
