@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { getAll } from "../../../service/services/apiService";
-  import MultiSelectField from "../../components/BaseComponents/MultiSelectField"
+import MultiSelectField from "../../components/BaseComponents/MultiSelectField";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 export default function FormFieldRendererLayout({ field, value, onChange, error, disabled }) {
   const [options, setOptions] = useState(Array.isArray(field?.options) ? field.options : []);
@@ -46,6 +48,7 @@ export default function FormFieldRendererLayout({ field, value, onChange, error,
   // 👇 الجزء المضاف: تحديد العرض الكامل بناءً على الـ key أو الـ type
   const isFullWidth = 
     field.type === "textarea" || 
+    field.type === "rich-text" ||
     field.key?.toLowerCase().includes("description") || 
     field.key?.toLowerCase().includes("desc");
 
@@ -53,6 +56,15 @@ export default function FormFieldRendererLayout({ field, value, onChange, error,
   const displayValue = (value === null || value === undefined) ? "" : value;
 
   // ================= STYLES =================
+
+  // 👇 الجزء المضاف: الكشف عن اللغة العربية
+  const isArabic = useMemo(() => {
+    return field.is_arabic || 
+           field.key?.toLowerCase().includes("arabic") || 
+           field.label?.toLowerCase().includes("arabic") ||
+           field.placeholder?.includes("عربي") ||
+           field.label?.includes("عربي");
+  }, [field]);
 
  const baseInputStyle = `
 w-full h-14 px-5 rounded-2xl border
@@ -63,11 +75,13 @@ outline-none font-semibold text-carbon-gray
 placeholder:text-text-description
 transition-all duration-300
 shadow-sm hover:shadow-md
+${isArabic ? "text-right" : "text-left"}
 ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
 `;
   const labelStyle = `
   text-[11px] font-extrabold text-text-description
   uppercase tracking-widest ml-1 mb-1
+  ${isArabic ? "text-right mr-1" : "text-left ml-1"}
   `;
 
   // ================= INPUT RENDER =================
@@ -108,12 +122,13 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
       case "textarea":
       case "text":
         // لو الحقل وصف (Description) حتى لو نوعه text، هنخليه textarea وياخد صف لوحده
-        if (isFullWidth) {
+        if (isFullWidth || field.type === "textarea") {
           return (
             <textarea
               name={field.key}
               value={displayValue}
               disabled={disabled}
+              dir={isArabic ? "rtl" : "ltr"}
               placeholder={field.placeholder}
               onChange={(e) => onChange(field.key, e.target.value)}
               className={`${baseInputStyle} h-32 py-4 resize-none`}
@@ -122,28 +137,67 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
         }
          break;
 
+      // ================= RICH TEXT (QUILL) =================
+      case "rich-text":
+        return (
+          <div className={`quill-wrapper ${isArabic ? 'rtl' : ''}`}>
+            <ReactQuill
+              theme="snow"
+              value={displayValue}
+              onChange={(val) => onChange(field.key, val)}
+              placeholder={field.placeholder || `Enter ${field.label}...`}
+              className={`bg-white rounded-2xl overflow-hidden border border-border-thin focus-within:border-emerald-solid transition-all ${isArabic ? 'text-right' : 'text-left'}`}
+              modules={{
+                toolbar: [
+                  [{ 'header': [1, 2, 3, false] }],
+                  ['bold', 'italic', 'underline', 'strike'],
+                  [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                  [{ 'direction': 'rtl' }, { 'align': [] }],
+                  ['link', 'clean']
+                ],
+              }}
+            />
+            <style>{`
+              .quill-wrapper.rtl .ql-editor {
+                text-align: right;
+                direction: rtl;
+              }
+              .quill-wrapper .ql-container {
+                border-bottom-left-radius: 1rem;
+                border-bottom-right-radius: 1rem;
+                min-height: 200px;
+              }
+              .quill-wrapper .ql-toolbar {
+                border-top-left-radius: 1rem;
+                border-top-right-radius: 1rem;
+                background: #f8fafc;
+              }
+            `}</style>
+          </div>
+        );
+
       // ================= CHECKBOX =================
-     case "checkbox":
-case "boolean":
-  return (
-    <div className={`flex items-center justify-between px-5 h-14 rounded-2xl border transition-all
-      ${value ? "bg-emerald-tint border-border-thin" : "bg-white border-slate-200"} shadow-sm`}
-    >
-      <span className="font-semibold text-slate-600">
-        {value ? "Active" : "Inactive"}
-      </span>
-      <div className="relative" onClick={() => onChange(field.key, value ? 0 : 1)}>
-        {/* Track */}
-        <div className={`w-12 h-6 rounded-full transition-colors duration-300 cursor-pointer
-          ${value ? "bg-emerald-500" : "bg-slate-200"}`}
-        />
-        {/* Thumb */}
-        <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all duration-300
-          ${value ? "left-7" : "left-1"}`}
-        />
-      </div>
-    </div>
-  );
+      case "checkbox":
+      case "boolean":
+        return (
+          <div className={`flex items-center justify-between px-5 h-14 rounded-2xl border transition-all
+            ${value ? "bg-emerald-tint border-border-thin" : "bg-white border-slate-200"} shadow-sm ${isArabic ? 'flex-row-reverse' : ''}`}
+          >
+            <span className="font-semibold text-slate-600">
+              {value ? "Active" : "Inactive"}
+            </span>
+            <div className="relative" onClick={() => onChange(field.key, value ? 0 : 1)}>
+              {/* Track */}
+              <div className={`w-12 h-6 rounded-full transition-colors duration-300 cursor-pointer
+                ${value ? "bg-emerald-500" : "bg-slate-200"}`}
+              />
+              {/* Thumb */}
+              <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all duration-300
+                ${value ? "left-7" : "left-1"}`}
+              />
+            </div>
+          </div>
+        );
       // ================= FILE =================
       case "file":
         return (
@@ -201,11 +255,12 @@ case "multi-select":
           value={displayValue}
           placeholder={field.placeholder}
           disabled={disabled}
+          dir={isArabic ? "rtl" : "ltr"}
           onChange={(e) => onChange(field.key, e.target.value)}
-          className={`${baseInputStyle} pl-12`}
+          className={`${baseInputStyle} ${isArabic ? 'pr-12' : 'pl-12'}`}
         />
 
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-description group-focus-within:text-emerald-solid transition">
+        <div className={`absolute ${isArabic ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-text-description group-focus-within:text-emerald-solid transition`}>
   ✎
 </div>
       </div>

@@ -262,7 +262,7 @@ export default function GenericViewPage({ entityName, title, fields }) {
                 <div key={field.key} className={field.type === 'textarea' ? 'md:col-span-3' : ''}>
                   <label className="block text-[11px] font-black uppercase text-slate-400 mb-3 tracking-widest">{field.label}</label>
                   <div className="bg-slate-50 rounded-2xl px-5 py-3 border border-slate-100 min-w-[100px] w-fit">
-                    <DynamicValueRenderer value={data[field.key]} labelKey={field.key} />
+                    <DynamicValueRenderer value={data[field.key]} field={field} />
                   </div>
                 </div>
               ))}
@@ -300,11 +300,23 @@ export default function GenericViewPage({ entityName, title, fields }) {
 }
 
 // ================= Dynamic Value Renderer =================
-function DynamicValueRenderer({ value, labelKey }) {
+function DynamicValueRenderer({ value, field }) {
   if (value === null || value === undefined) return <span className="text-slate-300">N/A</span>;
 
   const stringValue = String(value);
-  const keyName = labelKey ? labelKey.toLowerCase() : "";
+  const keyName = field?.key ? field.key.toLowerCase() : "";
+  const type = field?.type || "";
+
+  if (type === "rich-text") {
+    const isAr = value && /[\u0600-\u06FF]/.test(value);
+    return (
+      <div 
+        className={`text-slate-700 leading-relaxed prose prose-slate max-w-none ${isAr ? "text-right" : ""}`}
+        dir={isAr ? "rtl" : "ltr"}
+        dangerouslySetInnerHTML={{ __html: value }}
+      />
+    );
+  }
 
   if (isImageValue(value)) {
     return (

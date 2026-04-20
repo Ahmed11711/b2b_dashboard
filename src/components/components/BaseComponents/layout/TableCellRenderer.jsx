@@ -125,7 +125,18 @@ export default function TableCellRenderer({ cell_type, value, options, onImageCl
         </span>
       );
 
-    // 7. الحالة الافتراضية (Default Text) مع خاصية النسخ الذكي
+    // 7. Rich Text (HTML Content)
+    case "rich-text":
+      const isAr = value && /[\u0600-\u06FF]/.test(value);
+      return (
+        <div 
+          className={`text-gray-600 text-sm font-medium truncate max-w-[250px] block ${isAr ? "text-right" : ""}`}
+          dir={isAr ? "rtl" : "ltr"}
+          dangerouslySetInnerHTML={{ __html: value }}
+        />
+      );
+
+    // 8. الحالة الافتراضية (Default Text) مع خاصية النسخ الذكي
     case "text":
     default:
       return (
