@@ -2,16 +2,23 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getOne } from "../../../../service/services/apiService";
 
-// دالة لجلب القيم المتداخلة
 const getValueByPath = (obj, path) => {
   if (!path || !obj) return null;
   return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : null), obj);
 };
 
 const isImageValue = (val) => {
-    const s = String(val ?? '');
+  const s = String(val ?? '');
   return (s.startsWith('http') || s.startsWith('/storage') || s.startsWith('data:image')) &&
     (s.match(/\.(jpeg|jpg|gif|png|webp|svg)/i) || s.startsWith('data:image'));
+};
+
+// ✅ Helper لتحويل أي قيمة لـ array
+const toArray = (val) => {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  if (typeof val === 'object') return [val];
+  return [];
 };
 
 // ================= Relation Modal =================
@@ -70,7 +77,6 @@ function RelationSection({ label, items, navigateTo }) {
     else setModalItem(item);
   };
 
-  // Get keys for table headers (exclude objects and images if possible)
   const allKeys = items.reduce((keys, item) => {
     Object.keys(item).forEach(k => {
       if (!keys.includes(k) && typeof item[k] !== 'object' && !isImageValue(item[k])) {
@@ -79,8 +85,7 @@ function RelationSection({ label, items, navigateTo }) {
     });
     return keys;
   }, []);
-  
-  // limit to 4-5 columns for display
+
   const displayKeys = allKeys.slice(0, 4);
 
   return (
@@ -102,8 +107,8 @@ function RelationSection({ label, items, navigateTo }) {
             </thead>
             <tbody>
               {items.map((item, idx) => (
-                <tr 
-                  key={item.id || idx} 
+                <tr
+                  key={item.id || idx}
                   onClick={() => handleRowClick(item)}
                   className="hover:bg-emerald-tint/50 cursor-pointer transition-colors border-b border-border-light last:border-0"
                 >
@@ -118,7 +123,6 @@ function RelationSection({ label, items, navigateTo }) {
           </table>
         </div>
       </div>
-
       <RelationModal isOpen={!!modalItem} onClose={() => setModalItem(null)} item={modalItem} label={label} />
     </>
   );
@@ -148,17 +152,24 @@ export default function GenericViewPage({ entityName, title, fields }) {
   if (loading) return <LoadingSkeleton />;
   if (!data) return <NotFound />;
 
-  const mainFields = fields.filter(f => f.cell_type !== 'relation');
+const mainFields = fields.filter(f => 
+  f.cell_type !== 'relation' && f.cell_type !== 'relation_list'
+);
 
-  // Identify fields
+const relationListFields = fields.filter(f => 
+  f.cell_type === 'relation' || f.cell_type === 'relation_list'
+);
   const imageFields = mainFields.filter(f => f.type === 'file' || f.cell_type === 'image');
   const numericFields = mainFields.filter(f => f.type === 'number' || typeof data[f.key] === 'number');
   const statusFields = mainFields.filter(f => f.key.toLowerCase().includes('status') || typeof data[f.key] === 'boolean');
-  
-  // The rest
-  const otherFields = mainFields.filter(f => !imageFields.includes(f) && !numericFields.includes(f) && !statusFields.includes(f) && f.key !== 'title' && f.key !== 'name');
-
-  // Find title/name
+const otherFields = mainFields.filter(f =>
+  !imageFields.includes(f) &&
+  !numericFields.includes(f) &&
+  !statusFields.includes(f) &&
+  f.key !== 'title' &&
+  f.key !== 'name' &&
+  typeof data[f.key] !== 'object'  
+);
   const titleVal = data.title || data.name || data.label || title || `Item #${id}`;
   const firstImage = imageFields.length > 0 ? data[imageFields[0].key] : null;
   const mainStatusField = statusFields.length > 0 ? statusFields[0] : null;
@@ -167,7 +178,7 @@ export default function GenericViewPage({ entityName, title, fields }) {
     <div className="min-h-screen bg-bg-surface py-8 px-4 md:px-8">
       <div className="max-w-6xl mx-auto space-y-6">
 
-        {/* ===== Header ===== */}
+        {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => navigate(-1)}
@@ -180,14 +191,12 @@ export default function GenericViewPage({ entityName, title, fields }) {
           <h2 className="text-2xl font-bold text-heading-slate">Details</h2>
         </div>
 
-        {/* ===== Basic Information Card ===== */}
+        {/* Basic Information Card */}
         <div className="bg-card-bg rounded-2xl shadow-sm border border-border-light overflow-hidden">
           <div className="px-6 py-5 border-b border-border-light">
             <h3 className="text-lg font-bold text-heading-slate">Basic Information</h3>
           </div>
-          
           <div className="p-6 md:p-8 space-y-8">
-            {/* Top section: Image, Title, Badges */}
             <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
               <div className="flex items-center gap-5">
                 {imageFields.length > 0 && (
@@ -211,7 +220,6 @@ export default function GenericViewPage({ entityName, title, fields }) {
                   </div>
                 </div>
               </div>
-              
               {mainStatusField && data[mainStatusField.key] !== undefined && (
                 <div className="shrink-0">
                   <DynamicValueRenderer value={data[mainStatusField.key]} labelKey={mainStatusField.key} />
@@ -219,7 +227,6 @@ export default function GenericViewPage({ entityName, title, fields }) {
               )}
             </div>
 
-            {/* Middle section: Summary cards (Numeric) */}
             {numericFields.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {numericFields.map(field => (
@@ -228,7 +235,6 @@ export default function GenericViewPage({ entityName, title, fields }) {
                       <p className="text-xs font-bold uppercase text-secondary-link mb-1">{field.label}</p>
                       <h5 className="text-xl font-bold text-heading-slate">{data[field.key] || 0}</h5>
                     </div>
-                    {/* Placeholder for chart/icon */}
                     <div className="w-12 h-12 rounded-full border-4 border-emerald-tint flex items-center justify-center bg-card-bg">
                       <span className="text-emerald-solid font-bold text-sm">{String(data[field.key] || 0).slice(0, 3)}</span>
                     </div>
@@ -237,7 +243,6 @@ export default function GenericViewPage({ entityName, title, fields }) {
               </div>
             )}
 
-            {/* Bottom section: Other fields row */}
             {otherFields.length > 2 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-6 border-t border-border-light">
                 {otherFields.slice(2).map(field => (
@@ -258,12 +263,12 @@ export default function GenericViewPage({ entityName, title, fields }) {
           </div>
         </div>
 
-        {/* ===== Relation List ===== */}
+        {/* ✅ Relation List - مع toArray لحل مشكلة object vs array */}
         {relationListFields.map((relField, idx) => (
           <RelationSection
             key={idx}
             label={relField.label}
-            items={data[relField.key] || []}
+            items={toArray(data[relField.key])}
             navigateTo={relField.navigate_to || null}
           />
         ))}
@@ -272,37 +277,43 @@ export default function GenericViewPage({ entityName, title, fields }) {
   );
 }
 
-// ================= Value Renderer Components =================
-
-function ValueRenderer({ field, value }) {
-    if (value === null || value === undefined) return <span className="text-slate-300">N/A</span>;
-    if (field.type === 'file' || field.type === 'image') {
-        return <img src={value} alt="main" className="w-32 h-32 rounded-3xl object-cover border-4 border-white shadow-md" />;
-    }
-    return <span className="text-slate-700 font-bold">{String(value)}</span>;
-}
-
-// --- تم إصلاح الدالة هنا باستقبال labelKey ---
+// ================= DynamicValueRenderer ✅ مصلح بالكامل =================
 function DynamicValueRenderer({ value, labelKey }) {
-  if (value === null || value === undefined || value === "") return <span className="text-secondary-link font-medium italic">-</span>;
+  // 1. قيمة فارغة
+  if (value === null || value === undefined || value === "") {
+    return <span className="text-secondary-link font-medium italic">-</span>;
+  }
 
-    // 1. التخمين الذكي للصور
-    const isImageUrl = stringValue.match(/\.(jpeg|jpg|gif|png|webp|svg)$|unsplash\.com/i);
-    if (stringValue.startsWith('http') && isImageUrl) {
-        return (
-            <div className="relative group">
-                <img src={stringValue} alt="rel" className="w-24 h-24 rounded-2xl object-cover border-2 border-white shadow hover:scale-105 transition-all duration-300" />
-                <a href={stringValue} target="_blank" rel="noreferrer" className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl text-white text-[9px] font-black uppercase">View</a>
-            </div>
-        );
-    }
-
-  if (isImageValue(value)) {
+  // 2. ✅ Object check أولاً قبل String()
+  if (typeof value === 'object' && !Array.isArray(value)) {
     return (
-      <img src={stringValue} alt="img" className="w-10 h-10 rounded-lg object-cover border border-border-thin" />
+      <span className="text-carbon-black font-medium text-sm">
+        {value.title || value.name || value.label || `ID: ${value.id}`}
+      </span>
     );
   }
 
+  // 3. الآن بأمان نعمل String()
+  const stringValue = String(value);
+  const keyName = String(labelKey || '').toLowerCase();
+
+  // 4. صور URL
+  const isImageUrl = stringValue.match(/\.(jpeg|jpg|gif|png|webp|svg)$|unsplash\.com/i);
+  if (stringValue.startsWith('http') && isImageUrl) {
+    return (
+      <div className="relative group">
+        <img src={stringValue} alt="rel" className="w-24 h-24 rounded-2xl object-cover border-2 border-white shadow hover:scale-105 transition-all duration-300" />
+        <a href={stringValue} target="_blank" rel="noreferrer" className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl text-white text-[9px] font-black uppercase">View</a>
+      </div>
+    );
+  }
+
+  // 5. isImageValue
+  if (isImageValue(value)) {
+    return <img src={stringValue} alt="img" className="w-10 h-10 rounded-lg object-cover border border-border-thin" />;
+  }
+
+  // 6. Boolean
   if (value === 0 || value === 1 || value === true || value === false) {
     const isActive = value == 1 || value === true;
     return (
@@ -314,6 +325,7 @@ function DynamicValueRenderer({ value, labelKey }) {
     );
   }
 
+  // 7. Status
   if (keyName.includes('status')) {
     const statusColors = {
       pending: "bg-status-warning-bg text-status-warning-text",
@@ -331,6 +343,7 @@ function DynamicValueRenderer({ value, labelKey }) {
     );
   }
 
+  // 8. نص طويل
   if (stringValue.length > 60) {
     return <span className="text-text-description text-sm">{stringValue.substring(0, 60)}...</span>;
   }
@@ -338,6 +351,7 @@ function DynamicValueRenderer({ value, labelKey }) {
   return <span className="text-carbon-black font-medium text-sm">{stringValue}</span>;
 }
 
+// ================= LoadingSkeleton =================
 function LoadingSkeleton() {
   return (
     <div className="min-h-screen bg-bg-surface py-8 px-4 md:px-8">
@@ -350,6 +364,7 @@ function LoadingSkeleton() {
   );
 }
 
+// ================= NotFound =================
 function NotFound() {
   return (
     <div className="min-h-screen bg-bg-surface flex items-center justify-center">
@@ -359,9 +374,7 @@ function NotFound() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </div>
-        <div>
-          <h2 className="text-xl font-bold text-heading-slate">Record Not Found</h2>
-        </div>
+        <h2 className="text-xl font-bold text-heading-slate">Record Not Found</h2>
         <button onClick={() => window.history.back()} className="px-5 py-2.5 bg-bg-surface hover:bg-border-light text-carbon-gray font-bold rounded-xl transition-all text-sm">
           Go Back
         </button>

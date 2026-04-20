@@ -84,8 +84,7 @@ export const BagFields = [
   cell_type: "relation_list",
   relation_columns: ["title", "image"],
   navigate_to: "/bags_categories/view/:id", 
-  // أو
-  navigate_to: null,
+   navigate_to: null,
   table_show: false,
   form_show: false,
 },
