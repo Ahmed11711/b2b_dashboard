@@ -19,6 +19,7 @@ import {BagFields} from "./schemas/BagSchema"
 import BagPage from "./pages/Bag/BagPage";
 import Bags_categoriesPage from "./pages/bags_categories/Bags_categoriesPage";
 import {BagsCategoryFields} from "./schemas/bags_categoriesSchema"
+import StyleGuide from "./pages/StyleGuide";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
    
@@ -83,6 +84,14 @@ export default function App() {
               title="Ad Details"
               fields={AdsFields}
             />
+          }
+        />
+        <Route
+          path="/style-guide"
+          element={
+            <ProtectedRoute>
+              <StyleGuide />
+            </ProtectedRoute>
           }
         />
       </Routes>

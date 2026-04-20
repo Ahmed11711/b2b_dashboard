@@ -8,6 +8,123 @@ const getValueByPath = (obj, path) => {
   return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : null), obj);
 };
 
+const isImageValue = (val) => {
+    const s = String(val ?? '');
+  return (s.startsWith('http') || s.startsWith('/storage') || s.startsWith('data:image')) &&
+    (s.match(/\.(jpeg|jpg|gif|png|webp|svg)/i) || s.startsWith('data:image'));
+};
+
+// ================= Relation Modal =================
+function RelationModal({ isOpen, onClose, item, label }) {
+  if (!isOpen || !item) return null;
+  return (
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-carbon-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+      <div className="bg-card-bg rounded-3xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto border border-border-light animate-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between px-8 py-6 border-b border-border-light sticky top-0 bg-card-bg z-10 rounded-t-3xl">
+          <h3 className="text-xl font-bold text-heading-slate">{label}</h3>
+          <button onClick={onClose} className="p-2 rounded-xl bg-bg-surface text-carbon-gray hover:bg-status-error-bg hover:text-status-error-text transition-all">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="p-8 space-y-6">
+          <div className="flex flex-wrap gap-4">
+            {Object.entries(item).map(([key, val]) => {
+              if (!isImageValue(val)) return null;
+              return (
+                <div key={key} className="space-y-2">
+                  <p className="text-xs font-bold uppercase text-secondary-link tracking-wider">{key.replace(/_/g, ' ')}</p>
+                  <img src={String(val)} alt={key} className="w-32 h-32 rounded-2xl object-cover border border-border-light shadow-sm" />
+                </div>
+              );
+            })}
+          </div>
+          <div className="grid grid-cols-2 gap-5">
+            {Object.entries(item).map(([key, val]) => {
+              if (typeof val === 'object' && val !== null) return null;
+              if (isImageValue(val)) return null;
+              return (
+                <div key={key} className="bg-bg-surface rounded-2xl p-4 border border-border-light">
+                  <p className="text-[10px] font-bold uppercase text-secondary-link mb-1 tracking-widest">{key.replace(/_/g, ' ')}</p>
+                  <DynamicValueRenderer value={val} labelKey={key} />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ================= Relation Table =================
+function RelationSection({ label, items, navigateTo }) {
+  const navigate = useNavigate();
+  const [modalItem, setModalItem] = useState(null);
+
+  if (!items || !Array.isArray(items) || items.length === 0) return null;
+
+  const handleRowClick = (item) => {
+    if (navigateTo) navigate(navigateTo.replace(':id', item.id));
+    else setModalItem(item);
+  };
+
+  // Get keys for table headers (exclude objects and images if possible)
+  const allKeys = items.reduce((keys, item) => {
+    Object.keys(item).forEach(k => {
+      if (!keys.includes(k) && typeof item[k] !== 'object' && !isImageValue(item[k])) {
+        keys.push(k);
+      }
+    });
+    return keys;
+  }, []);
+  
+  // limit to 4-5 columns for display
+  const displayKeys = allKeys.slice(0, 4);
+
+  return (
+    <>
+      <div className="bg-card-bg rounded-2xl shadow-sm border border-border-light overflow-hidden mt-6">
+        <div className="px-6 py-5 border-b border-border-light bg-card-bg">
+          <h3 className="text-lg font-bold text-heading-slate capitalize">{label}</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-bg-surface">
+                {displayKeys.map(key => (
+                  <th key={key} className="px-6 py-4 text-xs font-bold text-secondary-link uppercase tracking-wider border-b border-border-light">
+                    {key.replace(/_/g, ' ')}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item, idx) => (
+                <tr 
+                  key={item.id || idx} 
+                  onClick={() => handleRowClick(item)}
+                  className="hover:bg-emerald-tint/50 cursor-pointer transition-colors border-b border-border-light last:border-0"
+                >
+                  {displayKeys.map(key => (
+                    <td key={key} className="px-6 py-4 text-sm text-carbon-gray">
+                      <DynamicValueRenderer value={item[key]} labelKey={key} />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <RelationModal isOpen={!!modalItem} onClose={() => setModalItem(null)} item={modalItem} label={label} />
+    </>
+  );
+}
+
+// ================= Main Page =================
 export default function GenericViewPage({ entityName, title, fields }) {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -33,59 +150,122 @@ export default function GenericViewPage({ entityName, title, fields }) {
 
   const mainFields = fields.filter(f => f.cell_type !== 'relation');
 
-  const relations = fields
-    .filter(f => f.cell_type === 'relation')
-    .map(f => {
-      const relKey = f.key.replace('_id', '');
-      return {
-        label: f.label.replace('Id', ''),
-        data: data[relKey], 
-      };
-    })
-    .filter(rel => rel.data !== null);
+  // Identify fields
+  const imageFields = mainFields.filter(f => f.type === 'file' || f.cell_type === 'image');
+  const numericFields = mainFields.filter(f => f.type === 'number' || typeof data[f.key] === 'number');
+  const statusFields = mainFields.filter(f => f.key.toLowerCase().includes('status') || typeof data[f.key] === 'boolean');
+  
+  // The rest
+  const otherFields = mainFields.filter(f => !imageFields.includes(f) && !numericFields.includes(f) && !statusFields.includes(f) && f.key !== 'title' && f.key !== 'name');
+
+  // Find title/name
+  const titleVal = data.title || data.name || data.label || title || `Item #${id}`;
+  const firstImage = imageFields.length > 0 ? data[imageFields[0].key] : null;
+  const mainStatusField = statusFields.length > 0 ? statusFields[0] : null;
 
   return (
-    <div className="min-h-screen bg-slate-50/50 py-10 px-4 md:px-10">
-      <div className="max-w-6xl mx-auto space-y-10">
-        
-        {/* Header */}
-        <div className="flex justify-between items-center bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
-          <div>
-            <h2 className="text-3xl font-black text-slate-900">{title}</h2>
-            <p className="text-slate-400 font-medium">Record ID: <span className="text-emerald-600">#{id}</span></p>
-          </div>
-          <button onClick={() => navigate(-1)} className="px-6 py-3 bg-slate-100 rounded-2xl font-bold hover:bg-slate-200 transition-all">Back</button>
+    <div className="min-h-screen bg-bg-surface py-8 px-4 md:px-8">
+      <div className="max-w-6xl mx-auto space-y-6">
+
+        {/* ===== Header ===== */}
+        <div className="flex items-center gap-4 mb-8">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center justify-center w-10 h-10 bg-card-bg hover:bg-emerald-tint text-carbon-gray rounded-full transition-all duration-300 shadow-sm border border-border-thin"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h2 className="text-2xl font-bold text-heading-slate">Details</h2>
         </div>
 
-        {/* سيكشن البيانات الأساسية */}
-        <DataSection title="Main Details" fields={mainFields} data={data} />
-
-        {/* سيكشنز العلاقات الديناميكية */}
-        {relations.map((rel, idx) => (
-          <div key={idx} className="space-y-6">
-             <div className="flex items-center gap-3 ml-6">
-                <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center shadow-sm">
-                    <div className="w-1.5 h-4 bg-emerald-500 rounded-full"></div>
-                </div>
-                <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">{rel.label} Details</h3>
-             </div>
-             
-             <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {Object.entries(rel.data).map(([dataKey, val]) => {
-                    if (typeof val === 'object' || dataKey.includes('_at')) return null;
-                    
-                    return (
-                        <div key={dataKey}>
-                            <label className="block text-[11px] font-black uppercase text-slate-400 mb-2">{dataKey.replace('_', ' ')}</label>
-                            <div className="bg-slate-50/50 rounded-2xl p-4 border border-transparent hover:border-slate-100 transition-all w-fit min-w-[120px]">
-                                {/* لاحظ هنا نمرر dataKey إلى labelKey */}
-                                <DynamicValueRenderer value={val} labelKey={dataKey} />
-                            </div>
-                        </div>
-                    );
-                })}
-             </div>
+        {/* ===== Basic Information Card ===== */}
+        <div className="bg-card-bg rounded-2xl shadow-sm border border-border-light overflow-hidden">
+          <div className="px-6 py-5 border-b border-border-light">
+            <h3 className="text-lg font-bold text-heading-slate">Basic Information</h3>
           </div>
+          
+          <div className="p-6 md:p-8 space-y-8">
+            {/* Top section: Image, Title, Badges */}
+            <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
+              <div className="flex items-center gap-5">
+                {imageFields.length > 0 && (
+                  firstImage ? (
+                    <img src={firstImage} alt={titleVal} className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-4 border-bg-surface shadow-sm" />
+                  ) : (
+                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-border-light flex items-center justify-center border-4 border-bg-surface shadow-sm">
+                      <svg className="w-8 h-8 text-secondary-link" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                  )
+                )}
+                <div>
+                  <h4 className="text-xl md:text-2xl font-bold text-heading-slate mb-2">{titleVal}</h4>
+                  <div className="flex items-center gap-4 text-sm text-secondary-link font-medium">
+                    {otherFields.slice(0, 2).map(f => (
+                      <span key={f.key} className="flex items-center gap-1.5">
+                        <svg className="w-4 h-4 text-secondary-link" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                        {data[f.key] || 'N/A'}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              {mainStatusField && data[mainStatusField.key] !== undefined && (
+                <div className="shrink-0">
+                  <DynamicValueRenderer value={data[mainStatusField.key]} labelKey={mainStatusField.key} />
+                </div>
+              )}
+            </div>
+
+            {/* Middle section: Summary cards (Numeric) */}
+            {numericFields.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {numericFields.map(field => (
+                  <div key={field.key} className="bg-bg-surface rounded-2xl p-5 border border-border-light flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-bold uppercase text-secondary-link mb-1">{field.label}</p>
+                      <h5 className="text-xl font-bold text-heading-slate">{data[field.key] || 0}</h5>
+                    </div>
+                    {/* Placeholder for chart/icon */}
+                    <div className="w-12 h-12 rounded-full border-4 border-emerald-tint flex items-center justify-center bg-card-bg">
+                      <span className="text-emerald-solid font-bold text-sm">{String(data[field.key] || 0).slice(0, 3)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Bottom section: Other fields row */}
+            {otherFields.length > 2 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-6 border-t border-border-light">
+                {otherFields.slice(2).map(field => (
+                  <div key={field.key} className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-full bg-status-warning-bg text-status-warning-text flex items-center justify-center shrink-0">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-secondary-link mb-0.5">{field.label}</p>
+                      <div className="text-sm font-semibold text-carbon-gray">
+                        <DynamicValueRenderer value={data[field.key]} labelKey={field.key} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ===== Relation List ===== */}
+        {relationListFields.map((relField, idx) => (
+          <RelationSection
+            key={idx}
+            label={relField.label}
+            items={data[relField.key] || []}
+            navigateTo={relField.navigate_to || null}
+          />
         ))}
       </div>
     </div>
@@ -104,10 +284,7 @@ function ValueRenderer({ field, value }) {
 
 // --- تم إصلاح الدالة هنا باستقبال labelKey ---
 function DynamicValueRenderer({ value, labelKey }) {
-    if (value === null || value === undefined) return <span className="text-slate-300">N/A</span>;
-    
-    const stringValue = String(value);
-    const keyName = labelKey ? labelKey.toLowerCase() : "";
+  if (value === null || value === undefined || value === "") return <span className="text-secondary-link font-medium italic">-</span>;
 
     // 1. التخمين الذكي للصور
     const isImageUrl = stringValue.match(/\.(jpeg|jpg|gif|png|webp|svg)$|unsplash\.com/i);
@@ -120,63 +297,75 @@ function DynamicValueRenderer({ value, labelKey }) {
         );
     }
 
-    // 2. معالجة الـ Boolean والـ Active
-    if (keyName.includes('active') || keyName.includes('is_') || value === 0 || value === 1) {
-        const isActive = value == 1 || value === true || stringValue === "true";
-        return (
-            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase border ${
-                isActive ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-rose-100 text-rose-700 border-rose-200"
-            }`}>
-                {isActive ? "Active / Yes" : "Inactive / No"}
-            </span>
-        );
-    }
-
-    // 3. معالجة الـ Status
-    if (keyName.includes('status')) {
-        const statusColors = {
-            pending: "bg-amber-100 text-amber-700 border-amber-200",
-            active: "bg-emerald-100 text-emerald-700 border-emerald-200",
-            confirmed: "bg-emerald-100 text-emerald-700 border-emerald-200",
-            canceled: "bg-rose-100 text-rose-700 border-rose-200",
-            expired: "bg-slate-100 text-slate-400 border-slate-200"
-        };
-        const colorClass = statusColors[stringValue.toLowerCase()] || "bg-blue-100 text-blue-700 border-blue-200";
-        return (
-            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase border ${colorClass}`}>
-                {stringValue}
-            </span>
-        );
-    }
-
-    // 4. معالجة النصوص الطويلة
-    if (stringValue.length > 50) {
-        return <p className="text-slate-600 text-sm leading-relaxed">{stringValue}</p>;
-    }
-
-    return <span className="text-slate-700 font-bold">{stringValue}</span>;
-}
-
-function DataSection({ title, fields, data }) {
+  if (isImageValue(value)) {
     return (
-        <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-            <div className="px-10 py-6 bg-slate-50/50 border-b border-slate-100 flex items-center gap-3">
-                <div className="w-2 h-6 bg-emerald-500 rounded-full"></div>
-                <h3 className="text-sm font-black uppercase tracking-widest text-slate-600">{title}</h3>
-            </div>
-            <div className="p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                {fields.map(field => (
-                    <div key={field.key} className={field.type === 'textarea' ? 'md:col-span-3' : ''}>
-                        <label className="block text-[11px] font-black uppercase text-slate-400 mb-3">{field.label}</label>
-                        <div className="bg-slate-50/50 rounded-2xl p-4 border border-transparent hover:border-slate-100 transition-all w-fit">
-                             <ValueRenderer field={field} value={data[field.key]} />
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
+      <img src={stringValue} alt="img" className="w-10 h-10 rounded-lg object-cover border border-border-thin" />
     );
+  }
+
+  if (value === 0 || value === 1 || value === true || value === false) {
+    const isActive = value == 1 || value === true;
+    return (
+      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+        isActive ? "bg-status-success-bg text-status-success-text" : "bg-status-error-bg text-status-error-text"
+      }`}>
+        {isActive ? "Yes" : "No"}
+      </span>
+    );
+  }
+
+  if (keyName.includes('status')) {
+    const statusColors = {
+      pending: "bg-status-warning-bg text-status-warning-text",
+      active: "bg-status-success-bg text-status-success-text",
+      published: "bg-status-success-bg text-status-success-text",
+      confirmed: "bg-status-success-bg text-status-success-text",
+      canceled: "bg-status-error-bg text-status-error-text",
+      expired: "bg-border-light text-carbon-gray"
+    };
+    const colorClass = statusColors[stringValue.toLowerCase()] || "bg-status-info-bg text-status-info-text";
+    return (
+      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${colorClass}`}>
+        {stringValue}
+      </span>
+    );
+  }
+
+  if (stringValue.length > 60) {
+    return <span className="text-text-description text-sm">{stringValue.substring(0, 60)}...</span>;
+  }
+
+  return <span className="text-carbon-black font-medium text-sm">{stringValue}</span>;
 }
 
-function LoadingSkeleton() { return <div className="p-20 text-center font-bold animate-pulse text-slate-400">Loading details...</div>; }
-function NotFound() { return <div className="p-20 text-center text-red-500 font-bold">Record not found.</div>; }
+function LoadingSkeleton() {
+  return (
+    <div className="min-h-screen bg-bg-surface py-8 px-4 md:px-8">
+      <div className="max-w-6xl mx-auto space-y-6 animate-pulse">
+        <div className="h-10 w-32 bg-border-thin rounded-lg"></div>
+        <div className="h-64 bg-card-bg rounded-2xl border border-border-light shadow-sm"></div>
+        <div className="h-48 bg-card-bg rounded-2xl border border-border-light shadow-sm"></div>
+      </div>
+    </div>
+  );
+}
+
+function NotFound() {
+  return (
+    <div className="min-h-screen bg-bg-surface flex items-center justify-center">
+      <div className="text-center space-y-4 bg-card-bg p-10 rounded-2xl border border-border-light shadow-sm">
+        <div className="w-16 h-16 bg-bg-surface rounded-full flex items-center justify-center mx-auto">
+          <svg className="w-8 h-8 text-secondary-link" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-heading-slate">Record Not Found</h2>
+        </div>
+        <button onClick={() => window.history.back()} className="px-5 py-2.5 bg-bg-surface hover:bg-border-light text-carbon-gray font-bold rounded-xl transition-all text-sm">
+          Go Back
+        </button>
+      </div>
+    </div>
+  );
+}

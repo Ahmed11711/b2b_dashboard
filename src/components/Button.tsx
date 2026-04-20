@@ -24,15 +24,15 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   const sizes = {
-    sm: 'px-3 py-1.5 text-xs rounded-lg',
-    md: 'px-4 py-2 text-sm rounded-lg',
-    lg: 'px-6 py-3 text-base rounded-xl',
+    sm: 'px-3 py-1.5 text-xs rounded-lg min-h-[44px] md:min-h-[32px]',
+    md: 'px-4 py-2 text-sm rounded-lg min-h-[44px] md:min-h-[40px]',
+    lg: 'px-6 py-3 text-base rounded-xl min-h-[48px] md:min-h-[48px]',
   };
 
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-solid/10 focus:ring-offset-2 disabled:opacity-50 active:scale-95',
+        'inline-flex items-center justify-center gap-2 font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-solid/30 focus:ring-offset-2 disabled:opacity-50 active:scale-[0.98]',
         variants[variant],
         sizes[size],
         className

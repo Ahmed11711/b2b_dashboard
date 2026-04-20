@@ -9,7 +9,7 @@ const api = axios.create({
 
 // 🟢 Get All
 export const getAll = async (endpoint, params = {}) => {
-const response = await api.get(`${endpoint}`, { params });
+  const response = await api.get(`${endpoint}`, { params });
   return response.data;
 };
 

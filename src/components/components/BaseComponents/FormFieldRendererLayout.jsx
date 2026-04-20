@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { getAll } from "../../../service/services/apiService";
-  import MultiSelectField from "../../components/BaseComponents/MultiSelectField"
+import MultiSelectField from "../../components/BaseComponents/MultiSelectField";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 export default function FormFieldRendererLayout({ field, value, onChange, error, disabled }) {
   const [options, setOptions] = useState(Array.isArray(field?.options) ? field.options : []);
@@ -46,6 +48,7 @@ export default function FormFieldRendererLayout({ field, value, onChange, error,
   // 👇 الجزء المضاف: تحديد العرض الكامل بناءً على الـ key أو الـ type
   const isFullWidth = 
     field.type === "textarea" || 
+    field.type === "file" ||
     field.key?.toLowerCase().includes("description") || 
     field.key?.toLowerCase().includes("desc");
 
@@ -55,19 +58,14 @@ export default function FormFieldRendererLayout({ field, value, onChange, error,
   // ================= STYLES =================
 
  const baseInputStyle = `
-w-full h-14 px-5 rounded-2xl border
-bg-card-bg/80 backdrop-blur-sm
-border-border-thin
-focus:border-emerald-solid focus:ring-4 focus:ring-emerald-solid/10
-outline-none font-semibold text-carbon-gray
-placeholder:text-text-description
-transition-all duration-300
-shadow-sm hover:shadow-md
+w-full min-h-[56px] px-5 rounded-[20px] border bg-card-bg/80 backdrop-blur-sm border-border-thin
+focus:border-emerald-solid focus:ring-4 focus:ring-emerald-solid/10 outline-none font-medium text-carbon-black
+placeholder:text-text-description/50 transition-all duration-300 shadow-sm hover:shadow-md pt-3 pb-1
 ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
 `;
+
   const labelStyle = `
-  text-[11px] font-extrabold text-text-description
-  uppercase tracking-widest ml-1 mb-1
+  absolute top-1 left-4 px-1 text-[11px] font-medium text-text-description bg-transparent pointer-events-none z-10
   `;
 
   // ================= INPUT RENDER =================
@@ -77,13 +75,13 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
       // ================= SELECT =================
       case "select":
         return (
-          <div className="relative group">
+          <div className="relative group h-full">
             <select
               name={field.key}
               value={displayValue}
               disabled={disabled || loading}
               onChange={(e) => onChange(field.key, e.target.value)}
-              className={`${baseInputStyle} appearance-none cursor-pointer pr-10 ${
+              className={`${baseInputStyle} appearance-none cursor-pointer pr-10 pt-4 pb-1 ${
                 loading ? "animate-pulse" : ""
               }`}
             >
@@ -98,136 +96,168 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
               ))}
             </select>
 
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-text-description group-focus-within:text-emerald-solid transition">
-              ▼
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-description group-focus-within:text-emerald-solid transition">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
             </div>
           </div>
         );
 
-      // ================= TEXTAREA & SMART DESCRIPTION =================
+      // ================= TEXTAREA / RICH TEXT =================
       case "textarea":
       case "text":
-        // لو الحقل وصف (Description) حتى لو نوعه text، هنخليه textarea وياخد صف لوحده
         if (isFullWidth) {
+          const modules = {
+            toolbar: [
+              [{ 'header': [1, 2, 3, false] }],
+              ['bold', 'italic', 'underline', 'strike'],
+              [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+              [{ 'align': [] }],
+              ['link'],
+              ['clean']
+            ],
+          };
+
           return (
-            <textarea
-              name={field.key}
-              value={displayValue}
-              disabled={disabled}
-              placeholder={field.placeholder}
-              onChange={(e) => onChange(field.key, e.target.value)}
-              className={`${baseInputStyle} h-32 py-4 resize-none`}
-            />
+            <div className="relative mt-2">
+               {/* Label for textarea positioned to look like integrated floating label */}
+               <label className="absolute -top-2.5 left-4 px-1 bg-card-bg text-[12px] text-text-description font-medium z-10">{field.label}</label>
+               <div className="bg-card-bg rounded-[20px] border border-border-light overflow-hidden transition-all duration-300 hover:shadow-md focus-within:border-emerald-solid focus-within:ring-4 focus-within:ring-emerald-solid/10">
+                 <ReactQuill
+                   theme="snow"
+                   value={displayValue}
+                   onChange={(content) => onChange(field.key, content)}
+                   readOnly={disabled}
+                   modules={modules}
+                   placeholder={field.placeholder || `Enter ${field.label}...`}
+                   className="quill-editor"
+                 />
+               </div>
+            </div>
           );
         }
          break;
 
       // ================= CHECKBOX =================
-     case "checkbox":
-case "boolean":
-  return (
-    <div className={`flex items-center justify-between px-5 h-14 rounded-2xl border transition-all
-      ${value ? "bg-emerald-tint border-border-thin" : "bg-white border-slate-200"} shadow-sm`}
-    >
-      <span className="font-semibold text-slate-600">
-        {value ? "Active" : "Inactive"}
-      </span>
-      <div className="relative" onClick={() => onChange(field.key, value ? 0 : 1)}>
-        {/* Track */}
-        <div className={`w-12 h-6 rounded-full transition-colors duration-300 cursor-pointer
-          ${value ? "bg-emerald-500" : "bg-slate-200"}`}
-        />
-        {/* Thumb */}
-        <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all duration-300
-          ${value ? "left-7" : "left-1"}`}
-        />
-      </div>
-    </div>
-  );
+      case "checkbox":
+      case "boolean":
+        return (
+          <div className="flex items-center justify-between p-4 md:p-5 bg-slate-50 rounded-[20px] border border-border-light hover:border-emerald-solid/20 transition-all duration-300 shadow-sm hover:shadow h-[56px] mt-2">
+            <div className="flex flex-col">
+              <span className="text-xs md:text-sm font-bold tracking-tight text-carbon-black capitalize">{field.label}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => !disabled && onChange(field.key, value ? 0 : 1)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-solid/20 shadow-inner ${value ? "bg-emerald-solid" : "bg-slate-300"}`}
+            >
+              <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform duration-300 ${value ? "translate-x-5" : "translate-x-1"}`} />
+            </button>
+          </div>
+        );
       // ================= FILE =================
       case "file":
         return (
-          <div className="flex flex-col gap-4">
-            <div className="relative group border-2 border-dashed border-border-thin rounded-2xl p-6 text-center hover:border-emerald-solid transition-all cursor-pointer">
-              <input
-                type="file"
-                onChange={(e) => onChange(field.key, e.target.files[0])}
-                className="absolute inset-0 opacity-0 cursor-pointer"
-              />
-
-              <div className="flex flex-col items-center gap-3">
-                <div className="text-3xl text-emerald-solid group-hover:scale-110 transition">
-                  ⬆
-                </div>
-
-                <p className="text-slate-500 font-medium">
-                  {value ? "Click to change file" : "Click or drag to upload"}
-                </p>
-              </div>
-            </div>
-
-            {value && (
-              <div className="relative w-36 h-36 group">
-                <img
-                  src={value instanceof File ? URL.createObjectURL(value) : value}
-                  className="w-full h-full object-cover rounded-2xl border shadow-lg"
-                  alt="preview"
+          <div className="flex flex-col gap-3">
+            {/* Same floating label style for consistency */}
+            <label className="absolute -top-2 left-4 px-1 bg-card-bg text-[11px] font-medium text-text-description pointer-events-none z-10">
+              {field.label}
+              {field.required ? (
+                <span className="text-status-error-text text-sm ml-0.5">*</span>
+              ) : null}
+            </label>
+            <div className="flex flex-col sm:flex-row gap-6 items-center w-full">
+              <div className="relative group border border-dashed border-emerald-solid/50 bg-emerald-tint/20 rounded-[20px] p-6 flex-1 w-full text-center hover:bg-emerald-tint/40 transition-all cursor-pointer mt-0 min-h-[120px] flex items-center justify-center">
+                <input
+                  type="file"
+                  onChange={(e) => onChange(field.key, e.target.files[0])}
+                  className="absolute inset-0 opacity-0 cursor-pointer"
                 />
 
-                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition rounded-2xl flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">Preview</span>
+                <div className="flex flex-col items-center gap-2">
+                  <div className="text-xl text-emerald-solid group-hover:-translate-y-1 transition-transform">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                  </div>
+
+                  <p className="text-text-description font-medium text-xs">
+                    {value ? "Click to change file" : "Click or drag to upload"}
+                  </p>
                 </div>
               </div>
-            )}
+
+              {value && (
+                <div className="relative w-28 h-28 sm:w-32 sm:h-32 group shrink-0">
+                  <img
+                    src={value instanceof File ? URL.createObjectURL(value) : value}
+                    className="w-full h-full object-cover rounded-2xl border border-border-light shadow-sm"
+                    alt="preview"
+                  />
+
+                  <div className="absolute inset-0 bg-carbon-black/40 opacity-0 group-hover:opacity-100 transition rounded-2xl flex items-center justify-center gap-3">
+                    <span className="text-white text-[10px] uppercase tracking-wider font-bold">Preview</span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        onChange(field.key, null);
+                      }}
+                      className="p-1.5 bg-status-error-bg text-status-error-text rounded-full hover:scale-110 transition-transform"
+                      title="Remove Image"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         );
     
 case "multi-select":
   return (
-    <MultiSelectField
-      field={field}
-      value={value}
-      onChange={onChange}
-      error={error}
-    />
+    <div className="mt-2">
+      <label className="text-[12px] font-medium text-text-description px-1 mb-1 block">{field.label}</label>
+      <MultiSelectField
+        field={field}
+        value={value}
+        onChange={onChange}
+        error={error}
+      />
+    </div>
   );
     }
     // ================= DEFAULT (للحالات العادية) =================
     return (
-      <div className="relative group">
+      <div className="relative group h-[56px]">
         <input
           type={field.type || "text"}
           name={field.key}
           value={displayValue}
-          placeholder={field.placeholder}
+          placeholder={field.placeholder || `Enter ${field.label}`}
           disabled={disabled}
           onChange={(e) => onChange(field.key, e.target.value)}
-          className={`${baseInputStyle} pl-12`}
+          className={`${baseInputStyle}`}
         />
-
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-description group-focus-within:text-emerald-solid transition">
-  ✎
-</div>
       </div>
     );
   };
 
   return (
     // 👇 استخدام isFullWidth عشان يفرش الحقل في الـ Grid لو هو وصف
-    <div className={`flex flex-col gap-1.5 animate-in fade-in slide-in-from-bottom-1 duration-300 ${isFullWidth ? "md:col-span-2" : ""}`}>
-      <label className={labelStyle}>
-        {field.label}
-        {field.required ? (
-          <span className="text-red-400 text-lg ml-1">*</span>
-        ) : (
-          <span className="text-slate-300 normal-case font-medium ml-2">(Optional)</span>
-        )}
-      </label>
+    <div className={`relative flex flex-col justify-start animate-in fade-in slide-in-from-bottom-1 duration-500 ${isFullWidth ? "md:col-span-2" : ""} ${field.type === 'multi-select' ? 'relative z-10 focus-within:z-20' : ''}`}>
+      {field.type !== "checkbox" && field.type !== "boolean" && field.type !== "multi-select" && field.type !== "file" && (!isFullWidth || (field.type !== 'textarea' && field.type !== 'text')) && (
+        <label className="absolute -top-2 left-4 px-1 bg-card-bg text-[11px] font-medium text-text-description pointer-events-none z-10">
+          {field.label}
+          {field.required ? (
+            <span className="text-status-error-text text-sm ml-0.5">*</span>
+          ) : null}
+        </label>
+      )}
 
       {renderInput()}
 
       {error && (
-        <p className="text-red-500 text-xs font-bold ml-2 flex items-center gap-1 mt-1">
+        <p className="text-status-error-text text-xs font-bold ml-4 flex items-center gap-1 mt-1">
           ⚠ {Array.isArray(error) ? error[0] : error}
         </p>
       )}

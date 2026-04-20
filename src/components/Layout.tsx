@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, LogOut, Menu, X, Bell, User,LayoutGrid,ShoppingBag } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, X, Bell, User,LayoutGrid,ShoppingBag, Palette } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Button } from "./Button";
 import { motion, AnimatePresence } from "motion/react";
@@ -14,6 +14,7 @@ const adminNavItems = [
   { icon: User, label: "Ads", path: "/Ads" },
 { icon: ShoppingBag, label: "Bag", path: "/Bag" },
 { icon: LayoutGrid, label: "Bags Categories", path: "/bags_categories" },
+{ icon: Palette, label: "Style Guide", path: "/style-guide" },
 
 
 
@@ -253,7 +254,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
         </main>
 
         {/* Bottom Navigation - Mobile only */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-border-light px-2 py-1 z-50 flex items-center justify-around shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-border-light px-2 py-1 z-50 flex items-center justify-around shadow-[0_-4px_12px_rgba(0,0,0,0.03)] min-h-[64px] pb-safe">
           {navItems.slice(0, 4).map((item) => {
             const isActive = location.pathname === item.path;
             return (
@@ -261,21 +262,17 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-xl transition-all duration-200 min-w-[64px]",
-                  isActive
-                    ? "text-emerald-solid"
-                    : "text-slate-400 hover:text-carbon-black",
+                  "flex flex-col items-center justify-center w-full py-2 px-1 transition-all duration-300 active:scale-95",
+                  isActive ? "text-emerald-solid" : "text-slate-400 hover:text-emerald-solid/70"
                 )}
               >
-                <item.icon
-                  className={cn(
-                    "h-5 w-5",
-                    isActive ? "stroke-[2.5px]" : "stroke-[1.5px]",
-                  )}
-                />
-                <span className="text-[10px] font-bold uppercase tracking-tighter">
-                  {item.label}
-                </span>
+                <div className={cn(
+                  "p-1.5 rounded-xl transition-all duration-300",
+                  isActive && "bg-emerald-tint"
+                )}>
+                  <item.icon className="h-5 w-5 mb-1" />
+                </div>
+                <span className="text-[10px] font-semibold">{item.label}</span>
               </Link>
             );
           })}
@@ -284,19 +281,17 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
           <button
             onClick={() => setIsSidebarOpen(true)}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-xl transition-all duration-200 min-w-[64px]",
-              isSidebarOpen ? "text-emerald-solid" : "text-slate-400",
+              "flex flex-col items-center justify-center w-full py-2 px-1 transition-all duration-300 active:scale-95",
+              isSidebarOpen ? "text-emerald-solid" : "text-slate-400 hover:text-emerald-solid/70"
             )}
           >
-            <Menu
-              className={cn(
-                "h-5 w-5",
-                isSidebarOpen ? "stroke-[2.5px]" : "stroke-[1.5px]",
-              )}
-            />
-            <span className="text-[10px] font-bold uppercase tracking-tighter">
-              More
-            </span>
+            <div className={cn(
+              "p-1.5 rounded-xl transition-all duration-300",
+              isSidebarOpen && "bg-emerald-tint"
+            )}>
+              <Menu className="h-5 w-5 mb-1" />
+            </div>
+            <span className="text-[10px] font-semibold">More</span>
           </button>
         </nav>
       </div>

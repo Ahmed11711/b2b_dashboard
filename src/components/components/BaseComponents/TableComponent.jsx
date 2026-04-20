@@ -104,17 +104,17 @@ export default function TableComponent({ headers, data, onEdit, onDelete, onView
               {headers.filter(h => h.table_show).map((header) => (
                 <th 
                   key={header.key} 
-                  className={`table-header-sticky text-right bg-slate-50 border-b border-border-thin px-6 py-4 ${header.sortable ? 'cursor-pointer hover:bg-slate-100' : ''}`}
+                  className={`table-header-sticky text-left bg-slate-50 border-b border-border-light px-6 py-4 transition-colors duration-300 ${header.sortable ? 'cursor-pointer hover:bg-slate-100/80 active:bg-slate-200/50' : ''}`}
                   onClick={() => header.sortable && requestSort(header.key)}
                   style={{ width: header.width || 'auto' }}
                 >
-                  <div className="flex items-center justify-start gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-widest">
+                  <div className="flex items-center justify-start gap-2 font-bold text-xs text-slate-500 uppercase tracking-widest">
                     {header.label}
                     {header.sortable && <span className="text-slate-300">↕</span>}
                   </div>
                 </th>
               ))}
-              <th className="table-header-sticky right-0 z-30 text-center bg-slate-50 px-6 py-4 font-bold text-[11px] uppercase text-slate-500">
+              <th className="table-header-sticky right-0 z-30 text-center bg-slate-50 border-b border-border-light px-6 py-4 font-bold text-xs uppercase text-slate-500 tracking-widest">
                 Action
               </th>
             </tr>
@@ -122,17 +122,19 @@ export default function TableComponent({ headers, data, onEdit, onDelete, onView
 
           <tbody className="divide-y divide-border-light bg-white">
             {sortedData.map((row, idx) => (
-              <tr key={row.id || idx} className="table-row group">
+              <tr key={row.id || idx} className="table-row group hover:bg-emerald-tint/30 transition-colors duration-300">
                 {headers.filter(h => h.table_show).map((header) => (
                   <td key={header.key} className="px-6 py-4 whitespace-nowrap align-middle">
                     <div className="flex justify-start items-center">
                       {header.cell_type === "image" ? (
-                        <img 
-                          src={row[header.key]} 
-                          className="w-10 h-10 rounded-lg object-cover cursor-zoom-in border border-border-light shadow-sm hover:scale-110 transition-transform"
-                          onClick={() => setSelectedImg(row[header.key])}
-                          alt=""
-                        />
+                        <div className="relative group/image">
+                          <img 
+                            src={row[header.key]} 
+                            className="w-12 h-12 rounded-xl object-cover cursor-zoom-in border border-border-light shadow-sm group-hover/image:shadow-md transition-all duration-300 group-hover/image:scale-[1.05]"
+                            onClick={() => setSelectedImg(row[header.key])}
+                            alt=""
+                          />
+                        </div>
                       ) : (
                         <TableCellRenderer
                           cell_type={header.cell_type}
@@ -146,11 +148,11 @@ export default function TableComponent({ headers, data, onEdit, onDelete, onView
                   </td>
                 ))}
 
-                <td className="right-0 z-20 bg-white group-hover:bg-emerald-tint/50 transition-colors px-4 py-4 shadow-[-6px_0_15px_-8px_rgba(0,0,0,0.08)]">
-                  <div className="flex justify-center gap-2">
-                    <button onClick={() => onView(row)} className="btn-action-icon" title="View"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" strokeWidth="2"/></svg></button>
-                    <button onClick={() => onEdit(row)} className="btn-action-icon" title="Edit"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" strokeWidth="2"/></svg></button>
-                    <button onClick={() => onDelete(row)} className="btn-action-icon btn-action-delete" title="Delete"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeWidth="2"/></svg></button>
+                <td className="right-0 z-20 bg-white group-hover:bg-emerald-tint/30 transition-colors duration-300 px-4 py-4 text-center">
+                  <div className="flex justify-center items-center gap-2 md:gap-3">
+                    <button onClick={() => onView(row)} className="btn-action-icon min-w-[40px] min-h-[40px] md:min-w-[36px] md:min-h-[36px] flex items-center justify-center hover:bg-emerald-tint hover:text-emerald-solid hover:border-emerald-solid/30" title="View"><svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" strokeWidth="2.5"/></svg></button>
+                    <button onClick={() => onEdit(row)} className="btn-action-icon min-w-[40px] min-h-[40px] md:min-w-[36px] md:min-h-[36px] flex items-center justify-center hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200" title="Edit"><svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" strokeWidth="2.5"/></svg></button>
+                    <button onClick={() => onDelete(row)} className="btn-action-icon btn-action-delete min-w-[40px] min-h-[40px] md:min-w-[36px] md:min-h-[36px] flex items-center justify-center" title="Delete"><svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeWidth="2.5"/></svg></button>
                   </div>
                 </td>
               </tr>
@@ -182,21 +184,21 @@ export default function TableComponent({ headers, data, onEdit, onDelete, onView
             };
 
             const navButtonStyle = `
-              w-10 h-10 flex items-center justify-center rounded-xl border
+              w-11 h-11 md:w-10 md:h-10 flex items-center justify-center rounded-xl border
               border-border-thin bg-card-bg text-carbon-gray
-              hover:border-emerald-solid hover:text-emerald-solid
+              hover:border-emerald-solid hover:text-emerald-solid hover:shadow-md hover:-translate-y-0.5
               transition-all duration-300 shadow-sm
               disabled:opacity-30 disabled:cursor-not-allowed
-              disabled:hover:border-border-thin disabled:hover:text-carbon-gray
+              disabled:hover:border-border-thin disabled:hover:text-carbon-gray disabled:hover:translate-y-0 disabled:hover:shadow-none active:scale-[0.98]
             `;
 
             const pageButtonBase = `
-              min-w-[40px] h-10 rounded-xl font-bold text-sm transition-all duration-300
-              border border-border-light
+              min-w-[44px] h-11 md:min-w-[40px] md:h-10 rounded-xl font-bold text-sm transition-all duration-300
+              border border-border-light active:scale-[0.98]
             `;
 
-            const activePageStyle = `bg-emerald-solid text-white shadow-lg scale-110`;
-            const inactivePageStyle = `bg-card-bg text-carbon-gray hover:border-emerald-solid/30 hover:bg-emerald-tint`;
+            const activePageStyle = `bg-emerald-solid text-white shadow-lg scale-110 md:scale-105`;
+            const inactivePageStyle = `bg-card-bg text-carbon-gray hover:border-emerald-solid/30 hover:bg-emerald-tint hover:shadow-sm`;
 
             return (
               <>

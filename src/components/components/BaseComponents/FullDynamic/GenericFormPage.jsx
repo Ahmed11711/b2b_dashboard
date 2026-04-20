@@ -63,7 +63,7 @@ const handleSubmit = async (formData) => {
 };
   if (loading) return (
     <div className="flex justify-center items-center h-64">
-       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-solid"></div>
     </div>
   );
   const visibleFields = fields.filter(
@@ -71,36 +71,31 @@ const handleSubmit = async (formData) => {
   );
 
   return (
-    // الـ Container ده هو اللي هيظبط شكل الصفحة ويخليها في النص وبمساحة معقولة
-    <div className="max-w-5xl mx-auto p-6">
-      <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-        
-        {/* Header الصفحة */}
-        <div className="px-8 py-6 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-black text-slate-800 tracking-tight">{title}</h1>
-            <p className="text-slate-400 text-sm font-medium mt-1">
-              {mode === "edit" ? `Modifying item #${id}` : "Fill in the details below"}
-            </p>
-          </div>
+    <div className="max-w-6xl mx-auto p-4 md:p-6 animate-in fade-in duration-500">
+      
+      {/* Header الصفحة */}
+      <div className="flex justify-between items-center mb-8 gap-4">
+        <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate(-1)}
-            className="text-slate-400 hover:text-slate-600 transition-colors"
+            className="flex items-center justify-center w-10 h-10 bg-card-bg hover:bg-emerald-tint text-carbon-gray rounded-full transition-all duration-300 shadow-sm border border-border-thin"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"/></svg>
           </button>
+          <h1 className="text-2xl md:text-3xl font-bold text-heading-slate tracking-tight capitalize">
+            {mode === "edit" ? ` ${title}` : `Create ${title}`}
+          </h1>
         </div>
+      </div>
 
-        {/* منطقة الفورم */}
-        <div className="p-8">
-          <DynamicForm 
+      {/* منطقة الفورم */}
+      <div className="w-full">
+        <DynamicForm 
           fields={visibleFields}  // 👈 بنبعت الحقول المفلترة هنا
-             initialData={initialData} // دي أهم قطعة عشان الداتا تظهر
-            onSubmit={handleSubmit}
-            mode={mode}
-          />
-        </div>
-
+          initialData={initialData} // دي أهم قطعة عشان الداتا تظهر
+          onSubmit={handleSubmit}
+          mode={mode}
+        />
       </div>
     </div>
   );

@@ -65,7 +65,7 @@ export default function MultiSelectField({ field, value = [], onChange, error })
   }
 
   return (
-    <div className="flex flex-col gap-1.5" ref={ref}>
+    <div className="flex flex-col gap-1.5 relative" ref={ref}>
       <label className="text-[11px] font-extrabold uppercase tracking-widest text-text-description ml-1">
         {field.label}
         {field.required ? <span className="text-red-400 text-lg ml-1">*</span> : <span className="text-slate-300 normal-case font-medium ml-2">(Optional)</span>}
@@ -87,43 +87,43 @@ export default function MultiSelectField({ field, value = [], onChange, error })
         )}
 
         {selected.map(val => (
-          <span key={val} className="inline-flex items-center gap-1 bg-emerald-50 border border-emerald-100 
-            text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">
+          <span key={val} className="inline-flex items-center gap-1 bg-emerald-tint border border-emerald-solid/20 
+            text-emerald-text text-xs font-bold px-3 py-1 rounded-full shadow-sm">
             {getLabel(val)}
             <button onClick={(e) => { e.stopPropagation(); removeChip(val); }}
-              className="ml-1 text-emerald-500 hover:text-red-500 transition-colors">×</button>
+              className="ml-1 text-emerald-solid/60 hover:text-red-500 transition-colors">×</button>
           </span>
         ))}
 
-        <span className={`ml-auto text-text-description text-xs transition-transform duration-200 ${open ? "rotate-180" : ""}`}>▾</span>
+        <span className={`ml-auto text-text-description text-xs transition-transform duration-200 ${open ? "rotate-180" : ""}`}>▼</span>
       </div>
 
       {/* الـ Dropdown */}
       {open && (
-        <div className="mt-1 rounded-2xl border border-border-thin bg-white shadow-xl overflow-hidden z-50">
-          <div className="px-4 py-3 border-b border-border-thin">
+        <div className="absolute z-[100] mt-1 w-full rounded-2xl border border-border-thin bg-white shadow-xl overflow-hidden" style={{ top: "100%" }}>
+          <div className="px-4 py-3 border-b border-border-light bg-slate-50/50">
             <input
               autoFocus
               value={search}
               onChange={e => setSearch(e.target.value)}
               onClick={e => e.stopPropagation()}
-              placeholder="بحث..."
-              className="w-full text-sm outline-none bg-transparent text-carbon-gray placeholder:text-text-description"
+              placeholder="Search..."
+              className="w-full text-sm outline-none bg-transparent text-carbon-gray placeholder:text-text-description font-medium"
             />
           </div>
 
-          <div className="max-h-60 overflow-y-auto">
+          <div className="max-h-60 overflow-y-auto custom-scrollbar">
             {filtered.length === 0 && (
-              <p className="text-center text-sm text-text-description py-6">لا توجد نتائج</p>
+              <p className="text-center text-sm text-text-description py-6">No results found</p>
             )}
             {filtered.map((opt) => {
               const isSelected = selected.includes(opt.value);
               return (
                 <div key={opt.value} onClick={() => toggle(opt)}
                   className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors text-sm font-medium
-                    ${isSelected ? "bg-emerald-50/60 text-emerald-800" : "text-carbon-gray hover:bg-slate-50"}`}>
+                    ${isSelected ? "bg-emerald-tint/60 text-emerald-text" : "text-carbon-gray hover:bg-slate-50"}`}>
                   <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all flex-shrink-0
-                    ${isSelected ? "bg-emerald-500 border-emerald-500" : "border-slate-300"}`}>
+                    ${isSelected ? "bg-emerald-solid border-emerald-solid" : "border-slate-300"}`}>
                     {isSelected && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"/>
                     </svg>}
