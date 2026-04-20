@@ -5,7 +5,7 @@ const BASE_URL = "https://b2bpartnership.com/api/api/admin/v1/";
 
 const api = axios.create({
   baseURL: BASE_URL,
- });
+ }); 
 
 // 🟢 Get All
 export const getAll = async (endpoint, params = {}) => {

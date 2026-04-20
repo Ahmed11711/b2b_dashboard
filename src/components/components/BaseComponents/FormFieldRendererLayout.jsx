@@ -157,7 +157,7 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
       // ================= FILE =================
       case "file":
         return (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 relative mt-2">
             {/* Same floating label style for consistency */}
             <label className="absolute -top-2 left-4 px-1 bg-card-bg text-[11px] font-medium text-text-description pointer-events-none z-10">
               {field.label}
@@ -165,50 +165,57 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
                 <span className="text-status-error-text text-sm ml-0.5">*</span>
               ) : null}
             </label>
-            <div className="flex flex-col sm:flex-row gap-6 items-center w-full">
-              <div className="relative group border border-dashed border-emerald-solid/50 bg-emerald-tint/20 rounded-[20px] p-6 flex-1 w-full text-center hover:bg-emerald-tint/40 transition-all cursor-pointer mt-0 min-h-[120px] flex items-center justify-center">
+            <div className="relative w-full">
+              <div className="relative group border border-dashed border-emerald-solid/50 bg-emerald-tint/20 rounded-[20px] p-6 w-full text-center hover:bg-emerald-tint/40 transition-all cursor-pointer mt-0 min-h-[120px] flex items-center justify-center overflow-hidden">
                 <input
                   type="file"
                   onChange={(e) => onChange(field.key, e.target.files[0])}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
+                  className="absolute inset-0 opacity-0 cursor-pointer z-20"
                 />
 
-                <div className="flex flex-col items-center gap-2">
-                  <div className="text-xl text-emerald-solid group-hover:-translate-y-1 transition-transform">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                  </div>
+                {/* If no value, show upload prompt */}
+                {!value && (
+                  <div className="flex flex-col items-center gap-2 z-10">
+                    <div className="text-xl text-emerald-solid group-hover:-translate-y-1 transition-transform">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                    </div>
 
-                  <p className="text-text-description font-medium text-xs">
-                    {value ? "Click to change file" : "Click or drag to upload"}
-                  </p>
-                </div>
+                    <p className="text-text-description font-medium text-xs">
+                      Click or drag to upload
+                    </p>
+                  </div>
+                )}
+
+                {/* If value exists, show image filling the box */}
+                {value && (
+                  <>
+                    <img
+                      src={value instanceof File ? URL.createObjectURL(value) : value}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      alt="preview"
+                    />
+                    {/* Hover overlay with action buttons */}
+                    <div className="absolute inset-0 bg-carbon-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 z-10">
+                      <div className="flex flex-col items-center gap-1 cursor-pointer">
+                         <span className="text-white text-xs font-medium">Click to change</span>
+                      </div>
+                      
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          onChange(field.key, null);
+                        }}
+                        className="p-2 bg-status-error-bg text-status-error-text rounded-full hover:scale-110 transition-transform relative z-30"
+                        title="Remove Image"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
-
-              {value && (
-                <div className="relative w-28 h-28 sm:w-32 sm:h-32 group shrink-0">
-                  <img
-                    src={value instanceof File ? URL.createObjectURL(value) : value}
-                    className="w-full h-full object-cover rounded-2xl border border-border-light shadow-sm"
-                    alt="preview"
-                  />
-
-                  <div className="absolute inset-0 bg-carbon-black/40 opacity-0 group-hover:opacity-100 transition rounded-2xl flex items-center justify-center gap-3">
-                    <span className="text-white text-[10px] uppercase tracking-wider font-bold">Preview</span>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        onChange(field.key, null);
-                      }}
-                      className="p-1.5 bg-status-error-bg text-status-error-text rounded-full hover:scale-110 transition-transform"
-                      title="Remove Image"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         );
