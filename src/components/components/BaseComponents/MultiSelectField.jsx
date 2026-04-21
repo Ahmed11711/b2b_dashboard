@@ -61,7 +61,7 @@ export default function MultiSelectField({ field, value = [], onChange, error })
             <option value="">{loading ? "جاري التحميل..." : `اختر ${field.label}`}</option>
             {options.map((o, i) => <option key={i} value={o.value}>{o.label}</option>)}
           </select>
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-description">
+          <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-text-description">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
             </svg>

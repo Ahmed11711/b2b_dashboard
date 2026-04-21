@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import TableComponent from "../TableComponent";
 import { getAll, deleteItem, createItem } from "../../../../service/services/apiService";
 import DynamicForm from "../DynamicForm"; 
+import { buildPayloadByEndpoint } from "../../../../utils/payloadBuilders";
 
 // 1. مكون مودل الحذف (كما هو بدون تغيير)
  function DeleteConfirmModal({ isOpen, onConfirm, onCancel, itemName }) {
@@ -75,34 +76,7 @@ function CreateRecordModal({ isOpen, onClose, endpoint, headers, onRefresh, titl
 // في handleFormSubmit جوه CreateRecordModal
 const handleFormSubmit = async (formData) => {
   try {
-    const payload = new FormData();
-
-    // ✅ Boolean fields
-    headers.forEach(h => {
-      if (h.type === "checkbox" || h.type === "boolean") {
-        const val = formData[h.key];
-        payload.append(h.key, val === undefined ? 0 : val ? 1 : 0);
-      }
-    });
-
-    Object.keys(formData).forEach((key) => {
-      const value = formData[key];
-      const field = headers.find(h => h.key === key);
-
-      if (field?.type === "checkbox" || field?.type === "boolean") return;
-
-      // ✅ Gallery
-      if (key === "gallery" && Array.isArray(value)) {
-        value.forEach((item) => {
-          payload.append(`gallery[]`, item.file);
-        });
-        return;
-      }
-
-      if (value !== null && value !== undefined) {
-        payload.append(key, value);
-      }
-    });
+    const payload = buildPayloadByEndpoint(endpoint, formData);
 
     await createItem(endpoint, payload);
     onRefresh();

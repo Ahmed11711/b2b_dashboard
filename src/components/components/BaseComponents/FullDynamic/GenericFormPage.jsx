@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DynamicForm from "../DynamicForm";
 import { getOne, createItem, updateItem } from "../../../../service/services/apiService";
+import { buildPayloadByEndpoint } from "../../../../utils/payloadBuilders";
 
 export default function GenericFormPage({ endpoint, fields, title, mode = "create" }) {
   const { id } = useParams();
@@ -25,28 +26,7 @@ export default function GenericFormPage({ endpoint, fields, title, mode = "creat
 
 const handleSubmit = async (formData) => {
   try {
-    const dataToSend = new FormData();
-
-    Object.keys(formData).forEach((key) => {
-      const value = formData[key];
-
-      // ✅ Gallery - array of { file, type }
-      if (key === "gallery" && Array.isArray(value)) {
-       value.forEach((item, index) => {
-  payload.append(`gallery[${index}][file]`, item.file);
-  payload.append(`gallery[${index}][type]`, item.type);
-});
-        return;
-      }
-
-      if (value instanceof File) {
-        dataToSend.append(key, value);
-      } else if (typeof value !== "string" || !value.startsWith("http")) {
-        if (value !== null && value !== undefined) {
-          dataToSend.append(key, value);
-        }
-      }
-    });
+    const dataToSend = buildPayloadByEndpoint(endpoint, formData);
 
     if (mode === "edit") {
       await updateItem(endpoint, id, dataToSend);

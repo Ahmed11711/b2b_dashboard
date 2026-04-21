@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getAll } from "../../../service/services/apiService";
 import MultiSelectField from "../../components/BaseComponents/MultiSelectField";
+import MultiFeatureField from "../../components/BaseComponents/MultiFeatureField";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
@@ -51,7 +52,8 @@ export default function FormFieldRendererLayout({ field, value, onChange, error,
  const isFullWidth = 
   field.type === "textarea" || 
   field.type === "file" ||
-  field.type === "gallery" ||   // ← أضيف السطر ده
+  field.type === "gallery" ||
+  field.type === "multi-features" ||
   field.key?.toLowerCase().includes("description") || 
   field.key?.toLowerCase().includes("desc");
   // 👇 الجزء المضاف: تنظيف القيمة من الـ 0 أو الـ null لو الحقل اختياري
@@ -133,7 +135,7 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
               ))}
             </select>
 
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-description group-focus-within:text-emerald-solid transition">
+            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-text-description group-focus-within:text-emerald-solid transition">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
             </div>
           </div>
@@ -390,12 +392,24 @@ case "gallery":
 case "multi-select":
   return (
     <div className="mt-2">
-      <label className="text-[12px] font-medium text-text-description px-1 mb-1 block">{field.label}</label>
       <MultiSelectField
         field={field}
         value={value}
         onChange={onChange}
         error={error}
+      />
+    </div>
+  );
+
+case "multi-features":
+  return (
+    <div className="mt-2">
+      <MultiFeatureField
+        field={field}
+        value={value}
+        onChange={onChange}
+        error={error}
+        disabled={disabled}
       />
     </div>
   );

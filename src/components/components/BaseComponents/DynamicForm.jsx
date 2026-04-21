@@ -58,7 +58,13 @@ useEffect(() => {
         <div className="p-6 md:p-8">
           {/* تقسيم الحقول بشكل متوازن */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-            {fields.map((field) => (
+            {fields
+              .filter((field) => {
+                if (!field?.show_when) return true;
+                const { key, equals } = field.show_when;
+                return formData?.[key] === equals;
+              })
+              .map((field) => (
               <FormFieldRendererLayout
                 key={field.key}
                 field={field}

@@ -136,7 +136,13 @@ export const PackagesFields = [
     optionValue: "id",        
     required: true
   },
-
- 
-  
+  { 
+    key: "features", 
+    label: "Package Features", 
+    type: "multi-features", 
+    cell_type: "relation_list",
+    required: 0, 
+    table_show: false, 
+    form_show: true 
+  },
 ];

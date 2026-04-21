@@ -97,14 +97,14 @@ function RelationSection({ label, items, navigateTo }) {
 
   const allKeys = items.reduce((keys, item) => {
     Object.keys(item).forEach(k => {
-      if (!keys.includes(k) && typeof item[k] !== 'object' && !isImageValue(item[k])) {
+      if (!keys.includes(k) && typeof item[k] !== 'object' && !isImageValue(item[k]) && !['id', 'package_id', 'feature_id', 'created_at', 'updated_at'].includes(k)) {
         keys.push(k);
       }
     });
     return keys;
   }, []);
 
-  const displayKeys = allKeys.slice(0, 4);
+  const displayKeys = allKeys.length > 0 ? allKeys : Object.keys(items[0]).slice(0, 4);
 
   return (
     <>
