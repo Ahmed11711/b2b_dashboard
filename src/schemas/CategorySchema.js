@@ -1,8 +1,4 @@
-/**
- * Auto-generated fields for Provider
- * Generated at: 2026-04-21
- */
-export const ProviderFields = [
+export const CategoryFields = [
   {
     key: "id",
     label: "Id",
@@ -14,6 +10,36 @@ export const ProviderFields = [
     searchable: false,
     filterable: false,
     sortable: true,
+    table_show: false,
+    form_show: false,
+    options: null
+  },
+  {
+    key: "name",
+    label: "Name",
+    type: "text",
+    cell_type: "text",
+    display_field: null,
+    required: 1,
+    placeholder: "Enter Name",
+    searchable: true,
+    filterable: false,
+    sortable: true,
+    table_show: true,
+    form_show: true,
+    options: null
+  },
+  {
+    key: "name_ar",
+    label: "Name Ar",
+    type: "text",
+    cell_type: "text",
+    display_field: null,
+    required: 1,
+    placeholder: "Enter Name Ar",
+    searchable: false,
+    filterable: false,
+    sortable: false,
     table_show: false,
     form_show: false,
     options: null
@@ -34,80 +60,18 @@ export const ProviderFields = [
     options: null
   },
   {
-    key: "name",
-    label: "Name",
-    type: "text",
-    cell_type: "text",
-    display_field: null,
-    required: 1,
-    placeholder: "Enter Name",
-    searchable: true,
-    filterable: false,
-    sortable: true,
-    table_show: true,
-    form_show: true,
-    options: null
-  },
-  {
-    key: "email",
-    label: "Email",
+    key: "sort_order",
+    label: "Sort Order",
     type: "text",
     cell_type: "text",
     display_field: null,
     required: 0,
-    placeholder: "Enter Email",
+    placeholder: "Enter Sort Order",
     searchable: false,
     filterable: false,
     sortable: true,
     table_show: true,
     form_show: true,
-    options: null
-  },
-   
-  
-  {
-    key: "package_name",
-    label: "Package",
-    type: "text",
-    cell_type: "text",
-    display_field: null,
-    required: 0,
-    placeholder: "",
-    searchable: false,
-    filterable: false,
-    sortable: false,
-    table_show: true,
-    form_show: false,
-    options: null
-  },
-  {
-    key: "services_count",
-    label: "Count Services",
-    type: "text",
-    cell_type: "progress",
-    display_field: null,
-    required: 0,
-    placeholder: "",
-    searchable: false,
-    filterable: false,
-    sortable: true,
-    table_show: true,
-    form_show: false,
-    options: null
-  },
-  {
-    key: "reviews_count",
-    label: "Reviews",
-    type: "text",
-    cell_type: "rating",
-    display_field: null,
-    required: 0,
-    placeholder: "",
-    searchable: false,
-    filterable: false,
-    sortable: true,
-    table_show: true,
-    form_show: false,
     options: null
   },
   {
@@ -123,7 +87,7 @@ export const ProviderFields = [
     sortable: true,
     table_show: true,
     form_show: true,
-    options: [{ label: 'Active', value: 1, color: 'success' }, { label: 'Inactive', value: 0, color: 'danger' }]
+    options: [{ label: "Active", value: 1, color: "success" }, { label: "Inactive", value: 0, color: "danger" }]
   },
   {
     key: "created_at",
@@ -132,7 +96,7 @@ export const ProviderFields = [
     cell_type: "date",
     display_field: null,
     required: 0,
-    placeholder: "",
+    placeholder: "Enter Created At",
     searchable: false,
     filterable: false,
     sortable: true,
@@ -141,12 +105,18 @@ export const ProviderFields = [
     options: null
   },
   {
-  key: "services",
-  label: "services",
-  cell_type: "relation_list",
-  view_show: true,
-  tab: true,  
-   headers: "service",
-  filterKey: "user_id",
-}
+    key: "updated_at",
+    label: "Updated At",
+    type: "date",
+    cell_type: "date",
+    display_field: null,
+    required: 0,
+    placeholder: "Enter Updated At",
+    searchable: false,
+    filterable: false,
+    sortable: true,
+    table_show: false,
+    form_show: false,
+    options: null
+  }
 ];

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getOne } from "../../../../service/services/apiService";
+import { getAll, getOne } from "../../../../service/services/apiService";
 
 const getValueByPath = (obj, path) => {
   if (!path || !obj) return null;
@@ -22,13 +22,102 @@ const isImageValue = (val) => {
   );
 };
 
-// ✅ Helper لتحويل أي قيمة لـ array
 const toArray = (val) => {
   if (!val) return [];
   if (Array.isArray(val)) return val;
   if (typeof val === "object") return [val];
   return [];
 };
+
+// ================= Tab Table Section =================
+function TabTableSection({ field, recordId }) {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetch() {
+      try {
+        const res = await getAll(field.endpoint, {
+          [field.filterKey]: recordId,
+        });
+        setItems(res.data || res || []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetch();
+  }, [field.endpoint, recordId]);
+
+  if (loading)
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="w-8 h-8 border-4 border-border-light border-t-emerald-solid rounded-full animate-spin" />
+      </div>
+    );
+
+  if (!items.length)
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-secondary-link">
+        <svg
+          className="w-12 h-12 mb-3 opacity-30"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.5"
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+          />
+        </svg>
+        <p className="text-sm font-medium">No records found</p>
+      </div>
+    );
+
+  // لو عنده headers استخدمها، لو لأ اعمل auto columns
+  const headers = field.headers
+    ? field.headers.filter((h) => h.table_show)
+    : Object.keys(items[0] || {})
+        .filter((k) => typeof items[0][k] !== "object")
+        .slice(0, 5)
+        .map((k) => ({ key: k, label: k.replace(/_/g, " ") }));
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-left border-collapse">
+        <thead>
+          <tr className="bg-bg-surface">
+            {headers.map((h) => (
+              <th
+                key={h.key}
+                className="px-6 py-4 text-xs font-bold text-secondary-link uppercase tracking-wider border-b border-border-light"
+              >
+                {h.label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item, idx) => (
+            <tr
+              key={item.id || idx}
+              className="hover:bg-emerald-tint/50 transition-colors border-b border-border-light last:border-0"
+            >
+              {headers.map((h) => (
+                <td key={h.key} className="px-6 py-4 text-sm text-carbon-gray">
+                  <DynamicValueRenderer value={item[h.key]} labelKey={h.key} />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 // ================= Relation Modal =================
 function RelationModal({ isOpen, onClose, item, label }) {
@@ -184,6 +273,7 @@ export default function GenericViewPage({ entityName, title, fields }) {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState(0); // 0 = Basic Info
 
   useEffect(() => {
     async function fetchData() {
@@ -202,18 +292,29 @@ export default function GenericViewPage({ entityName, title, fields }) {
   if (loading) return <LoadingSkeleton />;
   if (!data) return <NotFound />;
 
+  // ✅ الـ fields اللي عندها tab: true
+  const tabFields = fields.filter((f) => f.tab === true);
+
   const mainFields = fields.filter(
     (f) =>
       f.view_show !== false &&
       f.cell_type !== "relation" &&
-      f.cell_type !== "relation_list",
+      f.cell_type !== "relation_list" &&
+      !f.tab,
   );
-
   const relationListFields = fields.filter(
     (f) =>
       f.view_show === true &&
+      !f.tab &&
       (f.cell_type === "relation" || f.cell_type === "relation_list"),
   );
+  const relationTabs = data
+    ? Object.entries(data).filter(
+        ([key, val]) => Array.isArray(val) && val.length > 0,
+      )
+    : [];
+
+  const hasTabs = relationTabs.length > 0;
   const imageFields = mainFields.filter(
     (f) => f.type === "file" || f.cell_type === "image",
   );
@@ -234,6 +335,7 @@ export default function GenericViewPage({ entityName, title, fields }) {
       f.key !== "name" &&
       typeof data[f.key] !== "object",
   );
+
   const titleVal =
     data.title || data.name || data.label || title || `Item #${id}`;
   const firstImage = imageFields.length > 0 ? data[imageFields[0].key] : null;
@@ -295,7 +397,7 @@ export default function GenericViewPage({ entityName, title, fields }) {
                           strokeLinejoin="round"
                           strokeWidth="2"
                           d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        ></path>
+                        />
                       </svg>
                     </div>
                   ))}
@@ -317,7 +419,7 @@ export default function GenericViewPage({ entityName, title, fields }) {
                             strokeLinejoin="round"
                             strokeWidth="2"
                             d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                          ></path>
+                          />
                         </svg>
                         {data[f.key] || "N/A"}
                       </span>
@@ -334,7 +436,6 @@ export default function GenericViewPage({ entityName, title, fields }) {
                 </div>
               )}
             </div>
-
             {numericFields.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {numericFields.map((field) => (
@@ -359,7 +460,6 @@ export default function GenericViewPage({ entityName, title, fields }) {
                 ))}
               </div>
             )}
-
             {otherFields.length > 2 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-6 border-t border-border-light">
                 {otherFields.slice(2).map((field) => (
@@ -376,7 +476,7 @@ export default function GenericViewPage({ entityName, title, fields }) {
                           strokeLinejoin="round"
                           strokeWidth="2"
                           d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        ></path>
+                        />
                       </svg>
                     </div>
                     <div>
@@ -397,7 +497,7 @@ export default function GenericViewPage({ entityName, title, fields }) {
           </div>
         </div>
 
-        {/* ✅ Relation List - مع toArray لحل مشكلة object vs array */}
+        {/* ✅ Relation بدون tabs */}
         {relationListFields.map((relField, idx) => (
           <RelationSection
             key={idx}
@@ -406,19 +506,45 @@ export default function GenericViewPage({ entityName, title, fields }) {
             navigateTo={relField.navigate_to || null}
           />
         ))}
+
+        {/* ✅ Tabs Section */}
+        {hasTabs && (
+          <div className="bg-card-bg rounded-2xl shadow-sm border border-border-light overflow-hidden">
+            {/* Tab Headers */}
+            <div className="flex border-b border-border-light overflow-x-auto">
+              {relationTabs.map(([key], idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveTab(idx)}
+                  className={`px-6 py-4 text-sm font-bold whitespace-nowrap capitalize transition-all border-b-2 -mb-px ${
+                    activeTab === idx
+                      ? "border-emerald-solid text-emerald-solid bg-emerald-tint/30"
+                      : "border-transparent text-secondary-link hover:text-carbon-gray hover:bg-bg-surface"
+                  }`}
+                >
+                  {key.replace(/_/g, " ")}
+                </button>
+              ))}
+            </div>
+
+            {/* Tab Content */}
+            <div className="p-0">
+              <EmbeddedRelationTable
+                items={relationTabs[activeTab]?.[1] || []}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-// ================= DynamicValueRenderer ✅ مصلح بالكامل =================
+// ================= DynamicValueRenderer =================
 function DynamicValueRenderer({ value, labelKey }) {
-  // 1. قيمة فارغة
   if (value === null || value === undefined || value === "") {
     return <span className="text-secondary-link font-medium italic">-</span>;
   }
-
-  // 2. ✅ Object check أولاً قبل String()
   if (typeof value === "object" && !Array.isArray(value)) {
     return (
       <span className="text-carbon-black font-medium text-sm">
@@ -426,12 +552,8 @@ function DynamicValueRenderer({ value, labelKey }) {
       </span>
     );
   }
-
-  // 3. الآن بأمان نعمل String()
   const stringValue = String(value);
   const keyName = String(labelKey || "").toLowerCase();
-
-  // 4. صور URL
   const isImageUrl = stringValue.match(
     /\.(jpeg|jpg|gif|png|webp|svg)$|unsplash\.com/i,
   );
@@ -454,8 +576,6 @@ function DynamicValueRenderer({ value, labelKey }) {
       </div>
     );
   }
-
-  // 5. isImageValue
   if (isImageValue(value)) {
     return (
       <img
@@ -465,24 +585,16 @@ function DynamicValueRenderer({ value, labelKey }) {
       />
     );
   }
-
-  // 6. Boolean
   if (value === 0 || value === 1 || value === true || value === false) {
     const isActive = value == 1 || value === true;
     return (
       <span
-        className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-          isActive
-            ? "bg-status-success-bg text-status-success-text"
-            : "bg-status-error-bg text-status-error-text"
-        }`}
+        className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${isActive ? "bg-status-success-bg text-status-success-text" : "bg-status-error-bg text-status-error-text"}`}
       >
         {isActive ? "Yes" : "No"}
       </span>
     );
   }
-
-  // 7. Status
   if (keyName.includes("status")) {
     const statusColors = {
       pending: "bg-status-warning-bg text-status-warning-text",
@@ -503,8 +615,6 @@ function DynamicValueRenderer({ value, labelKey }) {
       </span>
     );
   }
-
-  // 8. نص طويل
   if (stringValue.length > 60) {
     return (
       <span className="text-text-description text-sm">
@@ -512,7 +622,6 @@ function DynamicValueRenderer({ value, labelKey }) {
       </span>
     );
   }
-
   return (
     <span className="text-carbon-black font-medium text-sm">{stringValue}</span>
   );

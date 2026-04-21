@@ -25,6 +25,8 @@ import {UserFields} from "./schemas/UserSchema"
 import ProviderPage from "./pages/Provider/ProviderPage";
 import {ProviderFields} from "./schemas/ProviderSchema"
 import CustomerPage from "./pages/Customer/CustomerPage";
+import CategoryPage from "./pages/Category/CategoryPage";
+import {CategoryFields} from "./schemas/CategorySchema"
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem("token");
@@ -86,9 +88,13 @@ export default function App() {
         <Route path="/Provider/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="provider" fields={ProviderFields} mode="edit" title="Edit Provider Item" /></ProtectedRoute>} />
         <Route path="/Provider/view/:id" element={<ProtectedRoute><GenericViewPage entityName="provider" fields={ProviderFields} title="Provider Item Details" /></ProtectedRoute>} />
 
- {/* Customer  Routes */}
+        {/* Customer  Routes */}
         <Route path="/Customer" element={<ProtectedRoute><CustomerPage /></ProtectedRoute>} />
  
+ {/* Category  Routes */}
+        <Route path="/Category" element={<ProtectedRoute><CategoryPage /></ProtectedRoute>} />
+        <Route path="/Category/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="categories" fields={CategoryFields} mode="edit" title="Edit Category Item" /></ProtectedRoute>} />
+        <Route path="/Category/view/:id" element={<ProtectedRoute><GenericViewPage entityName="categories" fields={CategoryFields} title="Category Item Details" /></ProtectedRoute>} />
 
 
       </Routes>

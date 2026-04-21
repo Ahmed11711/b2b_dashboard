@@ -140,4 +140,7 @@ export const CustomerFields = [
     form_show: false,
     options: null
   },
+
+ 
+
 ];
