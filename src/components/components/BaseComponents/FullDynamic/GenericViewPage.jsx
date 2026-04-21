@@ -21,6 +21,24 @@ const toArray = (val) => {
   return [];
 };
 
+const sanitizeHtml = (html = "") => {
+  if (typeof window === "undefined") return html;
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(String(html), "text/html");
+
+  doc.querySelectorAll("script, style, iframe, object, embed").forEach((el) => el.remove());
+  doc.querySelectorAll("*").forEach((el) => {
+    [...el.attributes].forEach((attr) => {
+      const name = attr.name.toLowerCase();
+      if (name.startsWith("on") || name === "style") {
+        el.removeAttribute(attr.name);
+      }
+    });
+  });
+
+  return doc.body.innerHTML;
+};
+
 // ================= Relation Modal =================
 function RelationModal({ isOpen, onClose, item, label }) {
   if (!isOpen || !item) return null;
@@ -214,7 +232,7 @@ const otherFields = mainFields.filter(f =>
                     {otherFields.slice(0, 2).map(f => (
                       <span key={f.key} className="flex items-center gap-1.5">
                         <svg className="w-4 h-4 text-secondary-link" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-                        {data[f.key] || 'N/A'}
+                        <DynamicValueRenderer value={data[f.key]} labelKey={f.key} />
                       </span>
                     ))}
                   </div>
@@ -296,6 +314,7 @@ function DynamicValueRenderer({ value, labelKey }) {
   // 3. الآن بأمان نعمل String()
   const stringValue = String(value);
   const keyName = String(labelKey || '').toLowerCase();
+  const hasHtml = /<\/?[a-z][\s\S]*>/i.test(stringValue);
 
   // 4. صور URL
   const isImageUrl = stringValue.match(/\.(jpeg|jpg|gif|png|webp|svg)$|unsplash\.com/i);
@@ -340,6 +359,16 @@ function DynamicValueRenderer({ value, labelKey }) {
       <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${colorClass}`}>
         {stringValue}
       </span>
+    );
+  }
+
+  // 8. Rich text / HTML content
+  if (hasHtml) {
+    return (
+      <div
+        className="text-carbon-black font-medium text-sm [&_p]:mb-1 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(stringValue) }}
+      />
     );
   }
 

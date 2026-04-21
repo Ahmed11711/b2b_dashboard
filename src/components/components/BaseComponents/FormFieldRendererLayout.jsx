@@ -7,6 +7,7 @@ import "react-quill/dist/quill.snow.css";
 export default function FormFieldRendererLayout({ field, value, onChange, error, disabled }) {
   const [options, setOptions] = useState(Array.isArray(field?.options) ? field.options : []);
   const [loading, setLoading] = useState(false);
+  const [translating, setTranslating] = useState(false);
 
   useEffect(() => {
     const isRelation = field?.type === "select" && !Array.isArray(field?.options);
@@ -54,6 +55,41 @@ export default function FormFieldRendererLayout({ field, value, onChange, error,
 
   // 👇 الجزء المضاف: تنظيف القيمة من الـ 0 أو الـ null لو الحقل اختياري
   const displayValue = (value === null || value === undefined) ? "" : value;
+
+  const stripHtml = (html = "") => {
+    if (typeof window === "undefined") return String(html);
+    const div = document.createElement("div");
+    div.innerHTML = String(html);
+    return div.textContent || div.innerText || "";
+  };
+
+  const escapeHtml = (text = "") =>
+    String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+  const translateContent = async (targetLang) => {
+    const sourceText = stripHtml(displayValue).trim();
+    if (!sourceText || disabled || translating) return;
+
+    setTranslating(true);
+    try {
+      const sourceLang = targetLang === "ar" ? "en" : "ar";
+      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(sourceText)}&langpair=${sourceLang}|${targetLang}`;
+      const response = await fetch(url);
+      const result = await response.json();
+      const translated = result?.responseData?.translatedText;
+
+      if (translated) {
+        onChange(field.key, `<p>${escapeHtml(translated)}</p>`);
+      }
+    } catch (translateError) {
+      console.error("Translation failed:", translateError);
+    } finally {
+      setTranslating(false);
+    }
+  };
 
   // ================= STYLES =================
 
