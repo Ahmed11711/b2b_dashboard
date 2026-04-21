@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getAll } from "../../../service/services/apiService";
 import MultiSelectField from "../../components/BaseComponents/MultiSelectField";
-import ReactQuill from 'react-quill-new';
+import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
 
