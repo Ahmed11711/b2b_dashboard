@@ -72,18 +72,17 @@ export const PackagesFields = [
     required: 1, 
     placeholder: "Enter Duration Months",
     searchable: false,
-    filterable: true,
+    filterable: false,
     sortable: true,
     table_show: true,
     form_show: true,
     options: null
   },
-  // الحقل الجديد الخاص بالحالة
-  { 
+   { 
     key: "active", 
     label: "Status", 
-    type: "select", // استخدام select بدلاً من text
-    cell_type: "badge", // يفضل عرضه كـ badge في الجدول
+    type: "select", 
+    cell_type: "badge",
     display_field: null,
     required: 1, 
     placeholder: "Select Status",
@@ -92,8 +91,8 @@ export const PackagesFields = [
     sortable: true,
     table_show: true,
     form_show: true,
-    // الخيارات المتاحة للـ Enum
-    options: [
+     options: [
+      
       { value: "active", label: "Active" },
       { value: "inactive", label: "Inactive" }
     ]
@@ -138,12 +137,6 @@ export const PackagesFields = [
     required: true
   },
 
-  // ✅ Single select من API (dropdown)
-  {
-    key: "status",
-    label: "Status",
-    type: "multi-select",
-    single: true,              
-    endpoint: "statuses",
-  },
+ 
+  
 ];

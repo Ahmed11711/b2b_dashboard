@@ -76,8 +76,8 @@ function CreateRecordModal({ isOpen, onClose, endpoint, headers, onRefresh, titl
 const handleFormSubmit = async (formData) => {
   try {
     const payload = new FormData();
-    
-    // ✅ تأكد إن الـ boolean/checkbox بيتبعت حتى لو 0
+
+    // ✅ Boolean fields
     headers.forEach(h => {
       if (h.type === "checkbox" || h.type === "boolean") {
         const val = formData[h.key];
@@ -87,10 +87,18 @@ const handleFormSubmit = async (formData) => {
 
     Object.keys(formData).forEach((key) => {
       const value = formData[key];
-      // تجاهل الـ boolean لأنا عملناهم فوق
       const field = headers.find(h => h.key === key);
+
       if (field?.type === "checkbox" || field?.type === "boolean") return;
-      
+
+      // ✅ Gallery
+      if (key === "gallery" && Array.isArray(value)) {
+        value.forEach((item) => {
+          payload.append(`gallery[]`, item.file);
+        });
+        return;
+      }
+
       if (value !== null && value !== undefined) {
         payload.append(key, value);
       }
@@ -107,7 +115,6 @@ const handleFormSubmit = async (formData) => {
     return { success: false, message: "Error occurred" };
   }
 };
-
   return (
     <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
       <div className="bg-white rounded-[3rem] shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-slate-100 animate-in zoom-in-95 duration-200 relative scrollbar-hide">
