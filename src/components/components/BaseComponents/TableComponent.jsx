@@ -23,29 +23,29 @@ export default function TableComponent({ headers, data, onEdit, onDelete, onView
   const [relationOptions, setRelationOptions] = useState({});
 
   // ✅ جديد - جلب الـ options من الـ API
-  useEffect(() => {
-    const relationFields = headers.filter(
-      h => h.filterable && h.cell_type === "relation" && h.endpoint
-    );
+ useEffect(() => {
+  const relationFields = headers.filter(h => h.filterable && h.cell_type === "relation" && h.endpoint);
+  
+  relationFields.forEach(async (field) => {
+    // نتحقق أولاً لمنع الطلبات المتكررة لنفس الـ endpoint
+    if (relationOptions[field.key]) return; 
 
-    relationFields.forEach(async (field) => {
-      try {
-        const res = await getAll(field.endpoint, { fields: field.relation_fields });
-        const data = res.data || [];
+    try {
+      const res = await getAll(field.endpoint, { fields: field.relation_fields });
+      const rawData = res.data || res;
 
-        setRelationOptions(prev => ({
-          ...prev,
-          [field.key]: data.map(item => ({
-            label: item[field.options.label],
-            value: item[field.options.value]
-          }))
-        }));
-      } catch (err) {
-        console.error(`Failed to load options for ${field.key}`, err);
-      }
-    });
-  }, [headers]);
-
+      setRelationOptions(prev => ({
+        ...prev,
+        [field.key]: Array.isArray(rawData) ? rawData.map(item => ({
+          label: item[field.options?.label || 'name'],
+          value: item[field.options?.value || 'id']
+        })) : []
+      }));
+    } catch (err) {
+      console.error(`Failed to load options for ${field.key}`, err);
+    }
+  });
+}, [headers]); // تأكد أن الـ headers مستقرة (Memoized) في المكون الأب
   const sortedData = [...data].sort((a, b) => {
     if (!sortConfig.key) return 0;
     const aValue = a[sortConfig.key];

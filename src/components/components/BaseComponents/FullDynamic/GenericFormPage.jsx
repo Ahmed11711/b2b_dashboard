@@ -27,35 +27,35 @@ const handleSubmit = async (formData) => {
   try {
     const dataToSend = new FormData();
 
-    // نلف على كل الحقول ونقرر هنبعت إيه
     Object.keys(formData).forEach((key) => {
       const value = formData[key];
 
-      // 1. لو الحقل عبارة عن ملف جديد (File Object) -> نبعته
+      // ✅ Gallery - array of { file, type }
+      if (key === "gallery" && Array.isArray(value)) {
+       value.forEach((item, index) => {
+  payload.append(`gallery[${index}][file]`, item.file);
+  payload.append(`gallery[${index}][type]`, item.type);
+});
+        return;
+      }
+
       if (value instanceof File) {
         dataToSend.append(key, value);
-      } 
-      // 2. لو الحقل نصي وفيه قيمة (ومش لينك صورة قديمة) -> نبعته
-      else if (typeof value !== "string" || !value.startsWith("http")) {
-        // بنبعت القيمة لو مش لينك، أو لو كانت Null/Empty (حسب منطق الـ API عندك)
+      } else if (typeof value !== "string" || !value.startsWith("http")) {
         if (value !== null && value !== undefined) {
           dataToSend.append(key, value);
         }
       }
-      // ملحوظة: لو القيمة String وبتبدأ بـ http (يعني صورة قديمة) "بنتجاهلها"
-      // لأن لارايفل أوريدي عندها الصورة في الـ DB ومش محتاجة اللينك تاني في الـ Request
     });
 
     if (mode === "edit") {
-      // نستخدم الـ updateItem اللي ظبطناها بالـ _method = PUT
       await updateItem(endpoint, id, dataToSend);
     } else {
       await createItem(endpoint, dataToSend);
     }
-    
+
     navigate(-1);
   } catch (err) {
-    // لو الـ API رجعت Validation Errors، اعرضها في الفورم
     if (err.response?.data?.errors) {
       return { success: false, errors: err.response.data.errors };
     }

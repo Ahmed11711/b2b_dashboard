@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { getAll } from "../../../service/services/apiService";
 import MultiSelectField from "../../components/BaseComponents/MultiSelectField";
-import ReactQuill from "react-quill";
+import ReactQuill from 'react-quill-new';
 import "react-quill/dist/quill.snow.css";
+
+
 
 export default function FormFieldRendererLayout({ field, value, onChange, error, disabled }) {
   const [options, setOptions] = useState(Array.isArray(field?.options) ? field.options : []);
@@ -46,13 +48,12 @@ export default function FormFieldRendererLayout({ field, value, onChange, error,
 
   if (!field) return null;
 
-  // 👇 الجزء المضاف: تحديد العرض الكامل بناءً على الـ key أو الـ type
-  const isFullWidth = 
-    field.type === "textarea" || 
-    field.type === "file" ||
-    field.key?.toLowerCase().includes("description") || 
-    field.key?.toLowerCase().includes("desc");
-
+ const isFullWidth = 
+  field.type === "textarea" || 
+  field.type === "file" ||
+  field.type === "gallery" ||   // ← أضيف السطر ده
+  field.key?.toLowerCase().includes("description") || 
+  field.key?.toLowerCase().includes("desc");
   // 👇 الجزء المضاف: تنظيف القيمة من الـ 0 أو الـ null لو الحقل اختياري
   const displayValue = (value === null || value === undefined) ? "" : value;
 
@@ -137,6 +138,136 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
             </div>
           </div>
         );
+
+
+
+
+
+
+
+
+case "gallery":
+  const galleryFiles = Array.isArray(value) ? value : [];
+
+  const FILE_TYPES = [
+    { label: "Image", value: "image", accept: "image/*", icon: "🖼️" },
+    { label: "PDF",   value: "pdf",   accept: ".pdf",    icon: "📄" },
+    { label: "Word",  value: "word",  accept: ".doc,.docx", icon: "📝" },
+    { label: "Excel", value: "excel", accept: ".xls,.xlsx", icon: "📊" },
+    { label: "Video", value: "video", accept: "video/*", icon: "🎬" },
+  ];
+
+  const [selectedType, setSelectedType] = useState("image");
+
+  const currentAccept = FILE_TYPES.find(t => t.value === selectedType)?.accept || "*";
+
+  const handleGalleryAdd = (e) => {
+    const files = Array.from(e.target.files).map(file => ({
+      file,
+      type: selectedType,
+      preview: selectedType === "image" ? URL.createObjectURL(file) : null,
+      name: file.name,
+    }));
+    onChange(field.key, [...galleryFiles, ...files]);
+    e.target.value = "";
+  };
+
+  const handleGalleryRemove = (index) => {
+    const updated = galleryFiles.filter((_, i) => i !== index);
+    onChange(field.key, updated);
+  };
+
+  return (
+    <div className="flex flex-col gap-3">
+      <label className="text-[12px] font-medium text-text-description px-1">
+        {field.label}
+      </label>
+
+      {/* Type Selector */}
+      <div className="flex flex-wrap gap-2">
+        {FILE_TYPES.map(t => (
+          <button
+            key={t.value}
+            type="button"
+            onClick={() => setSelectedType(t.value)}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200
+              ${selectedType === t.value
+                ? "bg-emerald-solid text-white border-emerald-solid shadow"
+                : "bg-card-bg text-text-description border-border-thin hover:border-emerald-solid/50"
+              }`}
+          >
+            {t.icon} {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Upload Area */}
+      <div className="relative border border-dashed border-emerald-solid/50 bg-emerald-tint/20 rounded-[20px] p-5 text-center hover:bg-emerald-tint/40 transition-all cursor-pointer">
+        <input
+          type="file"
+          accept={currentAccept}
+          multiple
+          onChange={handleGalleryAdd}
+          className="absolute inset-0 opacity-0 cursor-pointer"
+        />
+        <div className="flex flex-col items-center gap-1.5 pointer-events-none">
+          <svg className="w-6 h-6 text-emerald-solid" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+          </svg>
+          <p className="text-text-description text-xs font-medium">
+            Upload {FILE_TYPES.find(t => t.value === selectedType)?.label} files
+          </p>
+        </div>
+      </div>
+
+      {/* Preview Grid */}
+      {galleryFiles.length > 0 && (
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mt-1">
+          {galleryFiles.map((item, index) => (
+            <div key={index} className="relative group rounded-2xl border border-border-light overflow-hidden shadow-sm bg-slate-50">
+              {item.preview ? (
+                <img src={item.preview} className="w-full h-20 object-cover" alt={item.name} />
+              ) : (
+                <div className="w-full h-20 flex flex-col items-center justify-center gap-1">
+                  <span className="text-2xl">
+                    {FILE_TYPES.find(t => t.value === item.type)?.icon || "📁"}
+                  </span>
+                  <span className="text-[10px] text-text-description text-center px-1 truncate w-full text-center">
+                    {item.name}
+                  </span>
+                </div>
+              )}
+
+              {/* Type Badge */}
+              <span className="absolute top-1 left-1 bg-emerald-solid text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase">
+                {item.type}
+              </span>
+
+              {/* Remove Button */}
+              <button
+                type="button"
+                onClick={() => handleGalleryRemove(index)}
+                className="absolute top-1 right-1 p-1 bg-status-error-bg text-status-error-text rounded-full opacity-0 group-hover:opacity-100 transition-all hover:scale-110"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+
+
+
+
+
+
+
+
 
       // ================= TEXTAREA / RICH TEXT =================
       case "textarea":

@@ -9,11 +9,14 @@ import { Notification } from "../types";
 
 const adminNavItems = [
   
+  
   { icon: LayoutDashboard, label: "Overview", path: "/" },
   { icon: User, label: "Packages", path: "/Packages" },
   { icon: User, label: "Ads", path: "/Ads" },
 { icon: ShoppingBag, label: "Bag", path: "/Bag" },
 { icon: LayoutGrid, label: "Bags Categories", path: "/bags_categories" },
+  { icon: User, label: "Bag Items", path: "/bag_items" },
+
 { icon: Palette, label: "Style Guide", path: "/style-guide" },
 
 
