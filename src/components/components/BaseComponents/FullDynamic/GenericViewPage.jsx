@@ -4,20 +4,29 @@ import { getOne } from "../../../../service/services/apiService";
 
 const getValueByPath = (obj, path) => {
   if (!path || !obj) return null;
-  return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : null), obj);
+  return path
+    .split(".")
+    .reduce(
+      (acc, key) => (acc && acc[key] !== undefined ? acc[key] : null),
+      obj,
+    );
 };
 
 const isImageValue = (val) => {
-  const s = String(val ?? '');
-  return (s.startsWith('http') || s.startsWith('/storage') || s.startsWith('data:image')) &&
-    (s.match(/\.(jpeg|jpg|gif|png|webp|svg)/i) || s.startsWith('data:image'));
+  const s = String(val ?? "");
+  return (
+    (s.startsWith("http") ||
+      s.startsWith("/storage") ||
+      s.startsWith("data:image")) &&
+    (s.match(/\.(jpeg|jpg|gif|png|webp|svg)/i) || s.startsWith("data:image"))
+  );
 };
 
 // ✅ Helper لتحويل أي قيمة لـ array
 const toArray = (val) => {
   if (!val) return [];
   if (Array.isArray(val)) return val;
-  if (typeof val === 'object') return [val];
+  if (typeof val === "object") return [val];
   return [];
 };
 
@@ -29,9 +38,22 @@ function RelationModal({ isOpen, onClose, item, label }) {
       <div className="bg-card-bg rounded-3xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto border border-border-light animate-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between px-8 py-6 border-b border-border-light sticky top-0 bg-card-bg z-10 rounded-t-3xl">
           <h3 className="text-xl font-bold text-heading-slate">{label}</h3>
-          <button onClick={onClose} className="p-2 rounded-xl bg-bg-surface text-carbon-gray hover:bg-status-error-bg hover:text-status-error-text transition-all">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+          <button
+            onClick={onClose}
+            className="p-2 rounded-xl bg-bg-surface text-carbon-gray hover:bg-status-error-bg hover:text-status-error-text transition-all"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2.5"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -41,19 +63,30 @@ function RelationModal({ isOpen, onClose, item, label }) {
               if (!isImageValue(val)) return null;
               return (
                 <div key={key} className="space-y-2">
-                  <p className="text-xs font-bold uppercase text-secondary-link tracking-wider">{key.replace(/_/g, ' ')}</p>
-                  <img src={String(val)} alt={key} className="w-32 h-32 rounded-2xl object-cover border border-border-light shadow-sm" />
+                  <p className="text-xs font-bold uppercase text-secondary-link tracking-wider">
+                    {key.replace(/_/g, " ")}
+                  </p>
+                  <img
+                    src={String(val)}
+                    alt={key}
+                    className="w-32 h-32 rounded-2xl object-cover border border-border-light shadow-sm"
+                  />
                 </div>
               );
             })}
           </div>
           <div className="grid grid-cols-2 gap-5">
             {Object.entries(item).map(([key, val]) => {
-              if (typeof val === 'object' && val !== null) return null;
+              if (typeof val === "object" && val !== null) return null;
               if (isImageValue(val)) return null;
               return (
-                <div key={key} className="bg-bg-surface rounded-2xl p-4 border border-border-light">
-                  <p className="text-[10px] font-bold uppercase text-secondary-link mb-1 tracking-widest">{key.replace(/_/g, ' ')}</p>
+                <div
+                  key={key}
+                  className="bg-bg-surface rounded-2xl p-4 border border-border-light"
+                >
+                  <p className="text-[10px] font-bold uppercase text-secondary-link mb-1 tracking-widest">
+                    {key.replace(/_/g, " ")}
+                  </p>
                   <DynamicValueRenderer value={val} labelKey={key} />
                 </div>
               );
@@ -73,13 +106,17 @@ function RelationSection({ label, items, navigateTo }) {
   if (!items || !Array.isArray(items) || items.length === 0) return null;
 
   const handleRowClick = (item) => {
-    if (navigateTo) navigate(navigateTo.replace(':id', item.id));
+    if (navigateTo) navigate(navigateTo.replace(":id", item.id));
     else setModalItem(item);
   };
 
   const allKeys = items.reduce((keys, item) => {
-    Object.keys(item).forEach(k => {
-      if (!keys.includes(k) && typeof item[k] !== 'object' && !isImageValue(item[k])) {
+    Object.keys(item).forEach((k) => {
+      if (
+        !keys.includes(k) &&
+        typeof item[k] !== "object" &&
+        !isImageValue(item[k])
+      ) {
         keys.push(k);
       }
     });
@@ -92,15 +129,20 @@ function RelationSection({ label, items, navigateTo }) {
     <>
       <div className="bg-card-bg rounded-2xl shadow-sm border border-border-light overflow-hidden mt-6">
         <div className="px-6 py-5 border-b border-border-light bg-card-bg">
-          <h3 className="text-lg font-bold text-heading-slate capitalize">{label}</h3>
+          <h3 className="text-lg font-bold text-heading-slate capitalize">
+            {label}
+          </h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-bg-surface">
-                {displayKeys.map(key => (
-                  <th key={key} className="px-6 py-4 text-xs font-bold text-secondary-link uppercase tracking-wider border-b border-border-light">
-                    {key.replace(/_/g, ' ')}
+                {displayKeys.map((key) => (
+                  <th
+                    key={key}
+                    className="px-6 py-4 text-xs font-bold text-secondary-link uppercase tracking-wider border-b border-border-light"
+                  >
+                    {key.replace(/_/g, " ")}
                   </th>
                 ))}
               </tr>
@@ -112,8 +154,11 @@ function RelationSection({ label, items, navigateTo }) {
                   onClick={() => handleRowClick(item)}
                   className="hover:bg-emerald-tint/50 cursor-pointer transition-colors border-b border-border-light last:border-0"
                 >
-                  {displayKeys.map(key => (
-                    <td key={key} className="px-6 py-4 text-sm text-carbon-gray">
+                  {displayKeys.map((key) => (
+                    <td
+                      key={key}
+                      className="px-6 py-4 text-sm text-carbon-gray"
+                    >
                       <DynamicValueRenderer value={item[key]} labelKey={key} />
                     </td>
                   ))}
@@ -123,7 +168,12 @@ function RelationSection({ label, items, navigateTo }) {
           </table>
         </div>
       </div>
-      <RelationModal isOpen={!!modalItem} onClose={() => setModalItem(null)} item={modalItem} label={label} />
+      <RelationModal
+        isOpen={!!modalItem}
+        onClose={() => setModalItem(null)}
+        item={modalItem}
+        label={label}
+      />
     </>
   );
 }
@@ -152,40 +202,64 @@ export default function GenericViewPage({ entityName, title, fields }) {
   if (loading) return <LoadingSkeleton />;
   if (!data) return <NotFound />;
 
-const mainFields = fields.filter(f => 
-  f.cell_type !== 'relation' && f.cell_type !== 'relation_list'
-);
+  const mainFields = fields.filter(
+    (f) =>
+      f.view_show !== false &&
+      f.cell_type !== "relation" &&
+      f.cell_type !== "relation_list",
+  );
 
-const relationListFields = fields.filter(f => 
-  f.cell_type === 'relation' || f.cell_type === 'relation_list'
-);
-  const imageFields = mainFields.filter(f => f.type === 'file' || f.cell_type === 'image');
-  const numericFields = mainFields.filter(f => f.type === 'number' || typeof data[f.key] === 'number');
-  const statusFields = mainFields.filter(f => f.key.toLowerCase().includes('status') || typeof data[f.key] === 'boolean');
-const otherFields = mainFields.filter(f =>
-  !imageFields.includes(f) &&
-  !numericFields.includes(f) &&
-  !statusFields.includes(f) &&
-  f.key !== 'title' &&
-  f.key !== 'name' &&
-  typeof data[f.key] !== 'object'  
-);
-  const titleVal = data.title || data.name || data.label || title || `Item #${id}`;
+  const relationListFields = fields.filter(
+    (f) =>
+      f.view_show === true &&
+      (f.cell_type === "relation" || f.cell_type === "relation_list"),
+  );
+  const imageFields = mainFields.filter(
+    (f) => f.type === "file" || f.cell_type === "image",
+  );
+  const numericFields = mainFields.filter(
+    (f) => f.type === "number" || typeof data[f.key] === "number",
+  );
+  const statusFields = mainFields.filter(
+    (f) =>
+      f.key.toLowerCase().includes("status") ||
+      typeof data[f.key] === "boolean",
+  );
+  const otherFields = mainFields.filter(
+    (f) =>
+      !imageFields.includes(f) &&
+      !numericFields.includes(f) &&
+      !statusFields.includes(f) &&
+      f.key !== "title" &&
+      f.key !== "name" &&
+      typeof data[f.key] !== "object",
+  );
+  const titleVal =
+    data.title || data.name || data.label || title || `Item #${id}`;
   const firstImage = imageFields.length > 0 ? data[imageFields[0].key] : null;
   const mainStatusField = statusFields.length > 0 ? statusFields[0] : null;
 
   return (
     <div className="min-h-screen bg-bg-surface py-8 px-4 md:px-8">
       <div className="max-w-6xl mx-auto space-y-6">
-
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => navigate(-1)}
             className="flex items-center justify-center w-10 h-10 bg-card-bg hover:bg-emerald-tint text-carbon-gray rounded-full transition-all duration-300 shadow-sm border border-border-thin"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2.5"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
           <h2 className="text-2xl font-bold text-heading-slate">Details</h2>
@@ -194,27 +268,58 @@ const otherFields = mainFields.filter(f =>
         {/* Basic Information Card */}
         <div className="bg-card-bg rounded-2xl shadow-sm border border-border-light overflow-hidden">
           <div className="px-6 py-5 border-b border-border-light">
-            <h3 className="text-lg font-bold text-heading-slate">Basic Information</h3>
+            <h3 className="text-lg font-bold text-heading-slate">
+              Basic Information
+            </h3>
           </div>
           <div className="p-6 md:p-8 space-y-8">
             <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
               <div className="flex items-center gap-5">
-                {imageFields.length > 0 && (
-                  firstImage ? (
-                    <img src={firstImage} alt={titleVal} className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-4 border-bg-surface shadow-sm" />
+                {imageFields.length > 0 &&
+                  (firstImage ? (
+                    <img
+                      src={firstImage}
+                      alt={titleVal}
+                      className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-4 border-bg-surface shadow-sm"
+                    />
                   ) : (
                     <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-border-light flex items-center justify-center border-4 border-bg-surface shadow-sm">
-                      <svg className="w-8 h-8 text-secondary-link" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                      <svg
+                        className="w-8 h-8 text-secondary-link"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        ></path>
+                      </svg>
                     </div>
-                  )
-                )}
+                  ))}
                 <div>
-                  <h4 className="text-xl md:text-2xl font-bold text-heading-slate mb-2">{titleVal}</h4>
+                  <h4 className="text-xl md:text-2xl font-bold text-heading-slate mb-2">
+                    {titleVal}
+                  </h4>
                   <div className="flex items-center gap-4 text-sm text-secondary-link font-medium">
-                    {otherFields.slice(0, 2).map(f => (
+                    {otherFields.slice(0, 2).map((f) => (
                       <span key={f.key} className="flex items-center gap-1.5">
-                        <svg className="w-4 h-4 text-secondary-link" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-                        {data[f.key] || 'N/A'}
+                        <svg
+                          className="w-4 h-4 text-secondary-link"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                          ></path>
+                        </svg>
+                        {data[f.key] || "N/A"}
                       </span>
                     ))}
                   </div>
@@ -222,21 +327,33 @@ const otherFields = mainFields.filter(f =>
               </div>
               {mainStatusField && data[mainStatusField.key] !== undefined && (
                 <div className="shrink-0">
-                  <DynamicValueRenderer value={data[mainStatusField.key]} labelKey={mainStatusField.key} />
+                  <DynamicValueRenderer
+                    value={data[mainStatusField.key]}
+                    labelKey={mainStatusField.key}
+                  />
                 </div>
               )}
             </div>
 
             {numericFields.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {numericFields.map(field => (
-                  <div key={field.key} className="bg-bg-surface rounded-2xl p-5 border border-border-light flex items-center justify-between">
+                {numericFields.map((field) => (
+                  <div
+                    key={field.key}
+                    className="bg-bg-surface rounded-2xl p-5 border border-border-light flex items-center justify-between"
+                  >
                     <div>
-                      <p className="text-xs font-bold uppercase text-secondary-link mb-1">{field.label}</p>
-                      <h5 className="text-xl font-bold text-heading-slate">{data[field.key] || 0}</h5>
+                      <p className="text-xs font-bold uppercase text-secondary-link mb-1">
+                        {field.label}
+                      </p>
+                      <h5 className="text-xl font-bold text-heading-slate">
+                        {data[field.key] || 0}
+                      </h5>
                     </div>
                     <div className="w-12 h-12 rounded-full border-4 border-emerald-tint flex items-center justify-center bg-card-bg">
-                      <span className="text-emerald-solid font-bold text-sm">{String(data[field.key] || 0).slice(0, 3)}</span>
+                      <span className="text-emerald-solid font-bold text-sm">
+                        {String(data[field.key] || 0).slice(0, 3)}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -245,15 +362,32 @@ const otherFields = mainFields.filter(f =>
 
             {otherFields.length > 2 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-6 border-t border-border-light">
-                {otherFields.slice(2).map(field => (
+                {otherFields.slice(2).map((field) => (
                   <div key={field.key} className="flex items-start gap-3">
                     <div className="w-10 h-10 rounded-full bg-status-warning-bg text-status-warning-text flex items-center justify-center shrink-0">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        ></path>
+                      </svg>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-secondary-link mb-0.5">{field.label}</p>
+                      <p className="text-xs font-bold text-secondary-link mb-0.5">
+                        {field.label}
+                      </p>
                       <div className="text-sm font-semibold text-carbon-gray">
-                        <DynamicValueRenderer value={data[field.key]} labelKey={field.key} />
+                        <DynamicValueRenderer
+                          value={data[field.key]}
+                          labelKey={field.key}
+                        />
                       </div>
                     </div>
                   </div>
@@ -285,7 +419,7 @@ function DynamicValueRenderer({ value, labelKey }) {
   }
 
   // 2. ✅ Object check أولاً قبل String()
-  if (typeof value === 'object' && !Array.isArray(value)) {
+  if (typeof value === "object" && !Array.isArray(value)) {
     return (
       <span className="text-carbon-black font-medium text-sm">
         {value.title || value.name || value.label || `ID: ${value.id}`}
@@ -295,49 +429,76 @@ function DynamicValueRenderer({ value, labelKey }) {
 
   // 3. الآن بأمان نعمل String()
   const stringValue = String(value);
-  const keyName = String(labelKey || '').toLowerCase();
+  const keyName = String(labelKey || "").toLowerCase();
 
   // 4. صور URL
-  const isImageUrl = stringValue.match(/\.(jpeg|jpg|gif|png|webp|svg)$|unsplash\.com/i);
-  if (stringValue.startsWith('http') && isImageUrl) {
+  const isImageUrl = stringValue.match(
+    /\.(jpeg|jpg|gif|png|webp|svg)$|unsplash\.com/i,
+  );
+  if (stringValue.startsWith("http") && isImageUrl) {
     return (
       <div className="relative group">
-        <img src={stringValue} alt="rel" className="w-24 h-24 rounded-2xl object-cover border-2 border-white shadow hover:scale-105 transition-all duration-300" />
-        <a href={stringValue} target="_blank" rel="noreferrer" className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl text-white text-[9px] font-black uppercase">View</a>
+        <img
+          src={stringValue}
+          alt="rel"
+          className="w-24 h-24 rounded-2xl object-cover border-2 border-white shadow hover:scale-105 transition-all duration-300"
+        />
+        <a
+          href={stringValue}
+          target="_blank"
+          rel="noreferrer"
+          className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl text-white text-[9px] font-black uppercase"
+        >
+          View
+        </a>
       </div>
     );
   }
 
   // 5. isImageValue
   if (isImageValue(value)) {
-    return <img src={stringValue} alt="img" className="w-10 h-10 rounded-lg object-cover border border-border-thin" />;
+    return (
+      <img
+        src={stringValue}
+        alt="img"
+        className="w-10 h-10 rounded-lg object-cover border border-border-thin"
+      />
+    );
   }
 
   // 6. Boolean
   if (value === 0 || value === 1 || value === true || value === false) {
     const isActive = value == 1 || value === true;
     return (
-      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-        isActive ? "bg-status-success-bg text-status-success-text" : "bg-status-error-bg text-status-error-text"
-      }`}>
+      <span
+        className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+          isActive
+            ? "bg-status-success-bg text-status-success-text"
+            : "bg-status-error-bg text-status-error-text"
+        }`}
+      >
         {isActive ? "Yes" : "No"}
       </span>
     );
   }
 
   // 7. Status
-  if (keyName.includes('status')) {
+  if (keyName.includes("status")) {
     const statusColors = {
       pending: "bg-status-warning-bg text-status-warning-text",
       active: "bg-status-success-bg text-status-success-text",
       published: "bg-status-success-bg text-status-success-text",
       confirmed: "bg-status-success-bg text-status-success-text",
       canceled: "bg-status-error-bg text-status-error-text",
-      expired: "bg-border-light text-carbon-gray"
+      expired: "bg-border-light text-carbon-gray",
     };
-    const colorClass = statusColors[stringValue.toLowerCase()] || "bg-status-info-bg text-status-info-text";
+    const colorClass =
+      statusColors[stringValue.toLowerCase()] ||
+      "bg-status-info-bg text-status-info-text";
     return (
-      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${colorClass}`}>
+      <span
+        className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${colorClass}`}
+      >
         {stringValue}
       </span>
     );
@@ -345,10 +506,16 @@ function DynamicValueRenderer({ value, labelKey }) {
 
   // 8. نص طويل
   if (stringValue.length > 60) {
-    return <span className="text-text-description text-sm">{stringValue.substring(0, 60)}...</span>;
+    return (
+      <span className="text-text-description text-sm">
+        {stringValue.substring(0, 60)}...
+      </span>
+    );
   }
 
-  return <span className="text-carbon-black font-medium text-sm">{stringValue}</span>;
+  return (
+    <span className="text-carbon-black font-medium text-sm">{stringValue}</span>
+  );
 }
 
 // ================= LoadingSkeleton =================
@@ -370,12 +537,27 @@ function NotFound() {
     <div className="min-h-screen bg-bg-surface flex items-center justify-center">
       <div className="text-center space-y-4 bg-card-bg p-10 rounded-2xl border border-border-light shadow-sm">
         <div className="w-16 h-16 bg-bg-surface rounded-full flex items-center justify-center mx-auto">
-          <svg className="w-8 h-8 text-secondary-link" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          <svg
+            className="w-8 h-8 text-secondary-link"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </div>
-        <h2 className="text-xl font-bold text-heading-slate">Record Not Found</h2>
-        <button onClick={() => window.history.back()} className="px-5 py-2.5 bg-bg-surface hover:bg-border-light text-carbon-gray font-bold rounded-xl transition-all text-sm">
+        <h2 className="text-xl font-bold text-heading-slate">
+          Record Not Found
+        </h2>
+        <button
+          onClick={() => window.history.back()}
+          className="px-5 py-2.5 bg-bg-surface hover:bg-border-light text-carbon-gray font-bold rounded-xl transition-all text-sm"
+        >
           Go Back
         </button>
       </div>

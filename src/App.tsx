@@ -20,6 +20,11 @@ import { BagsCategoryFields } from "./schemas/bags_categoriesSchema";
 import StyleGuide from "./pages/StyleGuide";
 import { Bag_itemsFields } from "./schemas/bag_itemsSchema";
 import Bag_itemsPage from "./pages/bag_items/Bag_itemsPage";
+import UserPage from "./pages/User/UserPage";
+import {UserFields} from "./schemas/UserSchema"
+import ProviderPage from "./pages/Provider/ProviderPage";
+import {ProviderFields} from "./schemas/ProviderSchema"
+import CustomerPage from "./pages/Customer/CustomerPage";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem("token");
@@ -70,6 +75,22 @@ export default function App() {
         <Route path="/bag_items/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="bag_items" fields={Bag_itemsFields} mode="edit" title="Edit Bag Item" /></ProtectedRoute>} />
         <Route path="/bag_items/view/:id" element={<ProtectedRoute><GenericViewPage entityName="bag_items" fields={Bag_itemsFields} title="Bag Item Details" /></ProtectedRoute>} />
         
+
+        {/* User  Routes */}
+        <Route path="/User" element={<ProtectedRoute><UserPage /></ProtectedRoute>} />
+        <Route path="/User/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="users" fields={UserFields} mode="edit" title="Edit User Item" /></ProtectedRoute>} />
+        <Route path="/User/view/:id" element={<ProtectedRoute><GenericViewPage entityName="users" fields={UserFields} title="User Item Details" /></ProtectedRoute>} />
+
+   {/* Provider  Routes */}
+        <Route path="/Provider" element={<ProtectedRoute><ProviderPage /></ProtectedRoute>} />
+        <Route path="/Provider/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="provider" fields={ProviderFields} mode="edit" title="Edit Provider Item" /></ProtectedRoute>} />
+        <Route path="/Provider/view/:id" element={<ProtectedRoute><GenericViewPage entityName="provider" fields={ProviderFields} title="Provider Item Details" /></ProtectedRoute>} />
+
+ {/* Customer  Routes */}
+        <Route path="/Customer" element={<ProtectedRoute><CustomerPage /></ProtectedRoute>} />
+ 
+
+
       </Routes>
     </BrowserRouter>
   );
