@@ -128,7 +128,7 @@ export const ProviderFields = [
   {
     key: "created_at",
     label: "Created At",
-    type: "date",
+    type: "ahmed",
     cell_type: "date",
     display_field: null,
     required: 0,
@@ -164,12 +164,14 @@ export const ProviderFields = [
   view_show: true,
   tab: true,  
   headers: [
-    { key: "title", label: "Title" },
+    { key: "user_id", label: "Title" },
     { key: "price_to", label: "price" },
-    { key: "image", label: "Image" },
+    // { key: "image", label: "Image" },
     { key: "description", label: "description" },
     { key: "created_at", label: "Date" },
   ],
+    view_route: "/services/view/:id",    
+  edit_route: "/services/edit/:id", 
   filterKey: "user_id",
 }
 ];

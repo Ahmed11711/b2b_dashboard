@@ -5,8 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
-import Ads from "./pages/ads";
-import GenericFormPage from "./components/components/BaseComponents/FullDynamic/GenericFormPage";
+ import GenericFormPage from "./components/components/BaseComponents/FullDynamic/GenericFormPage";
 import GenericViewPage from "./components/components/BaseComponents/FullDynamic/GenericViewPage";
 import { AdsFields } from "./schemas/adsSchema";
 import AppPage from "./pages/app/AppPage";
@@ -91,7 +90,7 @@ export default function App() {
         {/* Customer  Routes */}
         <Route path="/Customer" element={<ProtectedRoute><CustomerPage /></ProtectedRoute>} />
  
- {/* Category  Routes */}
+        {/* Category  Routes */}
         <Route path="/Category" element={<ProtectedRoute><CategoryPage /></ProtectedRoute>} />
         <Route path="/Category/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="categories" fields={CategoryFields} mode="edit" title="Edit Category Item" /></ProtectedRoute>} />
         <Route path="/Category/view/:id" element={<ProtectedRoute><GenericViewPage entityName="categories" fields={CategoryFields} title="Category Item Details" /></ProtectedRoute>} />
