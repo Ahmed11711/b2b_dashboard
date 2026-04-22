@@ -140,7 +140,7 @@ export const Bag_itemsFields = [
   { 
     key: "text", 
     label: "Whose", 
-    type: "text", 
+    type: "textarea", 
     cell_type: "text",
     display_field: null,
     required: 0, 
@@ -155,7 +155,7 @@ export const Bag_itemsFields = [
   { 
     key: "what_will_you_get", 
     label: "What Will You Get", 
-    type: "text", 
+    type: "textarea", 
     cell_type: "text",
     display_field: null,
     required: 0, 

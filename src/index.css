@@ -132,6 +132,15 @@ body {
          active:scale-95;
 }
 
+.btn-action-icon {
+  @apply p-2 rounded-lg border border-border-thin text-secondary-link transition-all 
+         hover:bg-white hover:shadow-sm hover:text-emerald-solid active:scale-90;
+}
+
+.btn-action-delete {
+  @apply hover:text-red-600 hover:border-red-200 hover:bg-red-50;
+}
+
 /* =========================
    REACT QUILL OVERRIDES
 ========================= */
@@ -147,6 +156,7 @@ body {
   border-top-left-radius: 1rem;
   border-top-right-radius: 1rem;
   font-family: var(--font-sans) !important;
+  padding: 12px !important;
 }
 .quill-editor .ql-editor {
   min-height: 150px;
@@ -157,6 +167,101 @@ body {
 .quill-editor .ql-editor.ql-blank::before {
   font-style: normal;
   color: var(--color-text-description);
+}
+
+/* Quill Tooltip UI Fix (Link Format Modal & Pickers) */
+.ql-snow .ql-tooltip {
+  background-color: var(--color-card-bg) !important;
+  border: 1px solid var(--color-border-light) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1) !important;
+  padding: 10px 16px !important;
+  color: var(--color-carbon-gray) !important;
+  z-index: 99 !important;
+  transform: translateY(10px) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.ql-snow .ql-tooltip.ql-hidden {
+  display: none !important;
+}
+
+.ql-snow .ql-tooltip input[type="text"] {
+  border: 1px solid var(--color-border-thin) !important;
+  border-radius: 8px !important;
+  padding: 6px 12px !important;
+  font-size: 13px !important;
+  color: var(--color-carbon-gray) !important;
+  width: 220px !important;
+  outline: none !important;
+  background: var(--color-bg-surface) !important;
+  transition: all 0.2s !important;
+}
+
+.ql-snow .ql-tooltip input[type="text"]:focus {
+  border-color: var(--color-royal-base) !important;
+  box-shadow: 0 0 0 3px rgba(178, 34, 34, 0.1) !important;
+}
+
+.ql-snow .ql-tooltip a.ql-action {
+  color: var(--color-royal-base) !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  padding: 6px 10px !important;
+  border-radius: 6px !important;
+  transition: all 0.2s !important;
+}
+
+.ql-snow .ql-tooltip a.ql-action:hover {
+  background: var(--color-royal-tint) !important;
+}
+
+.ql-snow .ql-tooltip a.ql-remove {
+  color: var(--color-status-error-text) !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  padding: 6px 10px !important;
+  border-radius: 6px !important;
+  transition: all 0.2s !important;
+}
+
+.ql-snow .ql-tooltip a.ql-remove:hover {
+  background: var(--color-status-error-bg) !important;
+}
+
+.ql-snow .ql-tooltip[data-mode="link"]::before {
+  content: "URL:" !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  color: var(--color-heading-slate) !important;
+}
+
+.ql-snow .ql-picker-options {
+  border-radius: 8px !important;
+  border: 1px solid var(--color-border-light) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  padding: 8px !important;
+  z-index: 100 !important;
+  background: var(--color-card-bg) !important;
+}
+
+.ql-snow .ql-color-picker .ql-picker-options {
+  width: 152px !important;
+}
+
+.ql-snow .ql-color-picker .ql-picker-item {
+  border-radius: 4px !important;
+  margin: 2px !important;
+  width: 18px !important;
+  height: 18px !important;
+  transition: transform 0.1s !important;
+}
+
+.ql-snow .ql-color-picker .ql-picker-item:hover {
+  transform: scale(1.2) !important;
+  border-color: rgba(0,0,0,0.2) !important;
 }
 
 .btn-action-icon {

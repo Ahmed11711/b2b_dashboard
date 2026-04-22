@@ -134,7 +134,9 @@ export const PackagesFields = [
     endpoint: "categories",    
     optionLabel: "name",       
     optionValue: "id",        
-    required: true
+    required: false,
+    form_show: false,
+    table_show: false
   },
   { 
     key: "features", 

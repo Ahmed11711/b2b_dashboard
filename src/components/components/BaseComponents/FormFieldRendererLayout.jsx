@@ -157,6 +157,7 @@ case "gallery":
     { label: "Word",  value: "word",  accept: ".doc,.docx", icon: "📝" },
     { label: "Excel", value: "excel", accept: ".xls,.xlsx", icon: "📊" },
     { label: "Video", value: "video", accept: "video/*", icon: "🎬" },
+    { label: "Download Demo", value: "download_demo", accept: "*", icon: "⬇️" },
   ];
 
   const [selectedType, setSelectedType] = useState("image");
@@ -279,6 +280,7 @@ case "gallery":
             toolbar: [
               [{ 'header': [1, 2, 3, false] }],
               ['bold', 'italic', 'underline', 'strike'],
+              [{ 'color': [] }, { 'background': [] }],
               [{ 'list': 'ordered'}, { 'list': 'bullet' }],
               [{ 'align': [] }],
               ['link'],
