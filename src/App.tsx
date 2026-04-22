@@ -5,7 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
- import GenericFormPage from "./components/components/BaseComponents/FullDynamic/GenericFormPage";
+import GenericFormPage from "./components/components/BaseComponents/FullDynamic/GenericFormPage";
 import GenericViewPage from "./components/components/BaseComponents/FullDynamic/GenericViewPage";
 import { AdsFields } from "./schemas/adsSchema";
 import AppPage from "./pages/app/AppPage";
@@ -17,20 +17,17 @@ import Bags_categoriesPage from "./pages/bags_categories/Bags_categoriesPage";
 import { BagsCategoryFields } from "./schemas/bags_categoriesSchema";
 import StyleGuide from "./pages/StyleGuide";
 import Bag_itemsPage from "./pages/bag_items/Bag_itemsPage";
-<<<<<<< HEAD
 import PackagesFormPage from "./pages/Packages/PackagesFormPage";
 import PackagesViewPage from "./pages/Packages/PackagesViewPage";
 import BagItemsFormPage from "./pages/bag_items/BagItemsFormPage";
 import BagItemsViewPage from "./pages/bag_items/BagItemsViewPage";
-=======
 import UserPage from "./pages/User/UserPage";
-import {UserFields} from "./schemas/UserSchema"
+import { UserFields } from "./schemas/UserSchema"
 import ProviderPage from "./pages/Provider/ProviderPage";
-import {ProviderFields} from "./schemas/ProviderSchema"
+import { ProviderFields } from "./schemas/ProviderSchema"
 import CustomerPage from "./pages/Customer/CustomerPage";
 import CategoryPage from "./pages/Category/CategoryPage";
-import {CategoryFields} from "./schemas/CategorySchema"
->>>>>>> origin/master
+import { CategoryFields } from "./schemas/CategorySchema"
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem("token");
@@ -80,21 +77,21 @@ export default function App() {
         <Route path="/bag_items" element={<ProtectedRoute><Bag_itemsPage /></ProtectedRoute>} />
         <Route path="/bag_items/edit/:id" element={<ProtectedRoute><BagItemsFormPage mode="edit" /></ProtectedRoute>} />
         <Route path="/bag_items/view/:id" element={<ProtectedRoute><BagItemsViewPage /></ProtectedRoute>} />
-        
+
 
         {/* User  Routes */}
         <Route path="/User" element={<ProtectedRoute><UserPage /></ProtectedRoute>} />
         <Route path="/User/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="users" fields={UserFields} mode="edit" title="Edit User Item" /></ProtectedRoute>} />
         <Route path="/User/view/:id" element={<ProtectedRoute><GenericViewPage entityName="users" fields={UserFields} title="User Item Details" /></ProtectedRoute>} />
 
-   {/* Provider  Routes */}
+        {/* Provider  Routes */}
         <Route path="/Provider" element={<ProtectedRoute><ProviderPage /></ProtectedRoute>} />
         <Route path="/Provider/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="provider" fields={ProviderFields} mode="edit" title="Edit Provider Item" /></ProtectedRoute>} />
         <Route path="/Provider/view/:id" element={<ProtectedRoute><GenericViewPage entityName="provider" fields={ProviderFields} title="Provider Item Details" /></ProtectedRoute>} />
 
         {/* Customer  Routes */}
         <Route path="/Customer" element={<ProtectedRoute><CustomerPage /></ProtectedRoute>} />
- 
+
         {/* Category  Routes */}
         <Route path="/Category" element={<ProtectedRoute><CategoryPage /></ProtectedRoute>} />
         <Route path="/Category/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="categories" fields={CategoryFields} mode="edit" title="Edit Category Item" /></ProtectedRoute>} />
