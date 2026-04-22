@@ -1,8 +1,20 @@
 import { useState, useEffect } from "react";
 import { getAll } from "../../../service/services/apiService";
 import MultiSelectField from "../../components/BaseComponents/MultiSelectField";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
+
+// Helper to resolve image URLs for backend filenames
+const resolveImageUrl = (val) => {
+  if (!val) return "";
+  if (val instanceof File) return URL.createObjectURL(val);
+  if (typeof val === "string") {
+    if (val.startsWith("http") || val.startsWith("data:") || val.startsWith("/")) return val;
+    // Adjust this base URL to match your backend's public storage path
+    return `https://b2bpartnership.com/storage/${val}`; 
+  }
+  return val;
+};
 
 export default function FormFieldRendererLayout({
   field,
@@ -121,7 +133,7 @@ export default function FormFieldRendererLayout({
             onChange={(e) =>
               onChange(field.key, e.target.value)
             }
-            className="w-full border rounded p-2"
+            className={`w-full h-11 px-4 py-2 border rounded-lg bg-white outline-none transition-all duration-300 focus:border-emerald-solid focus:ring-4 focus:ring-emerald-solid/10 text-sm text-carbon-black placeholder:text-slate-400 ${error ? "border-red-500 focus:ring-red-500" : "border-border-thin hover:border-border-light"} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <option value="">
               {loading ? "Loading..." : "Select"}
@@ -222,26 +234,24 @@ export default function FormFieldRendererLayout({
       case "checkbox":
       case "boolean":
         return (
-          <input
-            type="checkbox"
-            checked={!!value}
-            onChange={() =>
-              onChange(field.key, value ? 0 : 1)
-            }
-          />
+          <div className="flex items-center h-11">
+            <input
+              type="checkbox"
+              checked={!!value}
+              onChange={() =>
+                onChange(field.key, value ? 0 : 1)
+              }
+              disabled={disabled}
+              className={`w-5 h-5 rounded border-border-thin text-emerald-solid focus:ring-emerald-solid/20 transition-all ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+            />
+            {field.label && <span className="ml-3 text-sm font-medium text-carbon-gray">{field.label}</span>}
+          </div>
         );
 
       // ===== FILE =====
       case "file":
         return (
           <div className="flex flex-col gap-3 relative mt-2">
-            {/* Same floating label style for consistency */}
-            <label className="absolute -top-2 left-4 px-1 bg-card-bg text-[11px] font-medium text-text-description pointer-events-none z-10">
-              {field.label}
-              {field.required ? (
-                <span className="text-status-error-text text-sm ml-0.5">*</span>
-              ) : null}
-            </label>
             <div className="relative w-full">
               <div className="relative group border border-dashed border-emerald-solid/50 bg-emerald-tint/20 rounded-[20px] p-6 w-full text-center hover:bg-emerald-tint/40 transition-all cursor-pointer mt-0 min-h-[120px] flex items-center justify-center overflow-hidden">
                 <input
@@ -267,7 +277,7 @@ export default function FormFieldRendererLayout({
                 {value && (
                   <>
                     <img
-                      src={value instanceof File ? URL.createObjectURL(value) : value}
+                      src={resolveImageUrl(value)}
                       className="absolute inset-0 w-full h-full object-cover"
                       alt="preview"
                     />
@@ -317,6 +327,8 @@ export default function FormFieldRendererLayout({
               onChange(field.key, e.target.value)
             }
             disabled={disabled}
+            placeholder={`Enter ${field.label || field.key}`}
+            className={`w-full h-11 px-4 py-2 border rounded-lg bg-white outline-none transition-all duration-300 focus:border-emerald-solid focus:ring-4 focus:ring-emerald-solid/10 text-sm text-carbon-black placeholder:text-slate-400 ${error ? "border-red-500 focus:ring-red-500 bg-red-50/50" : "border-border-thin hover:border-border-light"} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
           />
         );
     }
@@ -328,8 +340,8 @@ export default function FormFieldRendererLayout({
       className={`flex flex-col gap-1 ${isFullWidth ? "col-span-2" : ""
         }`}
     >
-      {field.type !== "checkbox" && (
-        <label className="text-sm font-medium">
+      {field.type !== "checkbox" && field.type !== "boolean" && (
+        <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-1">
           {field.label}
         </label>
       )}

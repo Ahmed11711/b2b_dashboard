@@ -2,6 +2,17 @@ import { useState, useEffect, useRef } from "react";
 import TableCellRenderer from "./layout/TableCellRenderer";
 import { getAll } from "../../../service/services/apiService";
 
+// Helper to resolve image URLs for backend filenames
+const resolveImageUrl = (val) => {
+  if (!val) return "";
+  if (typeof val === "string") {
+    if (val.startsWith("http") || val.startsWith("data:") || val.startsWith("/")) return val;
+    // Adjust this base URL to match your backend's public storage path
+    return `https://b2bpartnership.com/storage/${val}`; 
+  }
+  return val;
+};
+
 function ImagePreviewModal({ src, onClose }) {
   if (!src) return null;
   return (
@@ -240,9 +251,9 @@ export default function TableComponent({
                         {header.cell_type === "image" ? (
                           <div className="relative group/image">
                             <img
-                              src={row[header.key]}
+                              src={resolveImageUrl(row[header.key])}
                               className="w-12 h-12 rounded-xl object-cover cursor-zoom-in border border-border-light shadow-sm group-hover/image:shadow-md transition-all duration-300 group-hover/image:scale-[1.05]"
-                              onClick={() => setSelectedImg(row[header.key])}
+                              onClick={() => setSelectedImg(resolveImageUrl(row[header.key]))}
                               alt=""
                             />
                           </div>
