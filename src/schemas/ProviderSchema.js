@@ -142,20 +142,21 @@ export const ProviderFields = [
   },
   {
   key: "services",
-  label: "services",
+  label: "Services",
   cell_type: "relation_list",
   view_show: true,
-  tab: true,  
-
- headers: [
+  tab: true,
+  headers: [
     { key: "title", label: "Title" },
     { key: "price", label: "Price" },
     { key: "image", label: "Image" },
     { key: "desc", label: "Description" },
     { key: "created_at", label: "Date" },
   ],
-    filterKey: "user_id",
+  view_route: "/services/view/:id",    
+  edit_route: "/services/edit/:id",  
 },
+  
   {
   key: "opsts",
   label: "Posts",

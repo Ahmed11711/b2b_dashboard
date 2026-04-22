@@ -118,7 +118,9 @@ function DynamicValueRenderer({ value, labelKey }) {
 }
 
 // ================= InlineRelationTable =================
-function InlineRelationTable({ items, headers }) {
+function InlineRelationTable({ items, headers, viewRoute, editRoute }) {
+  const navigate = useNavigate();
+
   if (!items || items.length === 0)
     return (
       <div className="flex flex-col items-center justify-center py-16 text-secondary-link">
@@ -140,11 +142,14 @@ function InlineRelationTable({ items, headers }) {
     );
 
   const cols = Array.isArray(headers)
-    ? headers // ← لو حاطط headers يستخدمها
-    : Object.keys(items[0] || {}) // ← لو لأ يعمل auto
+    ? headers
+    : Object.keys(items[0] || {})
         .filter((k) => typeof items[0][k] !== "object")
         .slice(0, 6)
         .map((k) => ({ key: k, label: k.replace(/_/g, " ") }));
+
+  const hasActions = viewRoute || editRoute;
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left border-collapse">
@@ -158,6 +163,11 @@ function InlineRelationTable({ items, headers }) {
                 {h.label}
               </th>
             ))}
+            {hasActions && (
+              <th className="px-6 py-4 text-xs font-bold text-secondary-link uppercase tracking-wider border-b border-border-light text-center">
+                Actions
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -171,6 +181,58 @@ function InlineRelationTable({ items, headers }) {
                   <DynamicValueRenderer value={item[h.key]} labelKey={h.key} />
                 </td>
               ))}
+              {hasActions && (
+                <td className="px-6 py-4 text-center">
+                  <div className="flex justify-center items-center gap-2">
+                    {viewRoute && (
+                      <button
+                        onClick={() =>
+                          navigate(viewRoute.replace(":id", item.id))
+                        }
+                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-tint text-emerald-solid hover:bg-emerald-solid hover:text-white transition-all"
+                        title="View"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
+                        </svg>
+                      </button>
+                    )}
+                    {editRoute && (
+                      <button
+                        onClick={() =>
+                          navigate(editRoute.replace(":id", item.id))
+                        }
+                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-500 hover:text-white transition-all"
+                        title="Edit"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
@@ -460,9 +522,10 @@ export default function GenericViewPage({ entityName, title, fields }) {
       label: f.label,
       items: data[f.key] || [],
       headers: f.headers || null,
+      view_route: f.view_route || null,
+      edit_route: f.edit_route || null,
     }))
     .filter((t) => Array.isArray(t.items));
-
   const hasTabs = relationTabs.length > 0;
 
   const imageFields = mainFields.filter(
@@ -684,6 +747,8 @@ export default function GenericViewPage({ entityName, title, fields }) {
               <InlineRelationTable
                 items={relationTabs[activeTab]?.items || []}
                 headers={relationTabs[activeTab]?.headers || null}
+                viewRoute={relationTabs[activeTab]?.view_route || null}
+                editRoute={relationTabs[activeTab]?.edit_route || null}
               />
             </div>
           </div>
