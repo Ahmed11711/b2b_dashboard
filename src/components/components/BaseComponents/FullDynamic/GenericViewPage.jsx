@@ -29,6 +29,156 @@ const toArray = (val) => {
   return [];
 };
 
+// ================= DynamicValueRenderer =================
+function DynamicValueRenderer({ value, labelKey }) {
+  if (value === null || value === undefined || value === "") {
+    return <span className="text-secondary-link font-medium italic">-</span>;
+  }
+  if (typeof value === "object" && !Array.isArray(value)) {
+    return (
+      <span className="text-carbon-black font-medium text-sm">
+        {value.title || value.name || value.label || `ID: ${value.id}`}
+      </span>
+    );
+  }
+  const stringValue = String(value);
+  const keyName = String(labelKey || "").toLowerCase();
+  const isImageUrl = stringValue.match(
+    /\.(jpeg|jpg|gif|png|webp|svg)$|unsplash\.com/i,
+  );
+
+  if (stringValue.startsWith("http") && isImageUrl) {
+    return (
+      <div className="relative group">
+        <img
+          src={stringValue}
+          alt="rel"
+          className="w-24 h-24 rounded-2xl object-cover border-2 border-white shadow hover:scale-105 transition-all duration-300"
+        />
+        <a
+          href={stringValue}
+          target="_blank"
+          rel="noreferrer"
+          className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl text-white text-[9px] font-black uppercase"
+        >
+          View
+        </a>
+      </div>
+    );
+  }
+  if (isImageValue(value)) {
+    return (
+      <img
+        src={stringValue}
+        alt="img"
+        className="w-10 h-10 rounded-lg object-cover border border-border-thin"
+      />
+    );
+  }
+  if (value === 0 || value === 1 || value === true || value === false) {
+    const isActive = value == 1 || value === true;
+    return (
+      <span
+        className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${isActive ? "bg-status-success-bg text-status-success-text" : "bg-status-error-bg text-status-error-text"}`}
+      >
+        {isActive ? "Yes" : "No"}
+      </span>
+    );
+  }
+  if (keyName.includes("status")) {
+    const statusColors = {
+      pending: "bg-status-warning-bg text-status-warning-text",
+      active: "bg-status-success-bg text-status-success-text",
+      published: "bg-status-success-bg text-status-success-text",
+      confirmed: "bg-status-success-bg text-status-success-text",
+      canceled: "bg-status-error-bg text-status-error-text",
+      expired: "bg-border-light text-carbon-gray",
+    };
+    const colorClass =
+      statusColors[stringValue.toLowerCase()] ||
+      "bg-status-info-bg text-status-info-text";
+    return (
+      <span
+        className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${colorClass}`}
+      >
+        {stringValue}
+      </span>
+    );
+  }
+  if (stringValue.length > 60) {
+    return (
+      <span className="text-text-description text-sm">
+        {stringValue.substring(0, 60)}...
+      </span>
+    );
+  }
+  return (
+    <span className="text-carbon-black font-medium text-sm">{stringValue}</span>
+  );
+}
+
+// ================= InlineRelationTable =================
+function InlineRelationTable({ items, headers }) {
+  if (!items || items.length === 0)
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-secondary-link">
+        <svg
+          className="w-12 h-12 mb-3 opacity-30"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.5"
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+          />
+        </svg>
+        <p className="text-sm font-medium">No records found</p>
+      </div>
+    );
+
+  const cols = Array.isArray(headers)
+    ? headers // ← لو حاطط headers يستخدمها
+    : Object.keys(items[0] || {}) // ← لو لأ يعمل auto
+        .filter((k) => typeof items[0][k] !== "object")
+        .slice(0, 6)
+        .map((k) => ({ key: k, label: k.replace(/_/g, " ") }));
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-left border-collapse">
+        <thead>
+          <tr className="bg-bg-surface">
+            {cols.map((h) => (
+              <th
+                key={h.key}
+                className="px-6 py-4 text-xs font-bold text-secondary-link uppercase tracking-wider border-b border-border-light"
+              >
+                {h.label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item, idx) => (
+            <tr
+              key={item.id || idx}
+              className="hover:bg-emerald-tint/50 transition-colors border-b border-border-light last:border-0"
+            >
+              {cols.map((h) => (
+                <td key={h.key} className="px-6 py-4 text-sm text-carbon-gray">
+                  <DynamicValueRenderer value={item[h.key]} labelKey={h.key} />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 // ================= Tab Table Section =================
 function TabTableSection({ field, recordId }) {
   const [items, setItems] = useState([]);
@@ -57,27 +207,6 @@ function TabTableSection({ field, recordId }) {
       </div>
     );
 
-  if (!items.length)
-    return (
-      <div className="flex flex-col items-center justify-center py-16 text-secondary-link">
-        <svg
-          className="w-12 h-12 mb-3 opacity-30"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.5"
-            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-          />
-        </svg>
-        <p className="text-sm font-medium">No records found</p>
-      </div>
-    );
-
-  // لو عنده headers استخدمها، لو لأ اعمل auto columns
   const headers = field.headers
     ? field.headers.filter((h) => h.table_show)
     : Object.keys(items[0] || {})
@@ -85,38 +214,7 @@ function TabTableSection({ field, recordId }) {
         .slice(0, 5)
         .map((k) => ({ key: k, label: k.replace(/_/g, " ") }));
 
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left border-collapse">
-        <thead>
-          <tr className="bg-bg-surface">
-            {headers.map((h) => (
-              <th
-                key={h.key}
-                className="px-6 py-4 text-xs font-bold text-secondary-link uppercase tracking-wider border-b border-border-light"
-              >
-                {h.label}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item, idx) => (
-            <tr
-              key={item.id || idx}
-              className="hover:bg-emerald-tint/50 transition-colors border-b border-border-light last:border-0"
-            >
-              {headers.map((h) => (
-                <td key={h.key} className="px-6 py-4 text-sm text-carbon-gray">
-                  <DynamicValueRenderer value={item[h.key]} labelKey={h.key} />
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+  return <InlineRelationTable items={items} headers={headers} />;
 }
 
 // ================= Relation Modal =================
@@ -267,13 +365,60 @@ function RelationSection({ label, items, navigateTo }) {
   );
 }
 
+// ================= LoadingSkeleton =================
+function LoadingSkeleton() {
+  return (
+    <div className="min-h-screen bg-bg-surface py-8 px-4 md:px-8">
+      <div className="max-w-6xl mx-auto space-y-6 animate-pulse">
+        <div className="h-10 w-32 bg-border-thin rounded-lg"></div>
+        <div className="h-64 bg-card-bg rounded-2xl border border-border-light shadow-sm"></div>
+        <div className="h-48 bg-card-bg rounded-2xl border border-border-light shadow-sm"></div>
+      </div>
+    </div>
+  );
+}
+
+// ================= NotFound =================
+function NotFound() {
+  return (
+    <div className="min-h-screen bg-bg-surface flex items-center justify-center">
+      <div className="text-center space-y-4 bg-card-bg p-10 rounded-2xl border border-border-light shadow-sm">
+        <div className="w-16 h-16 bg-bg-surface rounded-full flex items-center justify-center mx-auto">
+          <svg
+            className="w-8 h-8 text-secondary-link"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </div>
+        <h2 className="text-xl font-bold text-heading-slate">
+          Record Not Found
+        </h2>
+        <button
+          onClick={() => window.history.back()}
+          className="px-5 py-2.5 bg-bg-surface hover:bg-border-light text-carbon-gray font-bold rounded-xl transition-all text-sm"
+        >
+          Go Back
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ================= Main Page =================
 export default function GenericViewPage({ entityName, title, fields }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(0); // 0 = Basic Info
+  const [activeTab, setActiveTab] = useState(0);
 
   useEffect(() => {
     async function fetchData() {
@@ -292,7 +437,6 @@ export default function GenericViewPage({ entityName, title, fields }) {
   if (loading) return <LoadingSkeleton />;
   if (!data) return <NotFound />;
 
-  // ✅ الـ fields اللي عندها tab: true
   const tabFields = fields.filter((f) => f.tab === true);
 
   const mainFields = fields.filter(
@@ -302,19 +446,25 @@ export default function GenericViewPage({ entityName, title, fields }) {
       f.cell_type !== "relation_list" &&
       !f.tab,
   );
+
   const relationListFields = fields.filter(
     (f) =>
       f.view_show === true &&
       !f.tab &&
       (f.cell_type === "relation" || f.cell_type === "relation_list"),
   );
-  const relationTabs = data
-    ? Object.entries(data).filter(
-        ([key, val]) => Array.isArray(val) && val.length > 0,
-      )
-    : [];
+
+  const relationTabs = tabFields
+    .map((f) => ({
+      key: f.key,
+      label: f.label,
+      items: data[f.key] || [],
+      headers: f.headers || null,
+    }))
+    .filter((t) => Array.isArray(t.items));
 
   const hasTabs = relationTabs.length > 0;
+
   const imageFields = mainFields.filter(
     (f) => f.type === "file" || f.cell_type === "image",
   );
@@ -436,6 +586,7 @@ export default function GenericViewPage({ entityName, title, fields }) {
                 </div>
               )}
             </div>
+
             {numericFields.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {numericFields.map((field) => (
@@ -460,6 +611,7 @@ export default function GenericViewPage({ entityName, title, fields }) {
                 ))}
               </div>
             )}
+
             {otherFields.length > 2 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-6 border-t border-border-light">
                 {otherFields.slice(2).map((field) => (
@@ -497,7 +649,7 @@ export default function GenericViewPage({ entityName, title, fields }) {
           </div>
         </div>
 
-        {/* ✅ Relation بدون tabs */}
+        {/* Relation بدون tabs */}
         {relationListFields.map((relField, idx) => (
           <RelationSection
             key={idx}
@@ -507,12 +659,11 @@ export default function GenericViewPage({ entityName, title, fields }) {
           />
         ))}
 
-        {/* ✅ Tabs Section */}
+        {/* Tabs Section */}
         {hasTabs && (
           <div className="bg-card-bg rounded-2xl shadow-sm border border-border-light overflow-hidden">
-            {/* Tab Headers */}
             <div className="flex border-b border-border-light overflow-x-auto">
-              {relationTabs.map(([key], idx) => (
+              {relationTabs.map((tab, idx) => (
                 <button
                   key={idx}
                   onClick={() => setActiveTab(idx)}
@@ -522,153 +673,21 @@ export default function GenericViewPage({ entityName, title, fields }) {
                       : "border-transparent text-secondary-link hover:text-carbon-gray hover:bg-bg-surface"
                   }`}
                 >
-                  {key.replace(/_/g, " ")}
+                  {tab.label}
+                  <span className="ml-2 px-2 py-0.5 rounded-full text-[10px] bg-bg-surface text-secondary-link">
+                    {tab.items.length}
+                  </span>
                 </button>
               ))}
             </div>
-
-            {/* Tab Content */}
             <div className="p-0">
-              <EmbeddedRelationTable
-                items={relationTabs[activeTab]?.[1] || []}
+              <InlineRelationTable
+                items={relationTabs[activeTab]?.items || []}
+                headers={relationTabs[activeTab]?.headers || null}
               />
             </div>
           </div>
         )}
-      </div>
-    </div>
-  );
-}
-
-// ================= DynamicValueRenderer =================
-function DynamicValueRenderer({ value, labelKey }) {
-  if (value === null || value === undefined || value === "") {
-    return <span className="text-secondary-link font-medium italic">-</span>;
-  }
-  if (typeof value === "object" && !Array.isArray(value)) {
-    return (
-      <span className="text-carbon-black font-medium text-sm">
-        {value.title || value.name || value.label || `ID: ${value.id}`}
-      </span>
-    );
-  }
-  const stringValue = String(value);
-  const keyName = String(labelKey || "").toLowerCase();
-  const isImageUrl = stringValue.match(
-    /\.(jpeg|jpg|gif|png|webp|svg)$|unsplash\.com/i,
-  );
-  if (stringValue.startsWith("http") && isImageUrl) {
-    return (
-      <div className="relative group">
-        <img
-          src={stringValue}
-          alt="rel"
-          className="w-24 h-24 rounded-2xl object-cover border-2 border-white shadow hover:scale-105 transition-all duration-300"
-        />
-        <a
-          href={stringValue}
-          target="_blank"
-          rel="noreferrer"
-          className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl text-white text-[9px] font-black uppercase"
-        >
-          View
-        </a>
-      </div>
-    );
-  }
-  if (isImageValue(value)) {
-    return (
-      <img
-        src={stringValue}
-        alt="img"
-        className="w-10 h-10 rounded-lg object-cover border border-border-thin"
-      />
-    );
-  }
-  if (value === 0 || value === 1 || value === true || value === false) {
-    const isActive = value == 1 || value === true;
-    return (
-      <span
-        className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${isActive ? "bg-status-success-bg text-status-success-text" : "bg-status-error-bg text-status-error-text"}`}
-      >
-        {isActive ? "Yes" : "No"}
-      </span>
-    );
-  }
-  if (keyName.includes("status")) {
-    const statusColors = {
-      pending: "bg-status-warning-bg text-status-warning-text",
-      active: "bg-status-success-bg text-status-success-text",
-      published: "bg-status-success-bg text-status-success-text",
-      confirmed: "bg-status-success-bg text-status-success-text",
-      canceled: "bg-status-error-bg text-status-error-text",
-      expired: "bg-border-light text-carbon-gray",
-    };
-    const colorClass =
-      statusColors[stringValue.toLowerCase()] ||
-      "bg-status-info-bg text-status-info-text";
-    return (
-      <span
-        className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${colorClass}`}
-      >
-        {stringValue}
-      </span>
-    );
-  }
-  if (stringValue.length > 60) {
-    return (
-      <span className="text-text-description text-sm">
-        {stringValue.substring(0, 60)}...
-      </span>
-    );
-  }
-  return (
-    <span className="text-carbon-black font-medium text-sm">{stringValue}</span>
-  );
-}
-
-// ================= LoadingSkeleton =================
-function LoadingSkeleton() {
-  return (
-    <div className="min-h-screen bg-bg-surface py-8 px-4 md:px-8">
-      <div className="max-w-6xl mx-auto space-y-6 animate-pulse">
-        <div className="h-10 w-32 bg-border-thin rounded-lg"></div>
-        <div className="h-64 bg-card-bg rounded-2xl border border-border-light shadow-sm"></div>
-        <div className="h-48 bg-card-bg rounded-2xl border border-border-light shadow-sm"></div>
-      </div>
-    </div>
-  );
-}
-
-// ================= NotFound =================
-function NotFound() {
-  return (
-    <div className="min-h-screen bg-bg-surface flex items-center justify-center">
-      <div className="text-center space-y-4 bg-card-bg p-10 rounded-2xl border border-border-light shadow-sm">
-        <div className="w-16 h-16 bg-bg-surface rounded-full flex items-center justify-center mx-auto">
-          <svg
-            className="w-8 h-8 text-secondary-link"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </div>
-        <h2 className="text-xl font-bold text-heading-slate">
-          Record Not Found
-        </h2>
-        <button
-          onClick={() => window.history.back()}
-          className="px-5 py-2.5 bg-bg-surface hover:bg-border-light text-carbon-gray font-bold rounded-xl transition-all text-sm"
-        >
-          Go Back
-        </button>
       </div>
     </div>
   );

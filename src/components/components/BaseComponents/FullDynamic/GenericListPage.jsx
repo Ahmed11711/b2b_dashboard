@@ -295,7 +295,8 @@ export default function GenericListPage({
   };
 
   return (
-    <div className="page-container antialiased pb-10 bg-[#fbfcfd] min-h-screen">
+    // الـ page container
+    <div className="page-container antialiased pb-10 bg-[#fbfcfd] min-h-screen overflow-visible">
       <div className="max-w-[1600px] mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center py-4 gap-6">
           <div className="text-center md:text-left">
@@ -333,7 +334,7 @@ export default function GenericListPage({
           </button>
         </div>
 
-        <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden relative">
+        <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 relative">
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center z-50 bg-white/60 backdrop-blur-md">
               <div className="w-12 h-12 border-[5px] border-slate-100 border-t-emerald-500 rounded-full animate-spin"></div>

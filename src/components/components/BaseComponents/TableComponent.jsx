@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import TableCellRenderer from "./layout/TableCellRenderer";
 import { getAll } from "../../../service/services/apiService";
 
@@ -54,17 +54,37 @@ export default function TableComponent({
 }) {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [selectedImg, setSelectedImg] = useState(null);
-  // ✅ جديد
   const [relationOptions, setRelationOptions] = useState({});
 
-  // ✅ جديد - جلب الـ options من الـ API
+  const scrollRef = useRef(null);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+
+  const handleMouseDown = (e) => {
+    isDragging.current = true;
+    startX.current = e.pageX - scrollRef.current.offsetLeft;
+    scrollLeft.current = scrollRef.current.scrollLeft;
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX.current) * 1.5;
+    scrollRef.current.scrollLeft = scrollLeft.current - walk;
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+
   useEffect(() => {
     const relationFields = headers.filter(
       (h) => h.filterable && h.cell_type === "relation" && h.endpoint,
     );
 
     relationFields.forEach(async (field) => {
-      // نتحقق أولاً لمنع الطلبات المتكررة لنفس الـ endpoint
       if (relationOptions[field.key]) return;
 
       try {
@@ -86,7 +106,8 @@ export default function TableComponent({
         console.error(`Failed to load options for ${field.key}`, err);
       }
     });
-  }, [headers]); // تأكد أن الـ headers مستقرة (Memoized) في المكون الأب
+  }, [headers]);
+
   const sortedData = [...data].sort((a, b) => {
     if (!sortConfig.key) return 0;
     const aValue = a[sortConfig.key];
@@ -144,7 +165,6 @@ export default function TableComponent({
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end text-right">
-          {/* ✅ جديد - بيعرض الـ filter لكل filterable field */}
           {headers
             .filter((h) => h.filterable)
             .map((header) => (
@@ -154,7 +174,6 @@ export default function TableComponent({
                 onChange={(e) => onFilterChange(header.key, e.target.value)}
               >
                 <option value="">All {header.label}</option>
-                // بعد
                 {(
                   relationOptions[header.key] ||
                   (Array.isArray(header.options) ? header.options : []) ||
@@ -170,8 +189,15 @@ export default function TableComponent({
       </div>
 
       {/* 2. Table Area */}
-      <div className="table-scroll-area overflow-x-auto relative">
-        <table className="w-full table-auto border-separate border-spacing-0 min-w-[1000px] ">
+      <div
+        className="table-scroll-area overflow-x-auto relative cursor-grab active:cursor-grabbing select-none"
+        ref={scrollRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
+        <table className="w-full table-auto border-separate border-spacing-0 min-w-[1000px]">
           <thead>
             <tr>
               {headers
@@ -345,7 +371,6 @@ export default function TableComponent({
 
             return (
               <>
-                {/* Counter */}
                 <div className="flex items-center gap-2 text-sm font-semibold text-text-description">
                   <span className="flex items-center justify-center bg-bg-surface text-carbon-gray px-3 py-1 rounded-full text-xs">
                     {(currentPage - 1) * perPage + 1} -{" "}
@@ -357,7 +382,6 @@ export default function TableComponent({
                   </span>
                 </div>
 
-                {/* Navigation */}
                 <div className="flex items-center gap-3">
                   <button
                     disabled={currentPage === 1}
