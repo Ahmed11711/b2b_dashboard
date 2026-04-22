@@ -1,27 +1,28 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, LogOut, Menu, X, Bell, User,LayoutGrid,ShoppingBag, Palette } from "lucide-react";
-import { cn } from "../lib/utils";
+import { 
+  LayoutDashboard, LogOut, Menu, X, Bell, 
+  User, Users, UserCheck, UserCog,
+  Package, Megaphone, ShoppingBag, 
+  LayoutGrid, BoxSelect, Palette ,Tag  
+} from "lucide-react";import { cn } from "../lib/utils";
 import { Button } from "./Button";
 import { motion, AnimatePresence } from "motion/react";
 import { NotificationPopover } from "./NotificationPopover";
 import { Notification } from "../types";
 
 const adminNavItems = [
-  
-  
-  { icon: LayoutDashboard, label: "Overview", path: "/" },
-  { icon: User, label: "Packages", path: "/Packages" },
-  { icon: User, label: "Ads", path: "/Ads" },
-{ icon: ShoppingBag, label: "Bag", path: "/Bag" },
-{ icon: LayoutGrid, label: "Bags Categories", path: "/bags_categories" },
-  { icon: User, label: "Bag Items", path: "/bag_items" },
-
-{ icon: Palette, label: "Style Guide", path: "/style-guide" },
-
-
-
-  // { icon: User, label: "Ads", path: "/ads" },
+  { icon: LayoutDashboard,  label: "Overview",        path: "/" },
+  { icon: Users,            label: "User",            path: "/User" },
+  { icon: UserCheck,        label: "Provider",        path: "/Provider" },
+  { icon: UserCog,          label: "Customer",        path: "/Customer" },
+  { icon: Package,          label: "Packages",        path: "/Packages" },
+  { icon: Megaphone,        label: "Ads",             path: "/Ads" },
+  { icon: Tag  , label: "Category", path: "/Category" },
+  { icon: ShoppingBag,      label: "Bag",             path: "/Bag" },
+  { icon: LayoutGrid,       label: "Bags Categories", path: "/bags_categories" },
+  { icon: BoxSelect,        label: "Bag Items",       path: "/bag_items" },
+  { icon: Palette,          label: "Style Guide",     path: "/style-guide" },
 ];
 
 const staffNavItems = [

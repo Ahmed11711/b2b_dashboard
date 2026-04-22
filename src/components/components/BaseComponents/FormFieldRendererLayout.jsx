@@ -1,176 +1,93 @@
 import { useState, useEffect } from "react";
 import { getAll } from "../../../service/services/apiService";
 import MultiSelectField from "../../components/BaseComponents/MultiSelectField";
-import MultiFeatureField from "../../components/BaseComponents/MultiFeatureField";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
-
-
-export default function FormFieldRendererLayout({ field, value, onChange, error, disabled }) {
-  const [options, setOptions] = useState(Array.isArray(field?.options) ? field.options : []);
+export default function FormFieldRendererLayout({
+  field,
+  value,
+  onChange,
+  error,
+  disabled,
+}) {
+  // ================= STATE =================
+  const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [translating, setTranslating] = useState(false);
+  const [selectedType, setSelectedType] = useState("image");
 
+  const displayValue =
+    value === null || value === undefined ? "" : value;
+
+  const isFullWidth =
+    field?.type === "textarea" ||
+    field?.type === "gallery" ||
+    field?.type === "file" ||
+    field?.key?.toLowerCase().includes("description");
+
+  // ================= FETCH OPTIONS =================
   useEffect(() => {
-    const isRelation = field?.type === "select" && !Array.isArray(field?.options);
+    if (!field) return;
 
-    if (isRelation) {
-      const fetchRelations = async () => {
-        setLoading(true);
-        try {
-          const targetPath = field.endpoint || field.key.replace("_id", "s");
-          const queryParams = field.relation_fields ? { fields: field.relation_fields } : {};
+    const isRelation =
+      field.type === "select" && !Array.isArray(field.options);
 
-          const response = await getAll(targetPath, queryParams);
-          const rawData = response.data || response;
-
-          const labelKey = field.options?.label || "name";
-          const valueKey = field.options?.value || "id";
-
-          const formatted = Array.isArray(rawData)
-            ? rawData.map(item => ({
-                label: item[labelKey],
-                value: item[valueKey],
-              }))
-            : [];
-
-          setOptions(formatted);
-        } catch (err) {
-          console.error(`❌ Error fetching ${field.key}:`, err);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchRelations();
+    if (!isRelation) {
+      setOptions(field.options || []);
+      return;
     }
-  }, [field?.key]);
 
-  if (!field) return null;
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const target =
+          field.endpoint || field.key.replace("_id", "s");
 
- const isFullWidth = 
-  field.type === "textarea" || 
-  field.type === "file" ||
-  field.type === "gallery" ||
-  field.type === "multi-features" ||
-  field.key?.toLowerCase().includes("description") || 
-  field.key?.toLowerCase().includes("desc");
-  // 👇 الجزء المضاف: تنظيف القيمة من الـ 0 أو الـ null لو الحقل اختياري
-  const displayValue = (value === null || value === undefined) ? "" : value;
+        const res = await getAll(target);
+        const data = res.data || res;
 
-  const stripHtml = (html = "") => {
-    if (typeof window === "undefined") return String(html);
-    const div = document.createElement("div");
-    div.innerHTML = String(html);
-    return div.textContent || div.innerText || "";
-  };
+        const labelKey = field.options?.label || "name";
+        const valueKey = field.options?.value || "id";
 
-  const escapeHtml = (text = "") =>
-    String(text)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+        const formatted = data.map((item) => ({
+          label: item[labelKey],
+          value: item[valueKey],
+        }));
 
-  const translateContent = async (targetLang) => {
-    const sourceText = stripHtml(displayValue).trim();
-    if (!sourceText || disabled || translating) return;
-
-    setTranslating(true);
-    try {
-      const sourceLang = targetLang === "ar" ? "en" : "ar";
-      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(sourceText)}&langpair=${sourceLang}|${targetLang}`;
-      const response = await fetch(url);
-      const result = await response.json();
-      const translated = result?.responseData?.translatedText;
-
-      if (translated) {
-        onChange(field.key, `<p>${escapeHtml(translated)}</p>`);
+        setOptions(formatted);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
       }
-    } catch (translateError) {
-      console.error("Translation failed:", translateError);
-    } finally {
-      setTranslating(false);
-    }
-  };
+    };
 
-  // ================= STYLES =================
+    fetchData();
+  }, [field]);
 
- const baseInputStyle = `
-w-full min-h-[56px] px-5 rounded-[20px] border bg-card-bg/80 backdrop-blur-sm border-border-thin
-focus:border-emerald-solid focus:ring-4 focus:ring-emerald-solid/10 outline-none font-medium text-carbon-black
-placeholder:text-text-description/50 transition-all duration-300 shadow-sm hover:shadow-md pt-3 pb-1
-${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
-`;
-
-  const labelStyle = `
-  absolute top-1 left-4 px-1 text-[11px] font-medium text-text-description bg-transparent pointer-events-none z-10
-  `;
-
-  // ================= INPUT RENDER =================
-
-  const renderInput = () => {
-    switch (field.type) {
-      // ================= SELECT =================
-      case "select":
-        return (
-          <div className="relative group h-full">
-            <select
-              name={field.key}
-              value={displayValue}
-              disabled={disabled || loading}
-              onChange={(e) => onChange(field.key, e.target.value)}
-              className={`${baseInputStyle} appearance-none cursor-pointer pr-10 pt-4 pb-1 ${
-                loading ? "animate-pulse" : ""
-              }`}
-            >
-              <option value="">
-                {loading ? "Fetching..." : field.placeholder || `Select ${field.label}`}
-              </option>
-
-              {options.map((opt, i) => (
-                <option key={i} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-
-            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-text-description group-focus-within:text-emerald-solid transition">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
-            </div>
-          </div>
-        );
-
-
-
-
-
-
-
-
-case "gallery":
+  // ================= GALLERY HANDLERS =================
   const galleryFiles = Array.isArray(value) ? value : [];
 
   const FILE_TYPES = [
-    { label: "Image", value: "image", accept: "image/*", icon: "🖼️" },
-    { label: "PDF",   value: "pdf",   accept: ".pdf",    icon: "📄" },
-    { label: "Word",  value: "word",  accept: ".doc,.docx", icon: "📝" },
-    { label: "Excel", value: "excel", accept: ".xls,.xlsx", icon: "📊" },
-    { label: "Video", value: "video", accept: "video/*", icon: "🎬" },
-    { label: "Download Demo", value: "download_demo", accept: "*", icon: "⬇️" },
+    { label: "Image", value: "image", accept: "image/*" },
+    { label: "PDF", value: "pdf", accept: ".pdf" },
+    { label: "Word", value: "word", accept: ".doc,.docx" },
+    { label: "Excel", value: "excel", accept: ".xls,.xlsx" },
+    { label: "Video", value: "video", accept: "video/*" },
+    { label: "Download Demo", value: "download_demo", accept: ".zip,.rar,.tar.gz,.pdf,.doc,.docx" },
   ];
 
-  const [selectedType, setSelectedType] = useState("image");
-
-  const currentAccept = FILE_TYPES.find(t => t.value === selectedType)?.accept || "*";
-
   const handleGalleryAdd = (e) => {
-    const files = Array.from(e.target.files).map(file => ({
+    const files = Array.from(e.target.files).map((file) => ({
       file,
       type: selectedType,
-      preview: selectedType === "image" ? URL.createObjectURL(file) : null,
+      preview:
+        selectedType === "image"
+          ? URL.createObjectURL(file)
+          : null,
       name: file.name,
     }));
+
     onChange(field.key, [...galleryFiles, ...files]);
     e.target.value = "";
   };
@@ -180,152 +97,141 @@ case "gallery":
     onChange(field.key, updated);
   };
 
-  return (
-    <div className="flex flex-col gap-3">
-      <label className="text-[12px] font-medium text-text-description px-1">
-        {field.label}
-      </label>
+  // ================= ReactQuill Config =================
+  const quillModules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      ['link'],
+      ['clean']
+    ]
+  };
 
-      {/* Type Selector */}
-      <div className="flex flex-wrap gap-2">
-        {FILE_TYPES.map(t => (
-          <button
-            key={t.value}
-            type="button"
-            onClick={() => setSelectedType(t.value)}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200
-              ${selectedType === t.value
-                ? "bg-emerald-solid text-white border-emerald-solid shadow"
-                : "bg-card-bg text-text-description border-border-thin hover:border-emerald-solid/50"
-              }`}
+  // ================= RENDER INPUT =================
+  const renderInput = () => {
+    switch (field.type) {
+      // ===== SELECT =====
+      case "select":
+        return (
+          <select
+            value={displayValue}
+            disabled={disabled || loading}
+            onChange={(e) =>
+              onChange(field.key, e.target.value)
+            }
+            className="w-full border rounded p-2"
           >
-            {t.icon} {t.label}
-          </button>
-        ))}
-      </div>
+            <option value="">
+              {loading ? "Loading..." : "Select"}
+            </option>
+            {options.map((opt, i) => (
+              <option key={i} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        );
 
-      {/* Upload Area */}
-      <div className="relative border border-dashed border-emerald-solid/50 bg-emerald-tint/20 rounded-[20px] p-5 text-center hover:bg-emerald-tint/40 transition-all cursor-pointer">
-        <input
-          type="file"
-          accept={currentAccept}
-          multiple
-          onChange={handleGalleryAdd}
-          className="absolute inset-0 opacity-0 cursor-pointer"
-        />
-        <div className="flex flex-col items-center gap-1.5 pointer-events-none">
-          <svg className="w-6 h-6 text-emerald-solid" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-          </svg>
-          <p className="text-text-description text-xs font-medium">
-            Upload {FILE_TYPES.find(t => t.value === selectedType)?.label} files
-          </p>
-        </div>
-      </div>
+      // ===== GALLERY =====
+      case "gallery":
+        return (
+          <div className="flex flex-col gap-3">
+            {/* Type Selector */}
+            <div className="flex gap-2 flex-wrap">
+              {FILE_TYPES.map((t) => (
+                <button
+                  key={t.value}
+                  type="button"
+                  onClick={() => setSelectedType(t.value)}
+                  className={`px-2 py-1 border rounded text-xs tracking-wider uppercase font-bold transition-all ${selectedType === t.value
+                    ? "bg-emerald-solid text-white border-emerald-solid shadow-md"
+                    : "bg-bg-surface text-secondary-link border-border-light hover:border-emerald-tint"
+                    }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
 
-      {/* Preview Grid */}
-      {galleryFiles.length > 0 && (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mt-1">
-          {galleryFiles.map((item, index) => (
-            <div key={index} className="relative group rounded-2xl border border-border-light overflow-hidden shadow-sm bg-slate-50">
-              {item.preview ? (
-                <img src={item.preview} className="w-full h-20 object-cover" alt={item.name} />
-              ) : (
-                <div className="w-full h-20 flex flex-col items-center justify-center gap-1">
-                  <span className="text-2xl">
-                    {FILE_TYPES.find(t => t.value === item.type)?.icon || "📁"}
-                  </span>
-                  <span className="text-[10px] text-text-description text-center px-1 truncate w-full text-center">
-                    {item.name}
-                  </span>
+            {/* Upload */}
+            <input
+              type="file"
+              multiple
+              accept={
+                FILE_TYPES.find(
+                  (t) => t.value === selectedType
+                )?.accept
+              }
+              onChange={handleGalleryAdd}
+              className="file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-tint file:text-emerald-solid hover:file:bg-emerald-solid hover:file:text-white transition-all text-sm text-carbon-gray"
+            />
+
+            {/* Preview */}
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {galleryFiles.map((item, i) => (
+                <div key={i} className="relative group rounded-2xl overflow-hidden border border-border-light aspect-square flex items-center justify-center bg-card-bg shadow-sm">
+                  {item.preview ? (
+                    <img
+                      src={item.preview}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      alt={item.name}
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center gap-2 p-2 text-center text-secondary-link">
+                      <svg className="w-8 h-8 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                      </svg>
+                      <span className="text-[10px] font-bold truncate w-full">{item.name}</span>
+                      <span className="text-[9px] uppercase tracking-wider bg-bg-surface px-2 py-0.5 rounded text-carbon-gray border border-border-light">{item.type}</span>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() =>
+                      handleGalleryRemove(i)
+                    }
+                    className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 shadow-md"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+                  </button>
                 </div>
-              )}
-
-              {/* Type Badge */}
-              <span className="absolute top-1 left-1 bg-emerald-solid text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase">
-                {item.type}
-              </span>
-
-              {/* Remove Button */}
-              <button
-                type="button"
-                onClick={() => handleGalleryRemove(index)}
-                className="absolute top-1 right-1 p-1 bg-status-error-bg text-status-error-text rounded-full opacity-0 group-hover:opacity-100 transition-all hover:scale-110"
-              >
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+          </div>
+        );
 
-
-
-
-
-
-
-
-
-
-      // ================= TEXTAREA / RICH TEXT =================
+      // ===== RICH TEXT =====
       case "textarea":
-      case "text":
-        if (isFullWidth) {
-          const modules = {
-            toolbar: [
-              [{ 'header': [1, 2, 3, false] }],
-              ['bold', 'italic', 'underline', 'strike'],
-              [{ 'color': [] }, { 'background': [] }],
-              [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-              [{ 'align': [] }],
-              ['link'],
-              ['clean']
-            ],
-          };
+        return (
+          <div className="quill-wrapper-custom">
+            <ReactQuill
+              value={displayValue}
+              onChange={(val) =>
+                onChange(field.key, val)
+              }
+              modules={quillModules}
+              readOnly={disabled}
+              className="bg-card-bg"
+            />
+          </div>
+        );
 
-          return (
-            <div className="relative mt-2">
-               {/* Label for textarea positioned to look like integrated floating label */}
-               <label className="absolute -top-2.5 left-4 px-1 bg-card-bg text-[12px] text-text-description font-medium z-10">{field.label}</label>
-               <div className="bg-card-bg rounded-[20px] border border-border-light overflow-hidden transition-all duration-300 hover:shadow-md focus-within:border-emerald-solid focus-within:ring-4 focus-within:ring-emerald-solid/10">
-                 <ReactQuill
-                   theme="snow"
-                   value={displayValue}
-                   onChange={(content) => onChange(field.key, content)}
-                   readOnly={disabled}
-                   modules={modules}
-                   placeholder={field.placeholder || `Enter ${field.label}...`}
-                   className="quill-editor"
-                 />
-               </div>
-            </div>
-          );
-        }
-         break;
-
-      // ================= CHECKBOX =================
+      // ===== CHECKBOX =====
       case "checkbox":
       case "boolean":
         return (
-          <div className="flex items-center justify-between p-4 md:p-5 bg-slate-50 rounded-[20px] border border-border-light hover:border-emerald-solid/20 transition-all duration-300 shadow-sm hover:shadow h-[56px] mt-2">
-            <div className="flex flex-col">
-              <span className="text-xs md:text-sm font-bold tracking-tight text-carbon-black capitalize">{field.label}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => !disabled && onChange(field.key, value ? 0 : 1)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-solid/20 shadow-inner ${value ? "bg-emerald-solid" : "bg-slate-300"}`}
-            >
-              <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform duration-300 ${value ? "translate-x-5" : "translate-x-1"}`} />
-            </button>
-          </div>
+          <input
+            type="checkbox"
+            checked={!!value}
+            onChange={() =>
+              onChange(field.key, value ? 0 : 1)
+            }
+          />
         );
-      // ================= FILE =================
+
+      // ===== FILE =====
       case "file":
         return (
           <div className="flex flex-col gap-3 relative mt-2">
@@ -368,9 +274,9 @@ case "gallery":
                     {/* Hover overlay with action buttons */}
                     <div className="absolute inset-0 bg-carbon-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 z-10">
                       <div className="flex flex-col items-center gap-1 cursor-pointer">
-                         <span className="text-white text-xs font-medium">Click to change</span>
+                        <span className="text-white text-xs font-medium">Click to change</span>
                       </div>
-                      
+
                       <button
                         type="button"
                         onClick={(e) => {
@@ -390,66 +296,50 @@ case "gallery":
             </div>
           </div>
         );
-    
-case "multi-select":
-  return (
-    <div className="mt-2">
-      <MultiSelectField
-        field={field}
-        value={value}
-        onChange={onChange}
-        error={error}
-      />
-    </div>
-  );
 
-case "multi-features":
-  return (
-    <div className="mt-2">
-      <MultiFeatureField
-        field={field}
-        value={value}
-        onChange={onChange}
-        error={error}
-        disabled={disabled}
-      />
-    </div>
-  );
+      case "multi-select":
+        return (
+          <MultiSelectField
+            field={field}
+            value={value}
+            onChange={onChange}
+            error={error}
+          />
+        );
+
+      // ===== DEFAULT =====
+      default:
+        return (
+          <input
+            type="text"
+            value={displayValue}
+            onChange={(e) =>
+              onChange(field.key, e.target.value)
+            }
+            disabled={disabled}
+          />
+        );
     }
-    // ================= DEFAULT (للحالات العادية) =================
-    return (
-      <div className="relative group h-[56px]">
-        <input
-          type={field.type || "text"}
-          name={field.key}
-          value={displayValue}
-          placeholder={field.placeholder || `Enter ${field.label}`}
-          disabled={disabled}
-          onChange={(e) => onChange(field.key, e.target.value)}
-          className={`${baseInputStyle}`}
-        />
-      </div>
-    );
   };
 
+  // ================= RETURN =================
   return (
-    // 👇 استخدام isFullWidth عشان يفرش الحقل في الـ Grid لو هو وصف
-    <div className={`relative flex flex-col justify-start animate-in fade-in slide-in-from-bottom-1 duration-500 ${isFullWidth ? "md:col-span-2" : ""} ${field.type === 'multi-select' ? 'relative z-10 focus-within:z-20' : ''}`}>
-      {field.type !== "checkbox" && field.type !== "boolean" && field.type !== "multi-select" && field.type !== "file" && (!isFullWidth || (field.type !== 'textarea' && field.type !== 'text')) && (
-        <label className="absolute -top-2 left-4 px-1 bg-card-bg text-[11px] font-medium text-text-description pointer-events-none z-10">
+    <div
+      className={`flex flex-col gap-1 ${isFullWidth ? "col-span-2" : ""
+        }`}
+    >
+      {field.type !== "checkbox" && (
+        <label className="text-sm font-medium">
           {field.label}
-          {field.required ? (
-            <span className="text-status-error-text text-sm ml-0.5">*</span>
-          ) : null}
         </label>
       )}
 
       {renderInput()}
 
       {error && (
-        <p className="text-status-error-text text-xs font-bold ml-4 flex items-center gap-1 mt-1">
-          ⚠ {Array.isArray(error) ? error[0] : error}
-        </p>
+        <span className="text-red-500 text-xs">
+          {error}
+        </span>
       )}
     </div>
   );
