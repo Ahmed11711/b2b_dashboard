@@ -140,7 +140,43 @@ export const CustomerFields = [
     form_show: false,
     options: null
   },
+{
+  key: "posts",
+  label: "my-posts",
+  cell_type: "relation_list",
+  view_show: true,
+  tab: true,  
+  headers: [
+ {key: "id", label: "ID", format: "short_id" },
+ { key: "title", label: "title" },
+ { key: "description", label: "description" },
+{ key: "price_from", label: "price_from" },
+{ key: "price_to", label: "price_to", },
+{ key: "image", label: "image", },
+{ key: "is_active", label: "is_active", },
+    { key: "created_at", label: "Date" },
+  ],
+  view_route: "/services/view/:id",    
+  edit_route: "/services/edit/:id", 
+  filterKey: "user_id",
+},
 
+,{
+  key: "UserContact",
+  label: "my-contacts",
+  cell_type: "relation_list",
+  view_show: true,
+  tab: true,  
+  headers: [
+{ key: "id", label: "ID", format: "short_id" },
+    { key: "type", label: "Type" },
+    { key: "value", label: "value" },
+    { key: "created_at", label: "Date" },
+  ],
+  view_route: "/services/view/:id",    
+  edit_route: "/services/edit/:id", 
+  filterKey: "user_id",
+},
  
 
 ];

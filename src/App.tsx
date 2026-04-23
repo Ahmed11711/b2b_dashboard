@@ -26,6 +26,11 @@ import {ProviderFields} from "./schemas/ProviderSchema"
 import CustomerPage from "./pages/Customer/CustomerPage";
 import CategoryPage from "./pages/Category/CategoryPage";
 import {CategoryFields} from "./schemas/CategorySchema"
+import {CustomerFields} from "./schemas/CustomerSchema"
+import ServicePage from "./pages/Service/ServicePage";
+import {ServiceFields} from "./schemas/ServiceSchema";
+import PostsPage from "./pages/Posts/PostsPage";
+import {PostsFields} from "./schemas/PostsSchema"
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem("token");
@@ -89,12 +94,25 @@ export default function App() {
 
         {/* Customer  Routes */}
         <Route path="/Customer" element={<ProtectedRoute><CustomerPage /></ProtectedRoute>} />
+        <Route path="/Customer/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="customer" fields={CustomerFields} mode="edit" title="Edit customer Item" /></ProtectedRoute>} />
+        <Route path="/Customer/view/:id" element={<ProtectedRoute><GenericViewPage entityName="customer" fields={CustomerFields} title="customer Item Details" /></ProtectedRoute>} />
+
  
         {/* Category  Routes */}
         <Route path="/Category" element={<ProtectedRoute><CategoryPage /></ProtectedRoute>} />
         <Route path="/Category/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="categories" fields={CategoryFields} mode="edit" title="Edit Category Item" /></ProtectedRoute>} />
         <Route path="/Category/view/:id" element={<ProtectedRoute><GenericViewPage entityName="categories" fields={CategoryFields} title="Category Item Details" /></ProtectedRoute>} />
 
+         {/* Service  Routes */}
+        <Route path="/Service" element={<ProtectedRoute><ServicePage /></ProtectedRoute>} />
+        <Route path="/Service/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="services" fields={ServiceFields} mode="edit" title="Edit Category Item" /></ProtectedRoute>} />
+        <Route path="/Service/view/:id" element={<ProtectedRoute><GenericViewPage entityName="services" fields={ServiceFields} title="Category Item Details" /></ProtectedRoute>} />
+
+
+  {/* posts  Routes */}
+        <Route path="/Posts" element={<ProtectedRoute><PostsPage /></ProtectedRoute>} />
+        <Route path="/Posts/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="postss" fields={PostsFields} mode="edit" title="Edit Category Item" /></ProtectedRoute>} />
+        <Route path="/Posts/view/:id" element={<ProtectedRoute><GenericViewPage entityName="postss" fields={PostsFields} title="Category Item Details" /></ProtectedRoute>} />
 
       </Routes>
     </BrowserRouter>

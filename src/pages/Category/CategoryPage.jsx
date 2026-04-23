@@ -7,6 +7,7 @@ export default function CategoryPage() {
       endpoint="categories"
       headers={CategoryFields}
       title={"All Category"}
+      routePrefix="Category"
     />
   );
 }

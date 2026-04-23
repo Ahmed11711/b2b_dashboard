@@ -4,7 +4,7 @@ import {
   LayoutDashboard, LogOut, Menu, X, Bell, 
   User, Users, UserCheck, UserCog,
   Package, Megaphone, ShoppingBag, 
-  LayoutGrid, BoxSelect, Palette ,Tag  
+  LayoutGrid, BoxSelect, Palette ,Tag ,Wrench
 } from "lucide-react";import { cn } from "../lib/utils";
 import { Button } from "./Button";
 import { motion, AnimatePresence } from "motion/react";
@@ -14,11 +14,15 @@ import { Notification } from "../types";
 const adminNavItems = [
   { icon: LayoutDashboard,  label: "Overview",        path: "/" },
   { icon: Users,            label: "User",            path: "/User" },
+
   { icon: UserCheck,        label: "Provider",        path: "/Provider" },
   { icon: UserCog,          label: "Customer",        path: "/Customer" },
+  { icon: Tag  ,            label: "Category",        path: "/Category" },
+  { icon: Wrench,           label: "Service",         path: "/Service" },
+  { icon: Wrench,           label: "Posts",           path: "/Posts" },
+
   { icon: Package,          label: "Packages",        path: "/Packages" },
   { icon: Megaphone,        label: "Ads",             path: "/Ads" },
-  { icon: Tag  , label: "Category", path: "/Category" },
   { icon: ShoppingBag,      label: "Bag",             path: "/Bag" },
   { icon: LayoutGrid,       label: "Bags Categories", path: "/bags_categories" },
   { icon: BoxSelect,        label: "Bag Items",       path: "/bag_items" },
