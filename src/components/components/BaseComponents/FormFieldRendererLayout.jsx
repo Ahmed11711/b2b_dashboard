@@ -171,17 +171,30 @@ export default function FormFieldRendererLayout({
             </div>
 
             {/* Upload */}
-            <input
-              type="file"
-              multiple
-              accept={
-                FILE_TYPES.find(
-                  (t) => t.value === selectedType
-                )?.accept
-              }
-              onChange={handleGalleryAdd}
-              className="file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-tint file:text-emerald-solid hover:file:bg-emerald-solid hover:file:text-white transition-all text-sm text-carbon-gray"
-            />
+            <label className="relative flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-emerald-solid/30 bg-emerald-tint/10 p-5 text-center hover:border-emerald-solid hover:bg-emerald-tint/20 transition-all cursor-pointer">
+              <input
+                type="file"
+                multiple
+                accept={
+                  FILE_TYPES.find(
+                    (t) => t.value === selectedType
+                  )?.accept
+                }
+                onChange={handleGalleryAdd}
+                className="absolute inset-0 opacity-0 cursor-pointer"
+              />
+              <div className="w-10 h-10 rounded-full bg-card-bg border border-emerald-solid/20 flex items-center justify-center text-emerald-solid">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 0115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+              </div>
+              <p className="text-xs font-bold text-carbon-black">
+                Choose multiple files for <span className="text-emerald-solid uppercase">{selectedType}</span>
+              </p>
+              <p className="text-[11px] text-secondary-link">
+                Click to browse or drag and drop files
+              </p>
+            </label>
 
             {/* Preview */}
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">

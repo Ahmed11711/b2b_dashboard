@@ -37,6 +37,20 @@ const getCellValue = (item, key) => {
   return item[key];
 };
 
+const htmlToPlainText = (value) => {
+  const raw = String(value ?? "");
+  const htmlLike = /<\/?[a-z][\s\S]*>/i.test(raw) || raw.includes("&nbsp;");
+  if (!htmlLike) return raw;
+
+  if (typeof window !== "undefined" && typeof window.document !== "undefined") {
+    const temp = window.document.createElement("div");
+    temp.innerHTML = raw;
+    return temp.textContent?.replace(/\s+/g, " ").trim() || "";
+  }
+
+  return raw.replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+};
+
 // ================= DynamicValueRenderer =================
 function DynamicValueRenderer({ value, labelKey, format }) {
   const { t } = useTranslation();
@@ -132,6 +146,7 @@ function DynamicValueRenderer({ value, labelKey, format }) {
   }
 
   const stringValue = String(value);
+  const plainTextValue = htmlToPlainText(value);
   const keyName = String(labelKey || "").toLowerCase();
   const isImageUrl = stringValue.match(
     /\.(jpeg|jpg|gif|png|webp|svg)$|unsplash\.com/i,
@@ -199,16 +214,16 @@ function DynamicValueRenderer({ value, labelKey, format }) {
     );
   }
 
-  if (stringValue.length > 60) {
+  if (plainTextValue.length > 60) {
     return (
       <span className="text-text-description text-sm">
-        {stringValue.substring(0, 60)}...
+        {plainTextValue.substring(0, 60)}...
       </span>
     );
   }
 
   return (
-    <span className="text-carbon-black font-medium text-sm">{stringValue}</span>
+    <span className="text-carbon-black font-medium text-sm">{plainTextValue}</span>
   );
 }
 
