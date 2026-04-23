@@ -31,6 +31,8 @@ import ServicePage from "./pages/Service/ServicePage";
 import {ServiceFields} from "./schemas/ServiceSchema";
 import PostsPage from "./pages/Posts/PostsPage";
 import {PostsFields} from "./schemas/PostsSchema"
+import SubscribePage from "./pages/subscribe/SubscribePage";
+import {UserPacakgesFields} from "./schemas/subscribeSchema"
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem("token");
@@ -113,6 +115,10 @@ export default function App() {
         <Route path="/Posts" element={<ProtectedRoute><PostsPage /></ProtectedRoute>} />
         <Route path="/Posts/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="postss" fields={PostsFields} mode="edit" title="Edit Category Item" /></ProtectedRoute>} />
         <Route path="/Posts/view/:id" element={<ProtectedRoute><GenericViewPage entityName="postss" fields={PostsFields} title="Category Item Details" /></ProtectedRoute>} />
+{/* posts  Routes */}
+        <Route path="/Subscribe" element={<ProtectedRoute><SubscribePage /></ProtectedRoute>} />
+        <Route path="/Subscribe/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="postss" fields={UserPacakgesFields} mode="edit" title="Edit Subscribe Item" /></ProtectedRoute>} />
+        <Route path="/Subscribe/view/:id" element={<ProtectedRoute><GenericViewPage entityName="postss" fields={UserPacakgesFields} title="Subscribe Item Details" /></ProtectedRoute>} />
 
       </Routes>
     </BrowserRouter>

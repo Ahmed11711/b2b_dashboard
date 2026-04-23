@@ -12,7 +12,7 @@ import { NotificationPopover } from "./NotificationPopover";
 import { Notification } from "../types";
 
 const adminNavItems = [
-  { icon: LayoutDashboard,  label: "Overview",        path: "/" },
+   { icon: LayoutDashboard,  label: "Overview",        path: "/" },
   { icon: Users,            label: "User",            path: "/User" },
 
   { icon: UserCheck,        label: "Provider",        path: "/Provider" },
@@ -22,6 +22,7 @@ const adminNavItems = [
   { icon: Wrench,           label: "Posts",           path: "/Posts" },
 
   { icon: Package,          label: "Packages",        path: "/Packages" },
+  { icon: Package,          label: "Subscribe",        path: "/Subscribe" },
   { icon: Megaphone,        label: "Ads",             path: "/Ads" },
   { icon: ShoppingBag,      label: "Bag",             path: "/Bag" },
   { icon: LayoutGrid,       label: "Bags Categories", path: "/bags_categories" },
