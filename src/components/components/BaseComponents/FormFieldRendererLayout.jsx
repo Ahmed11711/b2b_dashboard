@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { getAll } from "../../../service/services/apiService";
 import MultiSelectField from "../../components/BaseComponents/MultiSelectField";
+import MultiFeatureField from "../../components/BaseComponents/MultiFeatureField";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 
@@ -316,6 +317,16 @@ export default function FormFieldRendererLayout({
             value={value}
             onChange={onChange}
             error={error}
+          />
+        );
+      case "multi-features":
+        return (
+          <MultiFeatureField
+            field={field}
+            value={value}
+            onChange={onChange}
+            error={error}
+            disabled={disabled}
           />
         );
 
