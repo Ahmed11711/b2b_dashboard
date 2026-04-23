@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Camera, CheckCircle2, ShieldCheck, Star } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 import { profileService } from "../services/profileService";
@@ -7,6 +8,7 @@ import { CompanyProfile } from "../types";
 import { toast, Toaster } from "sonner";
 
 const Profile: React.FC = () => {
+  const { t } = useTranslation();
   const [profile, setProfile] = useState<CompanyProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -105,15 +107,16 @@ const Profile: React.FC = () => {
     return <div className="p-10 animate-pulse bg-slate-50 h-screen" />;
 
   return (
-    <div className="space-y-10">
+    <div className="max-w-6xl mx-auto p-4 md:p-6 lg:p-8 animate-in fade-in duration-500">
       <Toaster position="top-right" richColors />
 
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-carbon-black">
-          Company Profile
+      {/* Header Section */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-black text-carbon-black tracking-tight">
+          {t("pages.profile.title")}
         </h1>
         <p className="text-text-description mt-1">
-          Manage your business identity and settings.
+          {t("pages.profile.manage_info")}
         </p>
       </div>
 

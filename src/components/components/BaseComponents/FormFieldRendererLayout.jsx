@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { getAll } from "../../../service/services/apiService";
 import MultiSelectField from "../../components/BaseComponents/MultiSelectField";
 import ReactQuill from "react-quill-new";
@@ -23,6 +24,7 @@ export default function FormFieldRendererLayout({
   error,
   disabled,
 }) {
+  const { t } = useTranslation();
   // ================= STATE =================
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -81,12 +83,12 @@ export default function FormFieldRendererLayout({
   const galleryFiles = Array.isArray(value) ? value : [];
 
   const FILE_TYPES = [
-    { label: "Image", value: "image", accept: "image/*" },
-    { label: "PDF", value: "pdf", accept: ".pdf" },
-    { label: "Word", value: "word", accept: ".doc,.docx" },
-    { label: "Excel", value: "excel", accept: ".xls,.xlsx" },
-    { label: "Video", value: "video", accept: "video/*" },
-    { label: "Download Demo", value: "download_demo", accept: ".zip,.rar,.tar.gz,.pdf,.doc,.docx" },
+    { label: t("common.file_types.image"), value: "image", accept: "image/*" },
+    { label: t("common.file_types.pdf"), value: "pdf", accept: ".pdf" },
+    { label: t("common.file_types.word"), value: "word", accept: ".doc,.docx" },
+    { label: t("common.file_types.excel"), value: "excel", accept: ".xls,.xlsx" },
+    { label: t("common.file_types.video"), value: "video", accept: "video/*" },
+    { label: t("common.file_types.download_demo"), value: "download_demo", accept: ".zip,.rar,.tar.gz,.pdf,.doc,.docx" },
   ];
 
   const handleGalleryAdd = (e) => {
@@ -136,11 +138,11 @@ export default function FormFieldRendererLayout({
             className={`w-full h-11 px-4 py-2 border rounded-lg bg-white outline-none transition-all duration-300 focus:border-emerald-solid focus:ring-4 focus:ring-emerald-solid/10 text-sm text-carbon-black placeholder:text-slate-400 ${error ? "border-red-500 focus:ring-red-500" : "border-border-thin hover:border-border-light"} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <option value="">
-              {loading ? "Loading..." : "Select"}
+              {loading ? t("common.loading") : t("common.select")}
             </option>
             {options.map((opt, i) => (
               <option key={i} value={opt.value}>
-                {opt.label}
+                {t(`fields.${opt.label.toLowerCase()}`, { defaultValue: opt.label })}
               </option>
             ))}
           </select>
@@ -268,7 +270,7 @@ export default function FormFieldRendererLayout({
                     </div>
 
                     <p className="text-text-description font-medium text-xs">
-                      Click or drag to upload
+                      {t("common.upload_prompt")}
                     </p>
                   </div>
                 )}
@@ -284,7 +286,7 @@ export default function FormFieldRendererLayout({
                     {/* Hover overlay with action buttons */}
                     <div className="absolute inset-0 bg-carbon-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 z-10">
                       <div className="flex flex-col items-center gap-1 cursor-pointer">
-                        <span className="text-white text-xs font-medium">Click to change</span>
+                        <span className="text-white text-xs font-medium">{t("common.click_to_change")}</span>
                       </div>
 
                       <button
@@ -295,7 +297,7 @@ export default function FormFieldRendererLayout({
                           onChange(field.key, null);
                         }}
                         className="p-2 bg-status-error-bg text-status-error-text rounded-full hover:scale-110 transition-transform relative z-30"
-                        title="Remove Image"
+                        title={t("common.remove_image")}
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                       </button>
@@ -327,7 +329,7 @@ export default function FormFieldRendererLayout({
               onChange(field.key, e.target.value)
             }
             disabled={disabled}
-            placeholder={`Enter ${field.label || field.key}`}
+            placeholder={t("common.enter_field", { field: t(`fields.${field.key}`, { defaultValue: field.label }) })}
             className={`w-full h-11 px-4 py-2 border rounded-lg bg-white outline-none transition-all duration-300 focus:border-emerald-solid focus:ring-4 focus:ring-emerald-solid/10 text-sm text-carbon-black placeholder:text-slate-400 ${error ? "border-red-500 focus:ring-red-500 bg-red-50/50" : "border-border-thin hover:border-border-light"} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
           />
         );
@@ -342,7 +344,7 @@ export default function FormFieldRendererLayout({
     >
       {field.type !== "checkbox" && field.type !== "boolean" && (
         <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-1">
-          {field.label}
+          {t(`fields.${field.key}`, { defaultValue: field.label })}
         </label>
       )}
 

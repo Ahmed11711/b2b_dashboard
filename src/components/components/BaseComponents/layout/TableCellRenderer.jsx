@@ -1,5 +1,6 @@
 // components/layout/TableCellRenderer.jsx
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * TableCellRenderer - المكون السحري لعرض البيانات بديناميكية احترافية
@@ -21,11 +22,12 @@ export default function TableCellRenderer({
   options,
   onImageClick,
 }) {
+  const { t } = useTranslation();
   // --- أ- فحص البيانات الفارغة (Data Integrity Guardian) ---
   if ((value === null || value === undefined || value === "") && value !== 0) {
     return (
-      <span className="text-gray-300 italic text-[10px] tracking-widest font-light">
-        EMPTY
+      <span className="text-gray-300 italic text-[10px] tracking-widest font-light uppercase">
+        {t("common.empty")}
       </span>
     );
   }
@@ -81,7 +83,7 @@ export default function TableCellRenderer({
         <span
           className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border capitalize tracking-tight shadow-sm ${BADGE_THEMES[themeKey] || BADGE_THEMES.default}`}
         >
-          {option ? option.label : value}
+          {option ? t(`fields.${option.label.toLowerCase()}`, { defaultValue: option.label }) : t(`common.${val}`, { defaultValue: value })}
         </span>
       );
 
@@ -181,7 +183,7 @@ export default function TableCellRenderer({
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-xs font-bold transition-all group/link underline decoration-blue-200 underline-offset-4"
         >
-          View Resource
+          {t("common.view_resource")}
           <svg
             className="w-3 h-3 transform group-hover/link:translate-x-0.5 transition-transform"
             fill="none"

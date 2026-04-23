@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Mail, Lock, ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 import { toast, Toaster } from "sonner";
@@ -8,6 +9,7 @@ import { authService } from "../services/authService";
 import { LoginCredentials } from "../types";
 
 const Login: React.FC = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -27,13 +29,13 @@ const Login: React.FC = () => {
       localStorage.setItem("role", "admin");
       localStorage.setItem("user_name", data.user.name);
 
-      toast.success(`Welcome back, ${data.user.name}!`);
+      toast.success(t("login.welcome_back", { name: data.user.name }));
 
        navigate("/");
     } catch (error: any) {
        const message =
         error.response?.data?.message ||
-        "Login failed. Please check your credentials.";
+        t("login.login_failed");
       toast.error(message);
       console.error("Login error details:", error.response?.data);
     } finally {
@@ -56,10 +58,10 @@ const Login: React.FC = () => {
             </span>
           </div>
           <h2 className="text-2xl font-semibold tracking-tight text-carbon-black">
-            Welcome back
+            {t("login.welcome")}
           </h2>
           <p className="text-text-description mt-1 text-sm">
-            Sign in to manage your service provider dashboard.
+            {t("login.sign_in_to_manage")}
           </p>
         </div>
 
@@ -67,7 +69,7 @@ const Login: React.FC = () => {
           <form className="space-y-6" onSubmit={handleLogin}>
             <div className="space-y-4">
               <Input
-                label="Email Address Or Phone"
+                label={t("login.email_or_phone")}
                  placeholder="name@company.com || 01016158010"
                 className="h-11 rounded-lg"
                 value={email}
@@ -77,7 +79,7 @@ const Login: React.FC = () => {
                 icon={<Mail className="h-4 w-4" />}
               />
               <Input
-                label="Password"
+                label={t("login.password")}
                 type="password"
                 placeholder="••••••••"
                 className="h-11 rounded-lg"
@@ -98,26 +100,36 @@ const Login: React.FC = () => {
                 />
                 <label
                   htmlFor="remember-me"
-                  className="ml-2 block text-xs font-medium text-slate-400 cursor-pointer"
+                  className="ml-2 block text-sm text-carbon-black cursor-pointer"
                 >
-                  Remember me
+                  {t("login.remember_me")}
                 </label>
               </div>
-              {/* <Link
+
+              <Link
                 to="/forgot-password"
-                title="Forgot Password"
-                className="text-xs font-bold text-carbon-black hover:text-emerald-solid transition-colors"
+                className="text-sm font-medium text-emerald-solid hover:text-emerald-hover transition-colors"
               >
-                Forgot password?
-              </Link> */}
+                {t("login.forgot_password")}
+              </Link>
             </div>
 
             <Button
               type="submit"
-              className="w-full h-11 text-xs rounded-lg btn-emerald"
-              isLoading={isLoading}
+              className="w-full h-11 text-base font-semibold"
+              disabled={isLoading}
             >
-              Sign In <ArrowRight className="ml-2 h-4 w-4" />
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  {t("login.signing_in")}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  {t("login.sign_in")}
+                  <ArrowRight className="h-4 w-4" />
+                </div>
+              )}
             </Button>
           </form>
         </div>

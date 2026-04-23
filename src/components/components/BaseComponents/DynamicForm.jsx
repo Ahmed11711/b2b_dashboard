@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react"; // ضفنا useEffect
+import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import FormFieldRendererLayout from "./FormFieldRendererLayout";
 
 // ضفنا initialData و mode في الـ Props
 export default function DynamicForm({ fields, onSubmit, title, initialData, mode }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -25,7 +27,7 @@ useEffect(() => {
   if (!fields || fields.length === 0) {
     return (
       <div className="p-10 text-center border-2 border-dashed rounded-3xl text-slate-400">
-        No fields available to render.
+        {t("common.no_fields_available")}
       </div>
     );
   }
@@ -52,7 +54,7 @@ useEffect(() => {
       
       <div className="bg-card-bg rounded-2xl shadow-sm border border-border-light overflow-hidden">
         <div className="px-6 py-5 border-b border-border-light bg-card-bg">
-          <h3 className="text-lg font-bold text-heading-slate capitalize">Basic Information</h3>
+          <h3 className="text-lg font-bold text-heading-slate capitalize">{t("common.basic_information")}</h3>
         </div>
         
         <div className="p-6 md:p-8">
@@ -88,11 +90,11 @@ useEffect(() => {
           {loading ? (
             <span className="flex items-center justify-center gap-2">
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              Processing...
+              {t("common.processing")}
             </span>
           ) : (
             <span className="flex items-center justify-center gap-2">
-              {mode === "edit" ? "Publish" : "Create"}
+              {mode === "edit" ? t("common.publish") : t("common.create")}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
             </span>
           )}

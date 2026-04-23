@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import TableComponent from "../../components/components/BaseComponents/TableComponent";
 import DynamicForm from "../../components/components/BaseComponents/DynamicForm";
 import { createItem, deleteItem, getAll } from "../../service/services/apiService";
@@ -7,6 +8,7 @@ import { buildPayloadByEndpoint } from "../../utils/payloadBuilders";
 import { packagesEndpoint, packagesFields, packagesTitle } from "./config";
 
 export default function PackagesPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [meta, setMeta] = useState({ current_page: 1, last_page: 1, total: 0, per_page: 10 });
@@ -65,8 +67,8 @@ export default function PackagesPage() {
     <div className="page-container antialiased pb-20 bg-[#fbfcfd] min-h-screen">
       <div className="max-w-[1600px] mx-auto px-4 space-y-6">
         <div className="flex items-center justify-between gap-4">
-          <h1 className="text-3xl font-black text-heading-slate">{packagesTitle}</h1>
-          <button onClick={() => setShowCreate(true)} className="btn-emerald px-6 py-3 rounded-2xl">Add New Package</button>
+          <h1 className="text-3xl font-black text-heading-slate">{t("pages.packages.title")}</h1>
+          <button onClick={() => setShowCreate(true)} className="btn-emerald px-6 py-3 rounded-2xl">{t("common.add_new")}</button>
         </div>
         <div className="relative">
           {loading && <div className="absolute inset-0 z-10 bg-white/50" />}
@@ -88,7 +90,7 @@ export default function PackagesPage() {
         <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 p-4">
           <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 relative">
             <button onClick={() => setShowCreate(false)} className="absolute right-6 top-6 text-slate-500">✕</button>
-            <DynamicForm fields={visibleFields} onSubmit={handleCreate} title="Create Package" />
+            <DynamicForm fields={visibleFields} onSubmit={handleCreate} title={t("pages.packages.add_new")} />
           </div>
         </div>
       )}
@@ -96,10 +98,10 @@ export default function PackagesPage() {
       {deleteRow && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-            <p className="text-sm text-slate-700 mb-4">Delete "{deleteRow.name || deleteRow.id}"?</p>
+            <p className="text-sm text-slate-700 mb-4">{t("common.delete_warning", { name: deleteRow.name || deleteRow.id })}</p>
             <div className="flex justify-end gap-2">
-              <button onClick={() => setDeleteRow(null)} className="btn-outline-gray px-4 py-2 rounded-xl">Cancel</button>
-              <button onClick={handleDelete} className="px-4 py-2 rounded-xl bg-red-600 text-white">Delete</button>
+              <button onClick={() => setDeleteRow(null)} className="btn-outline-gray px-4 py-2 rounded-xl">{t("common.cancel")}</button>
+              <button onClick={handleDelete} className="px-4 py-2 rounded-xl bg-red-600 text-white">{t("common.delete")}</button>
             </div>
           </div>
         </div>

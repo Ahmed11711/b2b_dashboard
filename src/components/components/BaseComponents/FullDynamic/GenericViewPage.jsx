@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { getAll, getOne } from "../../../../service/services/apiService";
 
 const getValueByPath = (obj, path) => {
@@ -31,6 +32,7 @@ const toArray = (val) => {
 
 // ================= DynamicValueRenderer =================
 function DynamicValueRenderer({ value, labelKey }) {
+  const { t } = useTranslation();
   if (value === null || value === undefined || value === "") {
     return <span className="text-secondary-link font-medium italic">-</span>;
   }
@@ -61,7 +63,7 @@ function DynamicValueRenderer({ value, labelKey }) {
           rel="noreferrer"
           className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl text-white text-[9px] font-black uppercase"
         >
-          View
+          {t("common.view")}
         </a>
       </div>
     );
@@ -81,7 +83,7 @@ function DynamicValueRenderer({ value, labelKey }) {
       <span
         className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${isActive ? "bg-status-success-bg text-status-success-text" : "bg-status-error-bg text-status-error-text"}`}
       >
-        {isActive ? "Yes" : "No"}
+        {isActive ? t("common.yes") : t("common.no")}
       </span>
     );
   }
@@ -101,7 +103,7 @@ function DynamicValueRenderer({ value, labelKey }) {
       <span
         className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${colorClass}`}
       >
-        {stringValue}
+        {t(`common.${stringValue.toLowerCase()}`, { defaultValue: stringValue })}
       </span>
     );
   }
@@ -119,6 +121,7 @@ function DynamicValueRenderer({ value, labelKey }) {
 
 // ================= InlineRelationTable =================
 function InlineRelationTable({ items, headers, viewRoute, editRoute }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   if (!items || items.length === 0)
@@ -137,7 +140,7 @@ function InlineRelationTable({ items, headers, viewRoute, editRoute }) {
             d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
           />
         </svg>
-        <p className="text-sm font-medium">No records found</p>
+        <p className="text-sm font-medium">{t("common.no_records_found")}</p>
       </div>
     );
 
@@ -160,12 +163,12 @@ function InlineRelationTable({ items, headers, viewRoute, editRoute }) {
                 key={h.key}
                 className="px-6 py-4 text-xs font-bold text-secondary-link uppercase tracking-wider border-b border-border-light"
               >
-                {h.label}
+                {t(`fields.${h.key}`, { defaultValue: h.label })}
               </th>
             ))}
             {hasActions && (
               <th className="px-6 py-4 text-xs font-bold text-secondary-link uppercase tracking-wider border-b border-border-light text-center">
-                Actions
+                {t("common.actions")}
               </th>
             )}
           </tr>
@@ -190,7 +193,7 @@ function InlineRelationTable({ items, headers, viewRoute, editRoute }) {
                           navigate(viewRoute.replace(":id", item.id))
                         }
                         className="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-tint text-emerald-solid hover:bg-emerald-solid hover:text-white transition-all"
-                        title="View"
+                        title={t("common.view")}
                       >
                         <svg
                           className="w-4 h-4"
@@ -213,7 +216,7 @@ function InlineRelationTable({ items, headers, viewRoute, editRoute }) {
                           navigate(editRoute.replace(":id", item.id))
                         }
                         className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-500 hover:text-white transition-all"
-                        title="Edit"
+                        title={t("common.edit")}
                       >
                         <svg
                           className="w-4 h-4"

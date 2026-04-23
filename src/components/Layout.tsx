@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { 
   LayoutDashboard, LogOut, Menu, X, Bell, 
   User, Users, UserCheck, UserCog,
@@ -10,24 +11,6 @@ import { Button } from "./Button";
 import { motion, AnimatePresence } from "motion/react";
 import { NotificationPopover } from "./NotificationPopover";
 import { Notification } from "../types";
-
-const adminNavItems = [
-  { icon: LayoutDashboard,  label: "Overview",        path: "/" },
-  { icon: Users,            label: "User",            path: "/User" },
-  { icon: UserCheck,        label: "Provider",        path: "/Provider" },
-  { icon: UserCog,          label: "Customer",        path: "/Customer" },
-  { icon: Package,          label: "Packages",        path: "/Packages" },
-  { icon: Megaphone,        label: "Ads",             path: "/Ads" },
-  { icon: Tag  , label: "Category", path: "/Category" },
-  { icon: ShoppingBag,      label: "Bag",             path: "/Bag" },
-  { icon: LayoutGrid,       label: "Bags Categories", path: "/bags_categories" },
-  { icon: BoxSelect,        label: "Bag Items",       path: "/bag_items" },
-  { icon: Palette,          label: "Style Guide",     path: "/style-guide" },
-];
-
-const staffNavItems = [
-  { icon: LayoutDashboard, label: "My Tasks", path: "/" },
- ];
 
 const INITIAL_NOTIFICATIONS: Notification[] = [
   {
@@ -61,7 +44,26 @@ const INITIAL_NOTIFICATIONS: Notification[] = [
 export const Layout: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const { t, i18n } = useTranslation();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
+
+  const adminNavItems = [
+    { icon: LayoutDashboard,  label: t("sidebar.overview"),        path: "/" },
+    { icon: Users,            label: t("sidebar.user"),            path: "/User" },
+    { icon: UserCheck,        label: t("sidebar.provider"),        path: "/Provider" },
+    { icon: UserCog,          label: t("sidebar.customer"),        path: "/Customer" },
+    { icon: Package,          label: t("sidebar.packages"),        path: "/Packages" },
+    { icon: Megaphone,        label: t("sidebar.ads"),             path: "/Ads" },
+    { icon: Tag  ,            label: t("sidebar.category"),        path: "/Category" },
+    { icon: ShoppingBag,      label: t("sidebar.bag"),             path: "/Bag" },
+    { icon: LayoutGrid,       label: t("sidebar.bags_categories"), path: "/bags_categories" },
+    { icon: BoxSelect,        label: t("sidebar.bag_items"),       path: "/bag_items" },
+    { icon: Palette,          label: t("sidebar.style_guide"),     path: "/style-guide" },
+  ];
+
+  const staffNavItems = [
+    { icon: LayoutDashboard, label: t("sidebar.my_tasks"), path: "/" },
+   ];
   const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false);
   const [notifications, setNotifications] = React.useState<Notification[]>(
     INITIAL_NOTIFICATIONS,
@@ -156,11 +158,11 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
           <div className="border-t border-border-light p-4">
             <Button
               variant="ghost"
-              className="w-full justify-start text-carbon-gray hover:text-carbon-black hover:bg-slate-50"
+              className="w-full justify-start gap-3 text-error hover:bg-red-50"
               onClick={handleSignOut}
             >
-              <LogOut className="mr-3 h-5 w-5 text-slate-400" />
-              Sign Out
+              <LogOut className="h-5 w-5" />
+              <span>{t("sidebar.sign_out")}</span>
             </Button>
           </div>
         </div>
@@ -198,6 +200,16 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
           </div>
 
           <div className="flex flex-1 items-center justify-end gap-2 lg:gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() =>
+                i18n.changeLanguage(i18n.language === "en" ? "ar" : "en")
+              }
+              className="text-carbon-gray hover:text-emerald-solid transition-colors font-medium"
+            >
+              {i18n.language === "en" ? "العربية" : "English"}
+            </Button>
             <div className="relative">
               <Button
                 variant="ghost"

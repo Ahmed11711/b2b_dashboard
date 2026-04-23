@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import TableComponent from "../TableComponent";
 import { getAll, deleteItem, createItem } from "../../../../service/services/apiService";
 import DynamicForm from "../DynamicForm";
@@ -7,6 +8,7 @@ import { buildPayloadByEndpoint } from "../../../../utils/payloadBuilders";
 
 // 1. مكون مودل الحذف (كما هو بدون تغيير)
 function DeleteConfirmModal({ isOpen, onConfirm, onCancel, itemName }) {
+  const { t } = useTranslation();
   const [isDeleting, setIsDeleting] = useState(false);
 
   if (!isOpen) return null;
@@ -56,19 +58,13 @@ function DeleteConfirmModal({ isOpen, onConfirm, onCancel, itemName }) {
           </div>
 
           <h3 className="text-2xl font-black text-slate-900 mb-2">
-            Confirm Delete
+            {t("common.confirm_delete")}
           </h3>
           <p className="text-slate-500 mb-8 leading-relaxed">
             {isDeleting ? (
-              "Processing your request..."
+              t("common.processing")
             ) : (
-              <>
-                You are about to delete{" "}
-                <span className="font-bold text-red-600 underline decoration-2 underline-offset-4 tracking-tight">
-                  "{itemName}"
-                </span>
-                . This cannot be undone.
-              </>
+              t("common.delete_warning", { name: itemName })
             )}
           </p>
 
@@ -78,7 +74,7 @@ function DeleteConfirmModal({ isOpen, onConfirm, onCancel, itemName }) {
               disabled={isDeleting}
               className="flex-1 px-6 py-4 rounded-2xl border-2 border-slate-100 font-bold text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              Cancel
+              {t("common.cancel")}
             </button>
             <button
               onClick={handleConfirm}
@@ -108,10 +104,10 @@ function DeleteConfirmModal({ isOpen, onConfirm, onCancel, itemName }) {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  <span>Deleting...</span>
+                  <span>{t("common.deleting")}</span>
                 </>
               ) : (
-                "Yes, Delete"
+                t("common.yes_delete")
               )}
             </button>
           </div>
@@ -130,6 +126,7 @@ function CreateRecordModal({
   onRefresh,
   title,
 }) {
+  const { t } = useTranslation();
   if (!isOpen) return null;
   // في handleFormSubmit جوه CreateRecordModal
   const handleFormSubmit = async (formData) => {
@@ -171,7 +168,7 @@ function CreateRecordModal({
       if (error.response?.data?.errors) {
         return { success: false, errors: error.response.data.errors };
       }
-      return { success: false, message: "Error occurred" };
+      return { success: false, message: t("common.error_occurred") };
     }
   };
   return (
@@ -198,7 +195,7 @@ function CreateRecordModal({
 
         <div className="p-12">
           <DynamicForm
-            title={`Create New ${title || "Record"}`}
+            title={t("common.create_new", { title: title || t("common.record") })}
             fields={headers}
             onSubmit={handleFormSubmit}
           />
@@ -215,6 +212,7 @@ export default function GenericListPage({
   params = {},
   routePrefix,
 }) {
+  const { t } = useTranslation();
   const prefix = routePrefix || endpoint;
   const [data, setData] = useState([]);
   const [meta, setMeta] = useState({ current_page: 1, last_page: 1, total: 0 });
@@ -304,7 +302,7 @@ export default function GenericListPage({
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-solid animate-pulse"></span>
               <span className="text-[11px] font-bold text-emerald-text uppercase tracking-wider">
-                Database Online: {meta.total} Objects
+                {t("common.database_online", { total: meta.total })}
               </span>
             </div>
           </div>
@@ -313,7 +311,7 @@ export default function GenericListPage({
             onClick={() => setCreateModalOpen(true)}
             className="group relative overflow-hidden bg-emerald-solid text-white px-10 py-4 rounded-[1.5rem] font-bold flex items-center gap-3 transition-all hover:pr-12 active:scale-95 shadow-2xl shadow-blue-200"
           >
-            <span>Add New Record</span>
+            <span>{t("common.add_new_record")}</span>
 
             <svg
               className="w-5 h-5 transition-all group-hover:translate-x-1"

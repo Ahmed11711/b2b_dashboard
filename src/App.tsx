@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Layout } from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
@@ -38,6 +39,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 export default function App() {
+  const { t } = useTranslation();
   return (
     <BrowserRouter basename="/dashboard">
       <Routes>
@@ -52,8 +54,8 @@ export default function App() {
 
         {/* Ads Routes */}
         <Route path="/ads" element={<ProtectedRoute><AdsPage /></ProtectedRoute>} />
-        <Route path="/ads/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="ads" fields={AdsFields} mode="edit" title="Edit Advertisement" /></ProtectedRoute>} />
-        <Route path="/ads/view/:id" element={<ProtectedRoute><GenericViewPage entityName="ads" fields={AdsFields} title="Ad Details" /></ProtectedRoute>} />
+        <Route path="/ads/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="ads" fields={AdsFields} mode="edit" title={t("pages.ads.title")} /></ProtectedRoute>} />
+        <Route path="/ads/view/:id" element={<ProtectedRoute><GenericViewPage entityName="ads" fields={AdsFields} title={t("pages.ads.details")} /></ProtectedRoute>} />
 
         {/* App Routes */}
         <Route path="/app" element={<ProtectedRoute><AppPage /></ProtectedRoute>} />
@@ -65,13 +67,13 @@ export default function App() {
 
         {/* Bag Routes */}
         <Route path="/Bag" element={<ProtectedRoute><BagPage /></ProtectedRoute>} />
-        <Route path="/bags/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="bags" fields={BagFields} mode="edit" title="Edit Bag" /></ProtectedRoute>} />
-        <Route path="/bags/view/:id" element={<ProtectedRoute><GenericViewPage entityName="bags" fields={BagFields} title="Bag Details" /></ProtectedRoute>} />
+        <Route path="/bags/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="bags" fields={BagFields} mode="edit" title={t("pages.bag.title")} /></ProtectedRoute>} />
+        <Route path="/bags/view/:id" element={<ProtectedRoute><GenericViewPage entityName="bags" fields={BagFields} title={t("pages.bag.details")} /></ProtectedRoute>} />
 
         {/* Bags Categories Routes */}
         <Route path="/bags_categories" element={<ProtectedRoute><Bags_categoriesPage /></ProtectedRoute>} />
-        <Route path="/bags_categories/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="bags_categories" fields={BagsCategoryFields} mode="edit" title="Edit Category" /></ProtectedRoute>} />
-        <Route path="/bags_categories/view/:id" element={<ProtectedRoute><GenericViewPage entityName="bags_categories" fields={BagsCategoryFields} title="Category Details" /></ProtectedRoute>} />
+        <Route path="/bags_categories/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="bags_categories" fields={BagsCategoryFields} mode="edit" title={t("pages.bags_categories.title")} /></ProtectedRoute>} />
+        <Route path="/bags_categories/view/:id" element={<ProtectedRoute><GenericViewPage entityName="bags_categories" fields={BagsCategoryFields} title={t("pages.bags_categories.details")} /></ProtectedRoute>} />
 
         {/* Bag Items Routes (تم الإصلاح هنا) */}
         <Route path="/bag_items" element={<ProtectedRoute><Bag_itemsPage /></ProtectedRoute>} />
@@ -81,21 +83,21 @@ export default function App() {
 
         {/* User  Routes */}
         <Route path="/User" element={<ProtectedRoute><UserPage /></ProtectedRoute>} />
-        <Route path="/User/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="users" fields={UserFields} mode="edit" title="Edit User Item" /></ProtectedRoute>} />
-        <Route path="/User/view/:id" element={<ProtectedRoute><GenericViewPage entityName="users" fields={UserFields} title="User Item Details" /></ProtectedRoute>} />
+        <Route path="/User/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="users" fields={UserFields} mode="edit" title={t("pages.user.title")} /></ProtectedRoute>} />
+        <Route path="/User/view/:id" element={<ProtectedRoute><GenericViewPage entityName="users" fields={UserFields} title={t("pages.user.details")} /></ProtectedRoute>} />
 
         {/* Provider  Routes */}
         <Route path="/Provider" element={<ProtectedRoute><ProviderPage /></ProtectedRoute>} />
-        <Route path="/Provider/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="provider" fields={ProviderFields} mode="edit" title="Edit Provider Item" /></ProtectedRoute>} />
-        <Route path="/Provider/view/:id" element={<ProtectedRoute><GenericViewPage entityName="provider" fields={ProviderFields} title="Provider Item Details" /></ProtectedRoute>} />
+        <Route path="/Provider/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="provider" fields={ProviderFields} mode="edit" title={t("pages.provider.title")} /></ProtectedRoute>} />
+        <Route path="/Provider/view/:id" element={<ProtectedRoute><GenericViewPage entityName="provider" fields={ProviderFields} title={t("pages.provider.details")} /></ProtectedRoute>} />
 
         {/* Customer  Routes */}
         <Route path="/Customer" element={<ProtectedRoute><CustomerPage /></ProtectedRoute>} />
 
         {/* Category  Routes */}
         <Route path="/Category" element={<ProtectedRoute><CategoryPage /></ProtectedRoute>} />
-        <Route path="/Category/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="categories" fields={CategoryFields} mode="edit" title="Edit Category Item" /></ProtectedRoute>} />
-        <Route path="/Category/view/:id" element={<ProtectedRoute><GenericViewPage entityName="categories" fields={CategoryFields} title="Category Item Details" /></ProtectedRoute>} />
+        <Route path="/Category/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="categories" fields={CategoryFields} mode="edit" title={t("pages.category.title")} /></ProtectedRoute>} />
+        <Route path="/Category/view/:id" element={<ProtectedRoute><GenericViewPage entityName="categories" fields={CategoryFields} title={t("pages.category.details")} /></ProtectedRoute>} />
 
 
       </Routes>

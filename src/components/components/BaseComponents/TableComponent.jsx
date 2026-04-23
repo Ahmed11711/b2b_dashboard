@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import TableCellRenderer from "./layout/TableCellRenderer";
 import { getAll } from "../../../service/services/apiService";
 
@@ -63,6 +64,7 @@ export default function TableComponent({
   onSearchChange,
   onFilterChange,
 }) {
+  const { t } = useTranslation();
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [selectedImg, setSelectedImg] = useState(null);
   const [relationOptions, setRelationOptions] = useState({});
@@ -154,7 +156,7 @@ export default function TableComponent({
         <div className="relative w-full md:w-80">
           <input
             type="text"
-            placeholder="Search records..."
+            placeholder={t("common.search")}
             className="input-minimal w-full pl-12 h-11"
             onChange={(e) => onSearchChange(e.target.value)}
           />
@@ -184,7 +186,7 @@ export default function TableComponent({
                 className="input-minimal py-2 px-3 text-xs min-w-[140px] h-10 cursor-pointer"
                 onChange={(e) => onFilterChange(header.key, e.target.value)}
               >
-                <option value="">All {header.label}</option>
+                <option value="">{t("common.all")} {t(`fields.${header.key}`, { defaultValue: header.label })}</option>
                 {(
                   relationOptions[header.key] ||
                   (Array.isArray(header.options) ? header.options : []) ||
@@ -221,7 +223,7 @@ export default function TableComponent({
                     style={{ width: header.width || "auto" }}
                   >
                     <div className="flex items-center justify-start gap-2 font-bold text-xs text-slate-500 uppercase tracking-widest">
-                      {header.label}
+                      {t(`fields.${header.key}`, { defaultValue: header.label })}
                       {header.sortable && (
                         <span className="text-slate-300">↕</span>
                       )}
@@ -229,7 +231,7 @@ export default function TableComponent({
                   </th>
                 ))}
               <th className="table-header-sticky right-0 z-30 text-center bg-slate-50 border-b border-border-light px-6 py-4 font-bold text-xs uppercase text-slate-500 tracking-widest">
-                Action
+                {t("common.actions")}
               </th>
             </tr>
           </thead>

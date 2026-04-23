@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import DynamicForm from "../DynamicForm";
 import { getOne, createItem, updateItem } from "../../../../service/services/apiService";
 import { buildPayloadByEndpoint } from "../../../../utils/payloadBuilders";
 
 export default function GenericFormPage({ endpoint, fields, title, mode = "create" }) {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [initialData, setInitialData] = useState(null);
@@ -63,7 +65,7 @@ const handleSubmit = async (formData) => {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"/></svg>
           </button>
           <h1 className="text-2xl md:text-3xl font-bold text-heading-slate tracking-tight capitalize">
-            {mode === "edit" ? ` ${title}` : `Create ${title}`}
+            {mode === "edit" ? `${t("common.edit")} ${title}` : `${t("common.create")} ${title}`}
           </h1>
         </div>
       </div>
