@@ -2,27 +2,37 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
-
 import Profile from "./pages/Profile";
-
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
-import Ads from "./pages/ads";
-import GenericFormPage from "./components/components/BaseComponents/FullDynamic/GenericFormPage";
+ import GenericFormPage from "./components/components/BaseComponents/FullDynamic/GenericFormPage";
 import GenericViewPage from "./components/components/BaseComponents/FullDynamic/GenericViewPage";
 import { AdsFields } from "./schemas/adsSchema";
 import AppPage from "./pages/app/AppPage";
 import PackagesPage from "./pages/Packages/PackagesPage";
 import AdsPage from "./pages/Ads/AdsPage";
-import {PackagesFields} from "./schemas/PackagesSchema"
-import {BagFields} from "./schemas/BagSchema"
+import { PackagesFields } from "./schemas/PackagesSchema";
+import { BagFields } from "./schemas/BagSchema";
 import BagPage from "./pages/Bag/BagPage";
 import Bags_categoriesPage from "./pages/bags_categories/Bags_categoriesPage";
-import {BagsCategoryFields} from "./schemas/bags_categoriesSchema"
+import { BagsCategoryFields } from "./schemas/bags_categoriesSchema";
 import StyleGuide from "./pages/StyleGuide";
+import { Bag_itemsFields } from "./schemas/bag_itemsSchema";
+import Bag_itemsPage from "./pages/bag_items/Bag_itemsPage";
+import UserPage from "./pages/User/UserPage";
+import {UserFields} from "./schemas/UserSchema"
+import ProviderPage from "./pages/Provider/ProviderPage";
+import {ProviderFields} from "./schemas/ProviderSchema"
+import CustomerPage from "./pages/Customer/CustomerPage";
+import CategoryPage from "./pages/Category/CategoryPage";
+import {CategoryFields} from "./schemas/CategorySchema"
+import {CustomerFields} from "./schemas/CustomerSchema"
+import ServicePage from "./pages/Service/ServicePage";
+import {ServiceFields} from "./schemas/ServiceSchema";
+import PostsPage from "./pages/Posts/PostsPage";
+import {PostsFields} from "./schemas/PostsSchema"
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-   
   const token = localStorage.getItem("token");
   if (!token) {
     return <Navigate to="/login" replace />;
@@ -30,205 +40,81 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <Layout>{children}</Layout>;
 };
 
-const DashboardRouter = () => {
-  return <Dashboard />;
-};
-
 export default function App() {
   return (
-<BrowserRouter basename="/dashboard">
+    <BrowserRouter basename="/dashboard">
       <Routes>
+        {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <DashboardRouter />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
 
-        <Route
-          path="/ads"
-          element={
-            <ProtectedRoute>
-              <Ads />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/ads/edit/:id"
-          element={
-            <GenericFormPage
-              endpoint="ads"  
-              fields={AdsFields}  
-              mode="edit"  
-              title="Edit Advertisement"
-            />
-          }
-        />
-        <Route
-          path="/ads/view/:id"
-          element={
-            <GenericViewPage
-              entityName="ads"
-              title="Ad Details"
-              fields={AdsFields}
-            />
-          }
-        />
-        <Route
-          path="/style-guide"
-          element={
-            <ProtectedRoute>
-              <StyleGuide />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+        {/* Protected Routes Wrapper */}
+        <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/style-guide" element={<ProtectedRoute><StyleGuide /></ProtectedRoute>} />
 
-      <Routes>
+        {/* Ads Routes */}
+        <Route path="/ads" element={<ProtectedRoute><AdsPage /></ProtectedRoute>} />
+        <Route path="/ads/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="ads" fields={AdsFields} mode="edit" title="Edit Advertisement" /></ProtectedRoute>} />
+        <Route path="/ads/view/:id" element={<ProtectedRoute><GenericViewPage entityName="ads" fields={AdsFields} title="Ad Details" /></ProtectedRoute>} />
+
+        {/* App Routes */}
+        <Route path="/app" element={<ProtectedRoute><AppPage /></ProtectedRoute>} />
+
+        {/* Packages Routes */}
+        <Route path="/Packages" element={<ProtectedRoute><PackagesPage /></ProtectedRoute>} />
+        <Route path="/Packages/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="packages" fields={PackagesFields} mode="edit" title="Edit Package" /></ProtectedRoute>} />
+        <Route path="/Packages/view/:id" element={<ProtectedRoute><GenericViewPage entityName="packages" fields={PackagesFields} title="Package Details" /></ProtectedRoute>} />
+
+        {/* Bag Routes */}
+        <Route path="/Bag" element={<ProtectedRoute><BagPage /></ProtectedRoute>} />
+        <Route path="/bags/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="bags" fields={BagFields} mode="edit" title="Edit Bag" /></ProtectedRoute>} />
+        <Route path="/bags/view/:id" element={<ProtectedRoute><GenericViewPage entityName="bags" fields={BagFields} title="Bag Details" /></ProtectedRoute>} />
+
+        {/* Bags Categories Routes */}
+        <Route path="/bags_categories" element={<ProtectedRoute><Bags_categoriesPage /></ProtectedRoute>} />
+        <Route path="/bags_categories/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="bags_categories" fields={BagsCategoryFields} mode="edit" title="Edit Category" /></ProtectedRoute>} />
+        <Route path="/bags_categories/view/:id" element={<ProtectedRoute><GenericViewPage entityName="bags_categories" fields={BagsCategoryFields} title="Category Details" /></ProtectedRoute>} />
+
+        {/* Bag Items Routes (تم الإصلاح هنا) */}
+        <Route path="/bag_items" element={<ProtectedRoute><Bag_itemsPage /></ProtectedRoute>} />
+        <Route path="/bag_items/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="bag_items" fields={Bag_itemsFields} mode="edit" title="Edit Bag Item" /></ProtectedRoute>} />
+        <Route path="/bag_items/view/:id" element={<ProtectedRoute><GenericViewPage entityName="bag_items" fields={Bag_itemsFields} title="Bag Item Details" /></ProtectedRoute>} />
         
-  {/* AUTO ROUTE: app */}
 
-  <Route
-    path="/app"
-    element={
-      <ProtectedRoute>
-        <AppPage />
-      </ProtectedRoute>
-    }
-  />
+        {/* User  Routes */}
+        <Route path="/User" element={<ProtectedRoute><UserPage /></ProtectedRoute>} />
+        <Route path="/User/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="users" fields={UserFields} mode="edit" title="Edit User Item" /></ProtectedRoute>} />
+        <Route path="/User/view/:id" element={<ProtectedRoute><GenericViewPage entityName="users" fields={UserFields} title="User Item Details" /></ProtectedRoute>} />
 
+   {/* Provider  Routes */}
+        <Route path="/Provider" element={<ProtectedRoute><ProviderPage /></ProtectedRoute>} />
+        <Route path="/Provider/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="provider" fields={ProviderFields} mode="edit" title="Edit Provider Item" /></ProtectedRoute>} />
+        <Route path="/Provider/view/:id" element={<ProtectedRoute><GenericViewPage entityName="provider" fields={ProviderFields} title="Provider Item Details" /></ProtectedRoute>} />
 
-  {/* AUTO ROUTE: User */}
+        {/* Customer  Routes */}
+        <Route path="/Customer" element={<ProtectedRoute><CustomerPage /></ProtectedRoute>} />
+        <Route path="/Customer/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="customer" fields={CustomerFields} mode="edit" title="Edit customer Item" /></ProtectedRoute>} />
+        <Route path="/Customer/view/:id" element={<ProtectedRoute><GenericViewPage entityName="customer" fields={CustomerFields} title="customer Item Details" /></ProtectedRoute>} />
 
  
+        {/* Category  Routes */}
+        <Route path="/Category" element={<ProtectedRoute><CategoryPage /></ProtectedRoute>} />
+        <Route path="/Category/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="categories" fields={CategoryFields} mode="edit" title="Edit Category Item" /></ProtectedRoute>} />
+        <Route path="/Category/view/:id" element={<ProtectedRoute><GenericViewPage entityName="categories" fields={CategoryFields} title="Category Item Details" /></ProtectedRoute>} />
+
+         {/* Service  Routes */}
+        <Route path="/Service" element={<ProtectedRoute><ServicePage /></ProtectedRoute>} />
+        <Route path="/Service/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="services" fields={ServiceFields} mode="edit" title="Edit Category Item" /></ProtectedRoute>} />
+        <Route path="/Service/view/:id" element={<ProtectedRoute><GenericViewPage entityName="services" fields={ServiceFields} title="Category Item Details" /></ProtectedRoute>} />
 
 
-{/* AUTO ROUTE: Packages */}
-<Route
-  path="/Packages"
-  element={
-    <ProtectedRoute>
-      <PackagesPage />
-    // </ProtectedRoute>
-  }
-/>
- <Route
-          path="/Packages/edit/:id"
-          element={
-            <GenericFormPage
-              endpoint="packages"  
-              fields={PackagesFields}  
-              mode="edit"  
-              title="Edit Advertisement"
-            />
-          }
-        />
- 
-        <Route
-          path="/Packages/view/:id"
-          element={
-            <GenericViewPage
-              entityName="packages"
-              title="packages Details"
-              fields={PackagesFields}
-            />
-          }
-        />
+  {/* posts  Routes */}
+        <Route path="/Posts" element={<ProtectedRoute><PostsPage /></ProtectedRoute>} />
+        <Route path="/Posts/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="postss" fields={PostsFields} mode="edit" title="Edit Category Item" /></ProtectedRoute>} />
+        <Route path="/Posts/view/:id" element={<ProtectedRoute><GenericViewPage entityName="postss" fields={PostsFields} title="Category Item Details" /></ProtectedRoute>} />
 
-{/* AUTO ROUTE: Ads */}
-<Route
-  path="/Ads"
-  element={
-    <ProtectedRoute>
-      <AdsPage />
-    </ProtectedRoute>
-  }
-/>
-
-
-{/* AUTO ROUTE: Bag */}
-<Route
-  path="/Bag"
-  element={
-    <ProtectedRoute>
-      <BagPage />
-    </ProtectedRoute>
-  }
-/>
- <Route
-          path="/bags/edit/:id"
-          element={
-            <GenericFormPage
-              endpoint="bags"  
-              fields={BagFields}  
-              mode="edit"  
-              title="Edit Advertisement"
-            />
-          }
-        />
- 
-        <Route
-          path="/bags/view/:id"
-          element={
-            <GenericViewPage
-              entityName="bags"
-              title="packages Details"
-              fields={BagFields}
-            />
-          }
-        />
-
-
-{/* AUTO ROUTE: bags_categories */}
-<Route
-  path="/bags_categories"
-  element={
-    <ProtectedRoute>
-      <Bags_categoriesPage />
-    </ProtectedRoute>
-  }
-/>
- <Route
-          path="/bags_categories/edit/:id"
-          element={
-            <GenericFormPage
-              endpoint="bags_categories"  
-              fields={BagsCategoryFields}  
-              mode="edit"  
-              title="Edit Advertisement"
-            />
-          }
-        />
- 
-        <Route
-          path="/bags_categories/view/:id"
-          element={
-            <GenericViewPage
-              entityName="bags_categories"
-              title="packages Details"
-              fields={BagsCategoryFields}
-            />
-          }
-        />
-
-{/* AUTO ROUTES START */}
-        {/* AUTO ROUTES END */}
       </Routes>
     </BrowserRouter>
-
-
-
   );
 }
