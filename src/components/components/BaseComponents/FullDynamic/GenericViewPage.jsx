@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { getAll, getOne } from "../../../../service/services/apiService";
 import { useTranslation } from "../../../../hooks/useTranslation";
 
@@ -40,6 +39,7 @@ const getCellValue = (item, key) => {
 
 // ================= DynamicValueRenderer =================
 function DynamicValueRenderer({ value, labelKey, format }) {
+  const { t } = useTranslation();
   if (value === null || value === undefined || value === "") {
     return <span className="text-secondary-link font-medium italic">-</span>;
   }
@@ -216,7 +216,6 @@ function DynamicValueRenderer({ value, labelKey, format }) {
 function InlineRelationTable({ items, headers, viewRoute, editRoute }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { t } = useTranslation();
 
   if (!items || items.length === 0)
     return (

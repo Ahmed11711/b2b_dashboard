@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import TableComponent from "../TableComponent";
 import { getAll, deleteItem, createItem } from "../../../../service/services/apiService";
 import DynamicForm from "../DynamicForm";
@@ -125,8 +124,7 @@ function CreateRecordModal({
   endpoint,
   headers,
   onRefresh,
-  title,
-  t,
+  title
 }) {
   const { t } = useTranslation();
   if (!isOpen) return null;
@@ -202,7 +200,6 @@ export default function GenericListPage({
   params = {},
   routePrefix,
 }) {
-  const { t } = useTranslation();
   const prefix = routePrefix || endpoint;
   const { t } = useTranslation();
 
