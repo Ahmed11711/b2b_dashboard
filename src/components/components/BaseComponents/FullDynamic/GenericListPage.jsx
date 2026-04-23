@@ -4,21 +4,19 @@ import { useTranslation } from "react-i18next";
 import TableComponent from "../TableComponent";
 import { getAll, deleteItem, createItem } from "../../../../service/services/apiService";
 import DynamicForm from "../DynamicForm";
-import { buildPayloadByEndpoint } from "../../../../utils/payloadBuilders";
+import { useTranslation } from "../../../../hooks/useTranslation";
 
-// 1. مكون مودل الحذف (كما هو بدون تغيير)
-function DeleteConfirmModal({ isOpen, onConfirm, onCancel, itemName }) {
-  const { t } = useTranslation();
+// ================= DeleteConfirmModal =================
+function DeleteConfirmModal({ isOpen, onConfirm, onCancel, itemName, t }) {
   const [isDeleting, setIsDeleting] = useState(false);
-
   if (!isOpen) return null;
 
   const handleConfirm = async () => {
-    setIsDeleting(true); // 1. ابدأ التحميل
+    setIsDeleting(true);
     try {
-      await onConfirm(); // 2. استنى تنفيذ عملية المسح
+      await onConfirm();
     } finally {
-      setIsDeleting(false); // 3. اقفل التحميل (اختياري لأن المودال هيقفل غالباً)
+      setIsDeleting(false);
     }
   };
 
@@ -26,7 +24,6 @@ function DeleteConfirmModal({ isOpen, onConfirm, onCancel, itemName }) {
     <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
       <div className="bg-white rounded-[2.5rem] shadow-2xl max-w-md w-full p-10 border border-slate-100 animate-in zoom-in-95 duration-200">
         <div className="flex flex-col items-center text-center">
-          {/* Icon مع انيميشن نبض لو في حالة التحميل */}
           <div
             className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 text-red-500 shadow-inner transition-all duration-500 ${isDeleting ? "bg-red-100 animate-pulse" : "bg-red-50"}`}
           >
@@ -58,13 +55,19 @@ function DeleteConfirmModal({ isOpen, onConfirm, onCancel, itemName }) {
           </div>
 
           <h3 className="text-2xl font-black text-slate-900 mb-2">
-            {t("common.confirm_delete")}
+            {t("Confirm Delete")}
           </h3>
           <p className="text-slate-500 mb-8 leading-relaxed">
             {isDeleting ? (
-              t("common.processing")
+              t("Processing your request...")
             ) : (
-              t("common.delete_warning", { name: itemName })
+              <>
+                {t("You are about to delete")}{" "}
+                <span className="font-bold text-red-600 underline decoration-2 underline-offset-4">
+                  "{itemName}"
+                </span>
+                . {t("This cannot be undone.")}
+              </>
             )}
           </p>
 
@@ -74,14 +77,12 @@ function DeleteConfirmModal({ isOpen, onConfirm, onCancel, itemName }) {
               disabled={isDeleting}
               className="flex-1 px-6 py-4 rounded-2xl border-2 border-slate-100 font-bold text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              {t("common.cancel")}
+              {t("Cancel")}
             </button>
             <button
               onClick={handleConfirm}
               disabled={isDeleting}
-              className={`flex-1 px-6 py-4 rounded-2xl font-black text-white shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2
-                ${isDeleting ? "bg-red-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 shadow-red-200"}
-              `}
+              className={`flex-1 px-6 py-4 rounded-2xl font-black text-white shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${isDeleting ? "bg-red-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 shadow-red-200"}`}
             >
               {isDeleting ? (
                 <>
@@ -97,17 +98,17 @@ function DeleteConfirmModal({ isOpen, onConfirm, onCancel, itemName }) {
                       r="10"
                       stroke="currentColor"
                       strokeWidth="4"
-                    ></circle>
+                    />
                     <path
                       className="opacity-75"
                       fill="currentColor"
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
+                    />
                   </svg>
-                  <span>{t("common.deleting")}</span>
+                  <span>{t("Deleting...")}</span>
                 </>
               ) : (
-                t("common.yes_delete")
+                t("Yes, Delete")
               )}
             </button>
           </div>
@@ -117,7 +118,7 @@ function DeleteConfirmModal({ isOpen, onConfirm, onCancel, itemName }) {
   );
 }
 
-// 2. مكون مودل الإنشاء (كما هو بدون تغيير)
+// ================= CreateRecordModal =================
 function CreateRecordModal({
   isOpen,
   onClose,
@@ -125,52 +126,41 @@ function CreateRecordModal({
   headers,
   onRefresh,
   title,
+  t,
 }) {
   const { t } = useTranslation();
   if (!isOpen) return null;
-  // في handleFormSubmit جوه CreateRecordModal
+
   const handleFormSubmit = async (formData) => {
     try {
       const payload = new FormData();
-
-      // ✅ Boolean fields
       headers.forEach((h) => {
         if (h.type === "checkbox" || h.type === "boolean") {
           const val = formData[h.key];
           payload.append(h.key, val === undefined ? 0 : val ? 1 : 0);
         }
       });
-
       Object.keys(formData).forEach((key) => {
         const value = formData[key];
         const field = headers.find((h) => h.key === key);
-
         if (field?.type === "checkbox" || field?.type === "boolean") return;
-
-        // ✅ Gallery
         if (key === "gallery" && Array.isArray(value)) {
-          value.forEach((item) => {
-            payload.append(`gallery[]`, item.file);
-          });
+          value.forEach((item) => payload.append(`gallery[]`, item.file));
           return;
         }
-
-        if (value !== null && value !== undefined) {
-          payload.append(key, value);
-        }
+        if (value !== null && value !== undefined) payload.append(key, value);
       });
-
       await createItem(endpoint, payload);
       onRefresh();
       onClose();
       return { success: true };
     } catch (error) {
-      if (error.response?.data?.errors) {
+      if (error.response?.data?.errors)
         return { success: false, errors: error.response.data.errors };
-      }
-      return { success: false, message: t("common.error_occurred") };
+      return { success: false, message: "Error occurred" };
     }
   };
+
   return (
     <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
       <div className="bg-white rounded-[3rem] shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-slate-100 animate-in zoom-in-95 duration-200 relative scrollbar-hide">
@@ -192,10 +182,9 @@ function CreateRecordModal({
             />
           </svg>
         </button>
-
         <div className="p-12">
           <DynamicForm
-            title={t("common.create_new", { title: title || t("common.record") })}
+            title={`${t("Add New Record")} — ${title || ""}`}
             fields={headers}
             onSubmit={handleFormSubmit}
           />
@@ -205,6 +194,7 @@ function CreateRecordModal({
   );
 }
 
+// ================= GenericListPage =================
 export default function GenericListPage({
   endpoint,
   headers,
@@ -214,39 +204,37 @@ export default function GenericListPage({
 }) {
   const { t } = useTranslation();
   const prefix = routePrefix || endpoint;
+  const { t } = useTranslation();
+
   const [data, setData] = useState([]);
   const [meta, setMeta] = useState({ current_page: 1, last_page: 1, total: 0 });
   const [loading, setLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, item: null });
   const [createModalOpen, setCreateModalOpen] = useState(false);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilters, setActiveFilters] = useState({});
 
   const navigate = useNavigate();
 
+  const translatedHeaders = headers.map((h) => ({ ...h, label: t(h.label) }));
+
   const loadData = useCallback(
     async (page = 1) => {
       setLoading(true);
       try {
-        // 1. تجميع كل الـ Parameters
         const rawParams = {
           ...params,
           page,
           search: searchTerm,
           ...activeFilters,
         };
-
-        // 2. تنظيف الـ Parameters: حذف أي Key قيمته فارغة تماماً
         const cleanParams = Object.fromEntries(
-          Object.entries(rawParams).filter(([_, value]) => {
-            return value !== "" && value !== null && value !== undefined;
-          }),
+          Object.entries(rawParams).filter(
+            ([_, value]) =>
+              value !== "" && value !== null && value !== undefined,
+          ),
         );
-
-        // 3. مناداة الـ API بالـ Params النظيفة فقط
         const response = await getAll(endpoint, cleanParams);
-
         if (response) {
           const fetchedData =
             response.data || (Array.isArray(response) ? response : []);
@@ -271,11 +259,9 @@ export default function GenericListPage({
       JSON.stringify(params),
     ],
   );
-  // ✅ Debounce البحث لتقليل الـ API Requests
+
   useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      loadData(1);
-    }, 500);
+    const delayDebounceFn = setTimeout(() => loadData(1), 500);
     return () => clearTimeout(delayDebounceFn);
   }, [searchTerm, activeFilters]);
 
@@ -290,19 +276,18 @@ export default function GenericListPage({
   };
 
   return (
-    // الـ page container
     <div className="page-container antialiased pb-10 bg-[#fbfcfd] min-h-screen overflow-visible">
       <div className="max-w-[1600px] mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center py-4 gap-6">
           <div className="text-center md:text-left">
             <h1 className="text-4xl font-black text-heading-slate tracking-tighter capitalize mb-2">
-              {title || endpoint.replace(/-/g, " ")}
+              {t(title) || endpoint.replace(/-/g, " ")}
               <span className="block h-1 w-16 bg-emerald-solid mt-2 rounded-full"></span>
             </h1>
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-solid animate-pulse"></span>
               <span className="text-[11px] font-bold text-emerald-text uppercase tracking-wider">
-                {t("common.database_online", { total: meta.total })}
+                {t("Database Online")}: {meta.total} {t("Objects")}
               </span>
             </div>
           </div>
@@ -311,8 +296,7 @@ export default function GenericListPage({
             onClick={() => setCreateModalOpen(true)}
             className="group relative overflow-hidden bg-emerald-solid text-white px-10 py-4 rounded-[1.5rem] font-bold flex items-center gap-3 transition-all hover:pr-12 active:scale-95 shadow-2xl shadow-blue-200"
           >
-            <span>{t("common.add_new_record")}</span>
-
+            <span>{t("Add New Record")}</span>
             <svg
               className="w-5 h-5 transition-all group-hover:translate-x-1"
               fill="none"
@@ -335,16 +319,15 @@ export default function GenericListPage({
               <div className="w-12 h-12 border-[5px] border-slate-100 border-t-emerald-500 rounded-full animate-spin"></div>
             </div>
           )}
-
           <TableComponent
-            headers={headers}
+            headers={translatedHeaders}
             data={data}
             meta={meta}
             onPageChange={(page) => loadData(page)}
-            onSearchChange={(value) => setSearchTerm(value)} // ✅ للبحث
+            onSearchChange={(value) => setSearchTerm(value)}
             onFilterChange={(key, value) =>
               setActiveFilters((prev) => ({ ...prev, [key]: value }))
-            } // ✅ للفلترة
+            }
             onEdit={(row) => navigate(`/${prefix}/edit/${row.id}`)}
             onView={(row) => navigate(`/${prefix}/view/${row.id}`)}
             onDelete={(row) => setDeleteModal({ isOpen: true, item: row })}
@@ -361,19 +344,21 @@ export default function GenericListPage({
         }
         onCancel={() => setDeleteModal({ isOpen: false, item: null })}
         onConfirm={handleFinalDelete}
+        t={t}
       />
 
       <CreateRecordModal
         isOpen={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
         endpoint={endpoint}
-        headers={headers.filter((h) => {
+        headers={translatedHeaders.filter((h) => {
           const key = h.key?.toLowerCase();
           const systemFields = ["id", "created_at", "updated_at", "deleted_at"];
           return !systemFields.includes(key) && h.type && h.form_show === true;
         })}
-        title={title}
+        title={t(title)}
         onRefresh={() => loadData(1)}
+        t={t}
       />
     </div>
   );

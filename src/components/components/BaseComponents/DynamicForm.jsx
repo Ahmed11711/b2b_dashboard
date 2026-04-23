@@ -1,29 +1,33 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import FormFieldRendererLayout from "./FormFieldRendererLayout";
+import { useTranslation } from "../../../hooks/useTranslation";
 
-// ضفنا initialData و mode في الـ Props
-export default function DynamicForm({ fields, onSubmit, title, initialData, mode }) {
+export default function DynamicForm({
+  fields,
+  onSubmit,
+  title,
+  initialData,
+  mode,
+}) {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // 🛠️ أهم جزء للـ Edit: تحديث الـ formData لما الـ initialData توصل
-useEffect(() => {
-  if (initialData) {
-    setFormData(initialData);
-  } else {
-    // ✅ لو Create، حدد قيم افتراضية من الـ fields
-    const defaults = {};
-    fields.forEach(f => {
-      if (f.type === "checkbox" || f.type === "boolean") {
-        defaults[f.key] = 0; // ← افتراضي = 0 (Inactive)
-      }
-    });
-    setFormData(defaults);
-  }
-}, [initialData]);
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    } else {
+      const defaults = {};
+      fields.forEach((f) => {
+        if (f.type === "checkbox" || f.type === "boolean") {
+          defaults[f.key] = 0; // ← افتراضي = 0 (Inactive)
+        }
+      });
+      setFormData(defaults);
+    }
+  }, [initialData]);
   if (!fields || fields.length === 0) {
     return (
       <div className="p-10 text-center border-2 border-dashed rounded-3xl text-slate-400">
@@ -49,58 +53,65 @@ useEffect(() => {
   };
 
   return (
-  <div className="w-full">
-    <form onSubmit={handleSubmit} className="space-y-6 animate-in fade-in duration-500">
-      
-      <div className="bg-card-bg rounded-2xl shadow-sm border border-border-light overflow-hidden">
-        <div className="px-6 py-5 border-b border-border-light bg-card-bg">
-          <h3 className="text-lg font-bold text-heading-slate capitalize">{t("common.basic_information")}</h3>
-        </div>
-        
-        <div className="p-6 md:p-8">
-          {/* تقسيم الحقول بشكل متوازن */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-            {fields
-              .filter((field) => {
-                if (!field?.show_when) return true;
-                const { key, equals } = field.show_when;
-                return formData?.[key] === equals;
-              })
-              .map((field) => (
-              <FormFieldRendererLayout
-                key={field.key}
-                field={field}
-                value={formData[field.key]}
-                error={errors[field.key]}
-                onChange={handleChange}
-                disabled={loading}
-              />
-            ))}
+    <div className="w-full">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6 animate-in fade-in duration-500"
+      >
+        <div className="bg-card-bg rounded-2xl shadow-sm border border-border-light overflow-hidden">
+          <div className="px-6 py-5 border-b border-border-light bg-card-bg">
+            <h3 className="text-lg font-bold text-heading-slate capitalize">
+              {t("Basic Information")} {/* ← غير */}
+            </h3>
+          </div>
+          <div className="p-6 md:p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              {fields.map((field) => (
+                <FormFieldRendererLayout
+                  key={field.key}
+                  field={{ ...field, label: t(field.label) }} // ← ترجمة الـ label
+                  value={formData[field.key]}
+                  error={errors[field.key]}
+                  onChange={handleChange}
+                  disabled={loading}
+                />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* زرار الأكشن */}
-      <div className="flex justify-end gap-4 mt-6">
-        <button
-          type="submit"
-          disabled={loading}
-          className="btn-emerald min-w-[160px] relative overflow-hidden rounded-full py-2.5 px-6 font-semibold"
-        >
-          {loading ? (
-            <span className="flex items-center justify-center gap-2">
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              {t("common.processing")}
-            </span>
-          ) : (
-            <span className="flex items-center justify-center gap-2">
-              {mode === "edit" ? t("common.publish") : t("common.create")}
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
-            </span>
-          )}
-        </button>
-      </div>
-    </form>
-  </div>
+        <div className="flex justify-end gap-4 mt-6">
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-emerald min-w-[160px] relative overflow-hidden rounded-full py-2.5 px-6 font-semibold"
+          >
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                {t("Processing...")} {/* ← غير */}
+              </span>
+            ) : (
+              <span className="flex items-center justify-center gap-2">
+                {mode === "edit" ? t("Publish") : t("Create")} {/* ← غير */}
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </span>
+            )}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

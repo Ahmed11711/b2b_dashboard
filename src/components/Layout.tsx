@@ -1,16 +1,38 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { 
-  LayoutDashboard, LogOut, Menu, X, Bell, 
+import {
+  LayoutDashboard, LogOut, Menu, X, Bell,
   User, Users, UserCheck, UserCog,
-  Package, Megaphone, ShoppingBag, 
-  LayoutGrid, BoxSelect, Palette ,Tag  
-} from "lucide-react";import { cn } from "../lib/utils";
+  Package, Megaphone, ShoppingBag,
+  LayoutGrid, BoxSelect, Palette, Tag, Wrench
+} from "lucide-react"; import { cn } from "../lib/utils";
 import { Button } from "./Button";
 import { motion, AnimatePresence } from "motion/react";
 import { NotificationPopover } from "./NotificationPopover";
 import { Notification } from "../types";
+
+const adminNavItems = [
+  { icon: LayoutDashboard, label: "Overview", path: "/" },
+  { icon: Users, label: "User", path: "/User" },
+
+  { icon: UserCheck, label: "Provider", path: "/Provider" },
+  { icon: UserCog, label: "Customer", path: "/Customer" },
+  { icon: Tag, label: "Category", path: "/Category" },
+  { icon: Wrench, label: "Service", path: "/Service" },
+  { icon: Wrench, label: "Posts", path: "/Posts" },
+
+  { icon: Package, label: "Packages", path: "/Packages" },
+  { icon: Megaphone, label: "Ads", path: "/Ads" },
+  { icon: ShoppingBag, label: "Bag", path: "/Bag" },
+  { icon: LayoutGrid, label: "Bags Categories", path: "/bags_categories" },
+  { icon: BoxSelect, label: "Bag Items", path: "/bag_items" },
+  { icon: Palette, label: "Style Guide", path: "/style-guide" },
+];
+
+const staffNavItems = [
+  { icon: LayoutDashboard, label: "My Tasks", path: "/" },
+];
 
 const INITIAL_NOTIFICATIONS: Notification[] = [
   {
@@ -48,22 +70,22 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
 
   const adminNavItems = [
-    { icon: LayoutDashboard,  label: t("sidebar.overview"),        path: "/" },
-    { icon: Users,            label: t("sidebar.user"),            path: "/User" },
-    { icon: UserCheck,        label: t("sidebar.provider"),        path: "/Provider" },
-    { icon: UserCog,          label: t("sidebar.customer"),        path: "/Customer" },
-    { icon: Package,          label: t("sidebar.packages"),        path: "/Packages" },
-    { icon: Megaphone,        label: t("sidebar.ads"),             path: "/Ads" },
-    { icon: Tag  ,            label: t("sidebar.category"),        path: "/Category" },
-    { icon: ShoppingBag,      label: t("sidebar.bag"),             path: "/Bag" },
-    { icon: LayoutGrid,       label: t("sidebar.bags_categories"), path: "/bags_categories" },
-    { icon: BoxSelect,        label: t("sidebar.bag_items"),       path: "/bag_items" },
-    { icon: Palette,          label: t("sidebar.style_guide"),     path: "/style-guide" },
+    { icon: LayoutDashboard, label: t("sidebar.overview"), path: "/" },
+    { icon: Users, label: t("sidebar.user"), path: "/User" },
+    { icon: UserCheck, label: t("sidebar.provider"), path: "/Provider" },
+    { icon: UserCog, label: t("sidebar.customer"), path: "/Customer" },
+    { icon: Package, label: t("sidebar.packages"), path: "/Packages" },
+    { icon: Megaphone, label: t("sidebar.ads"), path: "/Ads" },
+    { icon: Tag, label: t("sidebar.category"), path: "/Category" },
+    { icon: ShoppingBag, label: t("sidebar.bag"), path: "/Bag" },
+    { icon: LayoutGrid, label: t("sidebar.bags_categories"), path: "/bags_categories" },
+    { icon: BoxSelect, label: t("sidebar.bag_items"), path: "/bag_items" },
+    { icon: Palette, label: t("sidebar.style_guide"), path: "/style-guide" },
   ];
 
   const staffNavItems = [
     { icon: LayoutDashboard, label: t("sidebar.my_tasks"), path: "/" },
-   ];
+  ];
   const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false);
   const [notifications, setNotifications] = React.useState<Notification[]>(
     INITIAL_NOTIFICATIONS,

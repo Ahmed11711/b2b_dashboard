@@ -8,7 +8,8 @@ export default function CategoryPage() {
     <GenericListPage
       endpoint="categories"
       headers={CategoryFields}
-      title={t("pages.category.title")}
+      title={"All Category"}
+      routePrefix="Category"
     />
   );
 }
