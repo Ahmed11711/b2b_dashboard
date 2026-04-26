@@ -204,8 +204,8 @@ export const PostsFields = [
     { key: "status", label: "status" },
     { key: "created_at", label: "Date" },
   ],
-  view_route: "/services/view/:id",    
-  edit_route: "/services/edit/:id", 
+  view_route: "/User/view/:id",    
+  // edit_route: "/services/edit/:id", 
   filterKey: "user_id",
 },
 ];

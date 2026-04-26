@@ -199,7 +199,7 @@ export const UserFields = [
     required: 0, 
     placeholder: "Enter Social Type",
     searchable: false,
-    filterable: true,
+    filterable: false,
     sortable: true,
     table_show: false,
     form_show: false,

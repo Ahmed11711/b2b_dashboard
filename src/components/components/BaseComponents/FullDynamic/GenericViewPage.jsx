@@ -629,6 +629,7 @@ export default function GenericViewPage({ entityName, title, fields }) {
     .filter((tab) => Array.isArray(tab.items));
 
   const hasTabs = relationTabs.length > 0;
+  const formFields = fields.filter((f) => f.form_show !== false);
 
   const imageFields = mainFields.filter(
     (f) => f.type === "file" || f.cell_type === "image",
