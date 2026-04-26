@@ -1,12 +1,8 @@
 import GenericListPage from "../../components/components/BaseComponents/FullDynamic/GenericListPage";
-import { AdsFields } from "../../schemas/AdsSchema";
+import { AdsFields } from "./../../schemas/adsSchema";
 
 export default function AdsPage() {
   return (
-    <GenericListPage
-      endpoint="Ads"
-      headers={AdsFields}
-      title={"All Ads"}
-    />
+    <GenericListPage endpoint="ads" headers={AdsFields} title={"All Ads"} />
   );
 }
