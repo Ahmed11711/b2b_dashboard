@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+
 import {
   Users,
   DollarSign,
@@ -19,6 +19,7 @@ import { Booking } from "../types";
 import { formatCurrency } from "../lib/utils";
 import { Badge } from "../components/Badge";
 import { getAll } from "../service/services/apiService";
+import { useTranslation } from "../hooks/useTranslation";
 import {
   AreaChart,
   Area,
@@ -37,45 +38,30 @@ const Dashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const role = localStorage.getItem("role") || "admin";
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        // Fetch stats (mocked for now as we don't have a stats endpoint)
-        const mockStats = {
-          totalRevenue: 154.3,
-          totalBookings: 124,
-          activeServices: 12,
-          pendingBookings: 8,
-        };
+useEffect(() => {
+    async function loadData() {
+        setIsLoading(true);
+        try {
+            const [statsRes, bookingsRes, chartRes] = await Promise.all([
+                getAll('dashboard/stats'),
+                getAll('dashboard/recent-bookings'),
+                getAll('dashboard/weekly-revenue'),
+            ]);
 
-        const mockChartData = [
-          { name: t("dashboard.mon"), revenue: 4000 },
-          { name: t("dashboard.tue"), revenue: 3000 },
-          { name: t("dashboard.wed"), revenue: 5000 },
-          { name: t("dashboard.thu"), revenue: 2780 },
-          { name: t("dashboard.fri"), revenue: 1890 },
-          { name: t("dashboard.sat"), revenue: 2390 },
-          { name: t("dashboard.sun"), revenue: 3490 },
-        ];
-
-        setData({ stats: mockStats, chartData: mockChartData });
-
-        // Fetch real posts data
-        const postsResponse = await getAll("postss", { limit: 5 });
-        if (postsResponse && postsResponse.data) {
-          setRecentPosts(postsResponse.data);
+            setData({
+                stats:     statsRes.stats,
+                chartData: chartRes.data,
+            });
+setRecentPosts(bookingsRes.data);
+        } catch (err) {
+            console.error('Dashboard load error:', err);
+        } finally {
+            setIsLoading(false);
         }
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    }
 
-    fetchData();
-  }, [t]);
-
+    loadData();
+}, []);
   const columns = [
     {
       header: t("common.title"),
@@ -229,41 +215,35 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="rounded-xl border border-border-light bg-white p-6 shadow-sm">
-          <h3 className="text-base font-semibold text-carbon-black mb-6">
-            {t("dashboard.quick_actions")}
-          </h3>
-          <div className="space-y-3">
-            <Button
-              className="w-full justify-start text-xs h-11"
-              variant="outline"
-              onClick={() => navigate("/Service")}
-            >
-              <Briefcase className="mr-3 h-4 w-4 text-slate-400" /> {t("dashboard.add_new_service")}
-            </Button>
-            <Button
-              className="w-full justify-start text-xs h-11"
-              variant="outline"
-              onClick={() => navigate("/Posts")}
-            >
-              <FileText className="mr-3 h-4 w-4 text-slate-400" /> {t("dashboard.create_new_post")}
-            </Button>
-            <Button
-              className="w-full justify-start text-xs h-11"
-              variant="outline"
-              onClick={() => navigate("/User")}
-            >
-              <Users className="mr-3 h-4 w-4 text-slate-400" /> {t("dashboard.manage_staff")}
-            </Button>
-            <Button
-              className="w-full justify-start text-xs h-11"
-              variant="outline"
-              onClick={() => navigate("/profile")}
-            >
-              <Settings className="mr-3 h-4 w-4 text-slate-400" /> {t("dashboard.settings")}
-            </Button>
-          </div>
-        </div>
+{/* Quick Actions */}
+<div className="rounded-xl border border-border-light bg-white p-6 shadow-sm">
+  <h3 className="text-base font-semibold text-carbon-black mb-6">
+    Quick Actions
+  </h3>
+  <div className="space-y-3">
+    <Button
+      className="w-full justify-start text-xs h-11"
+      variant="outline"
+      onClick={() => navigate('/Provider')}
+    >
+      <Briefcase className="mr-3 h-4 w-4 text-slate-400" /> Add New Provider
+    </Button>
+    <Button
+      className="w-full justify-start text-xs h-11"
+      variant="outline"
+      onClick={() => navigate('/Ads')}
+    >
+      <CalendarIcon className="mr-3 h-4 w-4 text-slate-400" /> Schedule Ads
+    </Button>
+    <Button
+      className="w-full justify-start text-xs h-11"
+      variant="outline"
+      onClick={() => navigate('/Packages')}
+    >
+      <Users className="mr-3 h-4 w-4 text-slate-400" /> Packages
+    </Button>
+  </div>
+</div>
       </div>
 
       {/* Recent Posts Table */}
