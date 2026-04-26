@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { getAll } from "../service/services/apiService";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -10,6 +9,8 @@ import {
   ArrowUpRight,
   Calendar as CalendarIcon,
   Loader2,
+  FileText,
+  Settings,
 } from "lucide-react";
 import { StatCard } from "../components/StatCard";
 import { DataTable } from "../components/DataTable";
@@ -17,6 +18,8 @@ import { Button } from "../components/Button";
 import { Booking } from "../types";
 import { formatCurrency } from "../lib/utils";
 import { Badge } from "../components/Badge";
+import { getAll } from "../service/services/apiService";
+import { useTranslation } from "../hooks/useTranslation";
 import {
   AreaChart,
   Area,
@@ -28,11 +31,12 @@ import {
 } from "recharts";
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
   const [data, setData] = useState<{ stats: any; chartData: any[] } | null>(null);
-  const [recentBookings, setRecentBookings] = useState<Booking[]>([]);
+  const [recentPosts, setRecentPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const role = localStorage.getItem("role") || "admin";
-const navigate = useNavigate();
 
 useEffect(() => {
     async function loadData() {
@@ -48,7 +52,7 @@ useEffect(() => {
                 stats:     statsRes.stats,
                 chartData: chartRes.data,
             });
-            setRecentBookings(bookingsRes.data);
+setRecentPosts(bookingsRes.data);
         } catch (err) {
             console.error('Dashboard load error:', err);
         } finally {
@@ -60,40 +64,43 @@ useEffect(() => {
 }, []);
   const columns = [
     {
-      header: "Customer",
-      accessor: (b: any) => (
+      header: t("common.title"),
+      accessor: (p: any) => (
         <span className="font-semibold text-carbon-black">
-          {b.user?.user_name || b.customer_name || "Guest"}
+          {p.title || p.user_name || t("common.untitled_post")}
         </span>
       ),
     },
     {
-      header: "Service",
-      accessor: (b: any) => b.service?.service_name || "General Service",
+      header: t("common.author"),
+      accessor: (p: any) => p.author?.user_name || p.user?.user_name || t("common.admin"),
     },
     {
-      header: "Date",
-      accessor: (b: Booking) => new Date(b.booking_date).toLocaleDateString(),
+      header: t("common.date"),
+      accessor: (p: any) => p.created_at ? new Date(p.created_at).toLocaleDateString() : t("common.na"),
     },
     {
-      header: "Status",
-      accessor: (b: Booking) => (
-        <Badge
-          variant={
-            b.status === "confirmed"
-              ? "success"
-              : b.status === "pending"
-                ? "warning"
-                : "error"
-          }
-        >
-          {b.status}
-        </Badge>
-      ),
-    },
-    {
-      header: "Price",
-      accessor: (b: Booking) => formatCurrency(b.total_price),
+      header: t("common.status"),
+      accessor: (p: any) => {
+        const isActive = p.is_active !== undefined ? p.is_active : p.status;
+        return (
+          <Badge
+            variant={
+              isActive === 1 || isActive === "active"
+                ? "success"
+                : isActive === 0 || isActive === "inactive"
+                  ? "error"
+                  : "warning"
+            }
+          >
+            {isActive === 1 || isActive === "active" 
+              ? t("fields.active") 
+              : isActive === 0 || isActive === "inactive" 
+                ? t("fields.inactive") 
+                : t("common.undefined")}
+          </Badge>
+        );
+      },
     },
   ];
 
@@ -110,34 +117,34 @@ useEffect(() => {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-carbon-black">
-          {role === "admin" ? "Operations & Analytics" : "Staff Dashboard"}
+          {role === "admin" ? t("dashboard.operations_analytics") : t("dashboard.staff_dashboard")}
         </h1>
         <p className="text-text-description mt-1">
-          Real-time overview of your business performance.
+          {t("dashboard.performance_overview")}
         </p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Total Revenue"
+          label={t("dashboard.total_revenue")}
           value={formatCurrency(data?.stats?.totalRevenue || 0)}
           icon={DollarSign}
           trend={{ value: 12, isPositive: true }}
         />
         <StatCard
-          label="Total Bookings"
+          label={t("dashboard.total_bookings")}
           value={data?.stats?.totalBookings || 0}
           icon={CalendarIcon}
           trend={{ value: 8, isPositive: true }}
         />
         <StatCard
-          label="Active Services"
+          label={t("dashboard.active_services")}
           value={data?.stats?.activeServices || 0}
           icon={Briefcase}
         />
         <StatCard
-          label="Pending Bookings"
+          label={t("dashboard.pending_bookings")}
           value={data?.stats?.pendingBookings || 0}
           icon={Clock}
           trend={{ value: 4, isPositive: false }}
@@ -149,10 +156,10 @@ useEffect(() => {
         <div className="lg:col-span-2 rounded-xl border border-border-light bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-base font-semibold text-carbon-black">
-              Weekly Revenue
+              {t("dashboard.weekly_revenue")}
             </h3>
             <Button variant="outline" size="sm" className="text-xs">
-              View Report <ArrowUpRight className="ml-2 h-3.5 w-3.5" />
+              {t("common.view_report")} <ArrowUpRight className="ml-2 h-3.5 w-3.5" />
             </Button>
           </div>
           <div className="h-[300px] w-full">
@@ -239,12 +246,12 @@ useEffect(() => {
 </div>
       </div>
 
-      {/* Recent Bookings Table */}
+      {/* Recent Posts Table */}
       <div className="overflow-hidden rounded-2xl border border-border-light bg-white px-4 pb-3 pt-4 shadow-sm sm:px-6">
         <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-lg font-semibold text-carbon-black">
-              Recent Bookings
+              {t("dashboard.recent_posts")}
             </h3>
           </div>
           <div className="flex items-center gap-3">
@@ -254,20 +261,21 @@ useEffect(() => {
               className="text-xs"
               onClick={() => window.location.reload()}
             >
-              Refresh
+              {t("common.refresh")}
             </Button>
             <Button
               variant="outline"
               size="sm"
               className="text-xs"
+              onClick={() => navigate("/Posts")}
             >
-              See all
+              {t("common.see_all")}
             </Button>
           </div>
         </div>
         <DataTable
           columns={columns}
-          data={recentBookings}
+          data={recentPosts}
           isLoading={isLoading}
         />
       </div>

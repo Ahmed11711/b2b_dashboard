@@ -22,6 +22,7 @@ i18n
     },
     detection: {
       order: ['localStorage', 'cookie', 'htmlTag', 'path', 'subdomain'],
+      lookupLocalStorage: 'userLanguage',
       caches: ['localStorage'],
     },
   });
