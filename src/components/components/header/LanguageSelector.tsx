@@ -15,14 +15,14 @@ const LanguageSelector: React.FC = () => {
   const handleLanguageChange = async (lang: string) => {
     try {
       await i18n.changeLanguage(lang);
-      localStorage.setItem("userLanguage", lang);
+      localStorage.setItem("lang", lang); // Set the correct key
       setIsOpen(false);
     } catch (error) {
       console.error("Failed to change language:", error);
     }
   };
 
-  const currentLanguage = languages.find((l) => l.code === i18n.language) || languages[0];
+  const currentLanguage = languages.find((l) => i18n.language?.startsWith(l.code)) || languages[0];
 
   return (
     <div className="relative">

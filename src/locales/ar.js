@@ -20,6 +20,7 @@ export default {
   "View": "عرض",
   "Edit": "تعديل",
   "Delete": "حذف",
+  "Search records": "بحث في السجلات...",
 
   // Field Labels
   "Id": "المعرف",
@@ -38,15 +39,72 @@ export default {
   "City Id": "المدينة",
   "Price": "السعر",
   "Rating": "التقييم",
-  "Name":"الاسم",
-  "Email":"البريد الاكترواني",
-  "my-reviews":"عدد المستخديم",
-  "views count":"عداد",
+  "Name": "الاسم",
+  "Email": "البريد الإلكتروني",
+  "Phone": "الهاتف",
+  "Role": "الدور",
+  "Action": "الإجراء",
+  "Active": "نشط",
+  "Inactive": "غير نشط",
+  "Status": "الحالة",
+  "Icon": "الأيقونة",
+  "Free": "مجاني",
+  "Bag Categories": "فئات الحقيبة",
+  "Sort Order": "ترتيب العرض",
+  "Desc": "الوصف",
+  "views count": "عدد المشاهدات",
+  "my-reviews": "تقييماتي",
+  "image": "الصورة",
+  "Duration Months": "المدة بالأشهر",
+  "Categories": "الفئات",
+  "pakage": "الباقة",
+  "Starts At": "تاريخ البدء",
+  "Ends At": "تاريخ الانتهاء",
+  "Package": "الباقة",
+  "Count posts": "عدد المنشورات",
+  "Applay Count": "عدد الطلبات",
+  "my-posts": "منشوراتي",
+  "my-contacts": "جهات اتصالي",
+  "Count Services": "عدد الخدمات",
+  "Reviews": "التقييمات",
+  "Services": "الخدمات",
+  "my-project": "مشاريعي",
+  "my-certificates": "شهاداتي",
+  "Bags Categories Id": "فئة الحقيبة",
+  "Currency": "العملة",
+  "Whose": "لمن",
+  "What Will You Get": "ماذا ستحصل",
+  "Bag Name": "اسم الحقيبة",
+  "bids": "العروض",
+
+  // Dropdown Filters
+  "All Role": "كل الأدوار",
+  "All Status": "كل الحالات",
+  "All City": "كل المدن",
+  "All نشط": "كل الحالات",
+  "All المدينة": "كل المدن",
+
+  // Roles
+  "User": "مستخدم",
+  "Super_Admin": "مسؤول خارق",
+  "Admin": "مسؤول",
 
   // Page Titles
   "All Posts": "كل المنشورات",
   "All Users": "كل المستخدمين",
+  "All User": "كل المستخدمين",
   "All Services": "كل الخدمات",
   "All Categories": "كل الفئات",
-  "All Service":"اسراء محمد"
+    "Packages": "كل الباقات",
+    
+      "All bags_categories":"كل فئات الحقائب",
+       "bag_items":"عناصر الحقيبة ",
+      "All Bag":"كل الحقائب",
+      "All Ads":"كل الاعلانات",
+      "All subscribe":"كل الاشتراكات",
+
+
+
+
+
 }
