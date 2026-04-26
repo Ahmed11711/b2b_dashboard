@@ -1,5 +1,5 @@
 export const packagesEndpoint = "packages";
-export const packagesTitle = "Packages";
+export const packagesTitle = "Packagesddd";
 
 export const packagesFields = [
   { key: "name", label: "Name", type: "text", cell_type: "text", required: 1, placeholder: "Enter Name", searchable: false, filterable: false, sortable: true, table_show: true, form_show: true, options: null },

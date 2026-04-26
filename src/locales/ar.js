@@ -1,6 +1,7 @@
 export default {
   // UI Strings
   "Add New Record": "إضافة سجل جديد",
+  "Add New Package": "إضافة باقة جديدة",
   "Confirm Delete": "تأكيد الحذف",
   "Yes, Delete": "نعم، احذف",
   "Cancel": "إلغاء",
@@ -20,11 +21,22 @@ export default {
   "View": "عرض",
   "Edit": "تعديل",
   "Delete": "حذف",
-  "Search records": "بحث في السجلات...",
+  "Search records...": "بحث في السجلات...",
+  "Processing...": "جاري المعالجة...",
+  "Publish": "نشر",
+  "Update": "تحديث",
+  "Select Status": "اختر الحالة",
+  "Fetching...": "جاري التحميل...",
+  "Upload file": "رفع ملف",
+  "Upload files": "رفع ملفات",
+  "Preview": "معاينة",
+  "Click to change file": "اضغط لتغيير الملف",
+  "Click or drag to upload": "اضغط أو اسحب للرفع",
 
   // Field Labels
   "Id": "المعرف",
   "Title": "العنوان",
+  "Name": "الاسم",
   "Description": "الوصف",
   "Price From": "السعر من",
   "Price To": "السعر إلى",
@@ -39,7 +51,6 @@ export default {
   "City Id": "المدينة",
   "Price": "السعر",
   "Rating": "التقييم",
-  "Name": "الاسم",
   "Email": "البريد الإلكتروني",
   "Phone": "الهاتف",
   "Role": "الدور",
@@ -76,13 +87,16 @@ export default {
   "What Will You Get": "ماذا ستحصل",
   "Bag Name": "اسم الحقيبة",
   "bids": "العروض",
+  "Packagesddd": "الباقات",
 
   // Dropdown Filters
   "All Role": "كل الأدوار",
   "All Status": "كل الحالات",
   "All City": "كل المدن",
-  "All نشط": "كل الحالات",
-  "All المدينة": "كل المدن",
+  "All Duration Months": "كل الفترات",
+  "All Name": "كل الأسماء",
+  "All Title": "كل العناوين",
+  "All Category": "كل الفئات",
 
   // Roles
   "User": "مستخدم",
@@ -94,17 +108,5 @@ export default {
   "All Users": "كل المستخدمين",
   "All User": "كل المستخدمين",
   "All Services": "كل الخدمات",
-  "All Categories": "كل الفئات",
-    "Packages": "كل الباقات",
-    
-      "All bags_categories":"كل فئات الحقائب",
-       "bag_items":"عناصر الحقيبة ",
-      "All Bag":"كل الحقائب",
-      "All Ads":"كل الاعلانات",
-      "All subscribe":"كل الاشتراكات",
-
-
-
-
-
+  "All Categories": "كل الفئات"
 }

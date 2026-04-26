@@ -6,7 +6,8 @@ export default function BagsItemsPage() {
     <GenericListPage
       endpoint="bag_items"
       headers={BagsItemsFields}
-      title={"All BagsItems"}
+      title="pages.bag_items.title"
+      addRecordText="pages.bag_items.add_new"
     />
   );
 }

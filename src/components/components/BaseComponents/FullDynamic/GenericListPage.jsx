@@ -186,7 +186,7 @@ function CreateRecordModal({
         </button>
         <div className="p-12">
           <DynamicForm
-            title={`${t("Add New Record")} — ${title || ""}`}
+            title={`${t("Add New Record")} — ${title ? t(title) : ""}`}
             fields={headers}
             onSubmit={handleFormSubmit}
           />
@@ -196,13 +196,13 @@ function CreateRecordModal({
   );
 }
 
-// ================= GenericListPage =================
 export default function GenericListPage({
   endpoint,
   headers,
   title,
   params = {},
   routePrefix,
+  addRecordText,
 }) {
   const prefix = routePrefix || endpoint;
   const { t } = useTranslation();
@@ -297,7 +297,7 @@ export default function GenericListPage({
             onClick={() => setCreateModalOpen(true)}
             className="group relative overflow-hidden bg-emerald-solid text-white px-10 py-4 rounded-[1.5rem] font-bold flex items-center gap-3 transition-all hover:pr-12 active:scale-95 shadow-2xl shadow-blue-200"
           >
-            <span>{t("Add New Record")}</span>
+            <span>{addRecordText ? t(addRecordText) : t("Add New Record")}</span>
             <svg
               className="w-5 h-5 transition-all group-hover:translate-x-1"
               fill="none"

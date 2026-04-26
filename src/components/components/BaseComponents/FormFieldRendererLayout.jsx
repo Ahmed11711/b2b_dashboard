@@ -4,6 +4,8 @@ import MultiSelectField from "../../components/BaseComponents/MultiSelectField";
 import ReactQuill from "react-quill-new";
 import "react-quill/dist/quill.snow.css";
 import MultiFeatureField from "../../components/BaseComponents/MultiFeatureField";
+import { useTranslation } from "../../../hooks/useTranslation";
+
 export default function FormFieldRendererLayout({
   field,
   value,
@@ -11,6 +13,7 @@ export default function FormFieldRendererLayout({
   error,
   disabled,
 }) {
+  const { t } = useTranslation();
   const [options, setOptions] = useState(
     Array.isArray(field?.options) ? field.options : [],
   );
@@ -97,13 +100,13 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
             >
               <option value="">
                 {loading
-                  ? "Fetching..."
-                  : field.placeholder || `Select ${field.label}`}
+                  ? t("Fetching...")
+                  : t(field.placeholder) || t(`Select ${field.label}`)}
               </option>
 
               {options.map((opt, i) => (
                 <option key={i} value={opt.value}>
-                  {opt.label}
+                  {t(opt.label)}
                 </option>
               ))}
             </select>
@@ -168,24 +171,24 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
         return (
           <div className="flex flex-col gap-3">
             <label className="text-[12px] font-medium text-text-description px-1">
-              {field.label}
+              {t(field.label)}
             </label>
 
             {/* Type Selector */}
             <div className="flex flex-wrap gap-2">
-              {FILE_TYPES.map((t) => (
+              {FILE_TYPES.map((t_opt) => (
                 <button
-                  key={t.value}
+                  key={t_opt.value}
                   type="button"
-                  onClick={() => setSelectedType(t.value)}
+                  onClick={() => setSelectedType(t_opt.value)}
                   className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200
               ${
-                selectedType === t.value
+                selectedType === t_opt.value
                   ? "bg-emerald-solid text-white border-emerald-solid shadow"
                   : "bg-card-bg text-text-description border-border-thin hover:border-emerald-solid/50"
               }`}
                 >
-                  {t.icon} {t.label}
+                  {t_opt.icon} {t(t_opt.label)}
                 </button>
               ))}
             </div>
@@ -214,9 +217,9 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
                   />
                 </svg>
                 <p className="text-text-description text-xs font-medium">
-                  Upload{" "}
-                  {FILE_TYPES.find((t) => t.value === selectedType)?.label}{" "}
-                  files
+                  {t("Upload")}{" "}
+                  {t(FILE_TYPES.find((t_opt) => t_opt.value === selectedType)?.label)}{" "}
+                  {t("files")}
                 </p>
               </div>
             </div>
@@ -298,7 +301,7 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
             <div className="relative mt-2">
               {/* Label for textarea positioned to look like integrated floating label */}
               <label className="absolute -top-2.5 left-4 px-1 bg-card-bg text-[12px] text-text-description font-medium z-10">
-                {field.label}
+                {t(field.label)}
               </label>
               <div className="bg-card-bg rounded-[20px] border border-border-light overflow-hidden transition-all duration-300 hover:shadow-md focus-within:border-emerald-solid focus-within:ring-4 focus-within:ring-emerald-solid/10">
                 <ReactQuill
@@ -307,7 +310,7 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
                   onChange={(content) => onChange(field.key, content)}
                   readOnly={disabled}
                   modules={modules}
-                  placeholder={field.placeholder || `Enter ${field.label}...`}
+                  placeholder={t(field.placeholder) || `${t("Enter")} ${t(field.label)}...`}
                   className="quill-editor"
                 />
               </div>
@@ -323,7 +326,7 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
           <div className="flex items-center justify-between p-4 md:p-5 bg-slate-50 rounded-[20px] border border-border-light hover:border-emerald-solid/20 transition-all duration-300 shadow-sm hover:shadow h-[56px] mt-2">
             <div className="flex flex-col">
               <span className="text-xs md:text-sm font-bold tracking-tight text-carbon-black capitalize">
-                {field.label}
+                {t(field.label)}
               </span>
             </div>
             <button
@@ -343,7 +346,7 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
           <div className="flex flex-col gap-3">
             {/* Same floating label style for consistency */}
             <label className="absolute -top-2 left-4 px-1 bg-card-bg text-[11px] font-medium text-text-description pointer-events-none z-10">
-              {field.label}
+              {t(field.label)}
               {field.required ? (
                 <span className="text-status-error-text text-sm ml-0.5">*</span>
               ) : null}
@@ -374,7 +377,7 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
                   </div>
 
                   <p className="text-text-description font-medium text-xs">
-                    {value ? "Click to change file" : "Click or drag to upload"}
+                    {value ? t("Click to change file") : t("Click or drag to upload")}
                   </p>
                 </div>
               </div>
@@ -391,7 +394,7 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
 
                   <div className="absolute inset-0 bg-carbon-black/40 opacity-0 group-hover:opacity-100 transition rounded-2xl flex items-center justify-center gap-3">
                     <span className="text-white text-[10px] uppercase tracking-wider font-bold">
-                      Preview
+                      {t("Preview")}
                     </span>
                     <button
                       type="button"
@@ -428,7 +431,7 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
         return (
           <div className="mt-2">
             <label className="text-[12px] font-medium text-text-description px-1 mb-1 block">
-              {field.label}
+              {t(field.label)}
             </label>
             <MultiSelectField
               field={field}
@@ -458,7 +461,7 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
           type={field.type || "text"}
           name={field.key}
           value={displayValue}
-          placeholder={field.placeholder || `Enter ${field.label}`}
+          placeholder={t(field.placeholder) || `${t("Enter")} ${t(field.label)}`}
           disabled={disabled}
           onChange={(e) => onChange(field.key, e.target.value)}
           className={`${baseInputStyle}`}
@@ -479,7 +482,7 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
         (!isFullWidth ||
           (field.type !== "textarea" && field.type !== "text")) && (
           <label className="absolute -top-2 left-4 px-1 bg-card-bg text-[11px] font-medium text-text-description pointer-events-none z-10">
-            {field.label}
+            {t(field.label)}
             {field.required ? (
               <span className="text-status-error-text text-sm ml-0.5">*</span>
             ) : null}
@@ -490,7 +493,7 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
 
       {error && (
         <p className="text-status-error-text text-xs font-bold ml-4 flex items-center gap-1 mt-1">
-          ⚠ {Array.isArray(error) ? error[0] : error}
+          ⚠ {Array.isArray(error) ? t(error[0]) : t(error)}
         </p>
       )}
     </div>

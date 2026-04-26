@@ -5,7 +5,7 @@ import DynamicForm from "../../components/components/BaseComponents/DynamicForm"
 import { createItem, deleteItem, getAll } from "../../service/services/apiService";
 import { buildPayloadByEndpoint } from "../../utils/payloadBuilders";
 import { bagItemsEndpoint, bagItemsFields, bagItemsTitle } from "./config";
-
+import { useTranslation } from "../../hooks/useTranslation";
 export default function Bag_itemsPage() {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
@@ -15,6 +15,7 @@ export default function Bag_itemsPage() {
   const [activeFilters, setActiveFilters] = useState({});
   const [showCreate, setShowCreate] = useState(false);
   const [deleteRow, setDeleteRow] = useState(null);
+  const { t } = useTranslation();
 
   const loadData = useCallback(async (page = 1) => {
     setLoading(true);
@@ -66,7 +67,7 @@ export default function Bag_itemsPage() {
       <div className="max-w-[1600px] mx-auto px-4 space-y-6">
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-3xl font-black text-heading-slate">{bagItemsTitle}</h1>
-          <button onClick={() => setShowCreate(true)} className="btn-emerald px-6 py-3 rounded-2xl">Add New Bag Item</button>
+          <button onClick={() => setShowCreate(true)} className="btn-emerald px-6 py-3 rounded-2xl">{t("Add New Bag Item")}</button>
         </div>
         <div className="relative">
           {loading && <div className="absolute inset-0 z-10 bg-white/50" />}
@@ -88,7 +89,7 @@ export default function Bag_itemsPage() {
         <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 p-4">
           <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 relative">
             <button onClick={() => setShowCreate(false)} className="absolute right-6 top-6 text-slate-500">✕</button>
-            <DynamicForm fields={visibleFields} onSubmit={handleCreate} title="Create Bag Item" />
+            <DynamicForm fields={visibleFields} onSubmit={handleCreate} title={t("pages.bag_items.add_new")} />
           </div>
         </div>
       )}
@@ -96,10 +97,10 @@ export default function Bag_itemsPage() {
       {deleteRow && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-            <p className="text-sm text-slate-700 mb-4">Delete "{deleteRow.title || deleteRow.id}"?</p>
+            <p className="text-sm text-slate-700 mb-4">{t("Delete Bag Item")} "{deleteRow.title || deleteRow.id}"?</p>
             <div className="flex justify-end gap-2">
-              <button onClick={() => setDeleteRow(null)} className="btn-outline-gray px-4 py-2 rounded-xl">Cancel</button>
-              <button onClick={handleDelete} className="px-4 py-2 rounded-xl bg-red-600 text-white">Delete</button>
+              <button onClick={() => setDeleteRow(null)} className="btn-outline-gray px-4 py-2 rounded-xl">{t("Cancel")}</button>
+              <button onClick={handleDelete} className="px-4 py-2 rounded-xl bg-red-600 text-white">{t("Delete")}</button>
             </div>
           </div>
         </div>

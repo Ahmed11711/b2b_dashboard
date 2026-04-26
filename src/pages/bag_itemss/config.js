@@ -1,5 +1,5 @@
 export const bagItemsEndpoint = "bag_items";
-export const bagItemsTitle = "Bag Items";
+export const bagItemsTitle = "bag_items";
 
 export const bagItemsFields = [
   { key: "id", label: "Id", type: "text", cell_type: "text", required: 1, placeholder: "Enter Id", searchable: false, filterable: false, sortable: true, table_show: false, form_show: true, options: null },

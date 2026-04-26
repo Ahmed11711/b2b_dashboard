@@ -1,6 +1,7 @@
 export default {
   // UI Strings
   "Add New Record": "Add New Record",
+  "Add New Package": "Add New Package",
   "Confirm Delete": "Confirm Delete",
   "Yes, Delete": "Yes, Delete",
   "Cancel": "Cancel",
@@ -20,11 +21,22 @@ export default {
   "View": "View",
   "Edit": "Edit",
   "Delete": "Delete",
-  "Search records": "Search records...",
+  "Search records...": "Search records...",
+  "Processing...": "Processing...",
+  "Publish": "Publish",
+  "Update": "Update",
+  "Select Status": "Select Status",
+  "Fetching...": "Fetching...",
+  "Upload file": "Upload file",
+  "Upload files": "Upload files",
+  "Preview": "Preview",
+  "Click to change file": "Click to change file",
+  "Click or drag to upload": "Click or drag to upload",
 
   // Field Labels
   "Id": "ID",
   "Title": "Title",
+  "Name": "Name",
   "Description": "Description",
   "Price From": "Price From",
   "Price To": "Price To",
@@ -39,7 +51,6 @@ export default {
   "City Id": "City ID",
   "Price": "Price",
   "Rating": "Rating",
-  "Name": "Name",
   "Email": "Email",
   "Phone": "Phone",
   "Role": "Role",
@@ -76,13 +87,16 @@ export default {
   "What Will You Get": "What Will You Get",
   "Bag Name": "Bag Name",
   "bids": "Bids",
+  "Packagesddd": "Packages",
 
   // Dropdown Filters
   "All Role": "All Roles",
   "All Status": "All Status",
   "All City": "All Cities",
-  "All نشط": "All Status",
-  "All المدينة": "All Cities",
+  "All Duration Months": "All Durations",
+  "All Name": "All Names",
+  "All Title": "All Titles",
+  "All Category": "All Categories",
 
   // Roles
   "User": "User",
@@ -95,4 +109,5 @@ export default {
   "All User": "All User",
   "All Services": "All Services",
   "All Categories": "All Categories"
+  
 }

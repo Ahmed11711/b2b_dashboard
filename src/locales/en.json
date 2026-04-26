@@ -25,6 +25,7 @@
     "bag": "Bag",
     "bags_categories": "Bags Categories",
     "bag_items": "Bag Items",
+    "Bag Items":"ddd",
     "style_guide": "Style Guide",
     "settings": "Settings",
     "app": "App Settings",
@@ -71,7 +72,7 @@
       "details": "Ad Details"
     },
     "packages": {
-      "title": "Packages",
+      "title": "Packagesss  s",
       "add_new": "Add New Package",
       "edit": "Edit Package",
       "details": "Package Details"
@@ -333,5 +334,23 @@
   "views count": "views count",
   "جنيه مصري": "جنيه مصري",
   "دولار": "دولار",
-  "ريال": "ريال"
+  "ريال": "ريال",
+  "All Provider": "All Provider",
+  "All Customer": "All Customer",
+  "All Service": "All Service",
+  "All User": "All User",
+  "All Category": "All Category",
+  "All Bag": "All Bag",
+  "All Ads": "All Ads",
+  "All app": "All app",
+  "All bag_items": "All bag_items",
+  "All bags_categories": "All bags_categories",
+  "All subscribe": "All subscribe",
+  "Select": "Select",
+  "Enter": "Enter",
+  "Upload": "Upload",
+  "Basic Information": "Basic Information",
+  "Processing...": "Processing...",
+  "Publish": "Publish",
+  "Create": "Create"
 }

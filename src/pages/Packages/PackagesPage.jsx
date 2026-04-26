@@ -6,7 +6,8 @@ export default function PackagesPage() {
     <GenericListPage
       endpoint="packages"
       headers={PackagesFields}
-      title={"All Packages"}
+      title="pages.packages.title"
+      addRecordText="pages.packages.add_new"
     />
   );
 }
