@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"; // ضفنا useEffect
 import FormFieldRendererLayout from "./FormFieldRendererLayout";
-import { useTranslation } from "../../../hooks/useTranslation";
 
+// ضفنا initialData و mode في الـ Props
 export default function DynamicForm({
   fields,
   onSubmit,
@@ -9,7 +9,6 @@ export default function DynamicForm({
   initialData,
   mode,
 }) {
-  const { t } = useTranslation();
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -18,6 +17,7 @@ export default function DynamicForm({
     if (initialData) {
       setFormData(initialData);
     } else {
+      // ✅ لو Create، حدد قيم افتراضية من الـ fields
       const defaults = {};
       fields.forEach((f) => {
         if (f.type === "checkbox" || f.type === "boolean") {
@@ -60,25 +60,34 @@ export default function DynamicForm({
         <div className="bg-card-bg rounded-2xl shadow-sm border border-border-light overflow-hidden">
           <div className="px-6 py-5 border-b border-border-light bg-card-bg">
             <h3 className="text-lg font-bold text-heading-slate capitalize">
-              {t("Basic Information")} {/* ← غير */}
+              Basic Information
             </h3>
           </div>
+
           <div className="p-6 md:p-8">
+            {/* تقسيم الحقول بشكل متوازن */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-              {fields.map((field) => (
-                <FormFieldRendererLayout
-                  key={field.key}
-                  field={{ ...field, label: t(field.label) }} // ← ترجمة الـ label
-                  value={formData[field.key]}
-                  error={errors[field.key]}
-                  onChange={handleChange}
-                  disabled={loading}
-                />
-              ))}
+              {fields
+                .filter((field) => {
+                  if (!field?.show_when) return true;
+                  const { key, equals } = field.show_when;
+                  return formData?.[key] === equals;
+                })
+                .map((field) => (
+                  <FormFieldRendererLayout
+                    key={field.key}
+                    field={field}
+                    value={formData[field.key]}
+                    error={errors[field.key]}
+                    onChange={handleChange}
+                    disabled={loading}
+                  />
+                ))}
             </div>
           </div>
         </div>
 
+        {/* زرار الأكشن */}
         <div className="flex justify-end gap-4 mt-6">
           <button
             type="submit"
@@ -88,11 +97,11 @@ export default function DynamicForm({
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                {t("Processing...")} {/* ← غير */}
+                Processing...
               </span>
             ) : (
               <span className="flex items-center justify-center gap-2">
-                {mode === "edit" ? t("Publish") : t("Create")} {/* ← غير */}
+                {mode === "edit" ? "Publish" : "Create"}
                 <svg
                   className="w-4 h-4"
                   fill="none"

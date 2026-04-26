@@ -3,7 +3,7 @@ import { getAll } from "../../../service/services/apiService";
 import MultiSelectField from "../../components/BaseComponents/MultiSelectField";
 import ReactQuill from "react-quill-new";
 import "react-quill/dist/quill.snow.css";
-
+import MultiFeatureField from "../../components/BaseComponents/MultiFeatureField";
 export default function FormFieldRendererLayout({
   field,
   value,
@@ -135,6 +135,12 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
           { label: "Word", value: "word", accept: ".doc,.docx", icon: "📝" },
           { label: "Excel", value: "excel", accept: ".xls,.xlsx", icon: "📊" },
           { label: "Video", value: "video", accept: "video/*", icon: "🎬" },
+          {
+            label: "Download Demo",
+            value: "download_demo",
+            accept: ".zip,.rar,.tar.gz,.pdf,.doc,.docx",
+            icon: "📦",
+          },
         ];
 
         const [selectedType, setSelectedType] = useState("image");
@@ -432,7 +438,19 @@ ${error ? "border-red-300 bg-red-50/40 focus:ring-red-100" : ""}
             />
           </div>
         );
+
+      case "multi-features":
+        return (
+          <MultiFeatureField
+            field={field}
+            value={value}
+            onChange={onChange}
+            error={error}
+            disabled={disabled}
+          />
+        );
     }
+
     // ================= DEFAULT (للحالات العادية) =================
     return (
       <div className="relative group h-[56px]">

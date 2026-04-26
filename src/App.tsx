@@ -9,7 +9,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import GenericViewPage from "./components/components/BaseComponents/FullDynamic/GenericViewPage";
 import { AdsFields } from "./schemas/adsSchema";
 import AppPage from "./pages/app/AppPage";
-import PackagesPage from "./pages/Packages/PackagesPage";
+import PackagesPage from "./pages/Packages_new/PackagesPage";
 import AdsPage from "./pages/Ads/AdsPage";
 import { PackagesFields } from "./schemas/PackagesSchema";
 import { BagFields } from "./schemas/BagSchema";
@@ -18,7 +18,9 @@ import Bags_categoriesPage from "./pages/bags_categories/Bags_categoriesPage";
 import { BagsCategoryFields } from "./schemas/bags_categoriesSchema";
 import StyleGuide from "./pages/StyleGuide";
 import { Bag_itemsFields } from "./schemas/bag_itemsSchema";
-import Bag_itemsPage from "./pages/bag_items/Bag_itemsPage";
+import Bag_itemsPage from "./pages/bag_itemss/Bag_itemsPage";
+import BagItemsViewPage from "./pages/bag_itemss/BagItemsViewPage";
+import BagItemsFormPage from "./pages/bag_itemss/BagItemsFormPage";
 import UserPage from "./pages/User/UserPage";
 import {UserFields} from "./schemas/UserSchema"
 import ProviderPage from "./pages/Provider/ProviderPage";
@@ -33,7 +35,8 @@ import PostsPage from "./pages/Posts/PostsPage";
 import {PostsFields} from "./schemas/PostsSchema"
 import SubscribePage from "./pages/subscribe/SubscribePage";
 import {UserPacakgesFields} from "./schemas/subscribeSchema"
-
+import PackagesFormPage from "./pages/Packages_new/PackagesFormPage";
+import PackagesViewPage from "./pages/Packages_new/PackagesViewPage";
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -64,9 +67,9 @@ export default function App() {
         <Route path="/app" element={<ProtectedRoute><AppPage /></ProtectedRoute>} />
 
         {/* Packages Routes */}
-        <Route path="/Packages" element={<ProtectedRoute><PackagesPage /></ProtectedRoute>} />
+        {/* <Route path="/Packages" element={<ProtectedRoute><PackagesPage /></ProtectedRoute>} />
         <Route path="/Packages/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="packages" fields={PackagesFields} mode="edit" title="Edit Package" /></ProtectedRoute>} />
-        <Route path="/Packages/view/:id" element={<ProtectedRoute><GenericViewPage entityName="packages" fields={PackagesFields} title="Package Details" /></ProtectedRoute>} />
+        <Route path="/Packages/view/:id" element={<ProtectedRoute><GenericViewPage entityName="packages" fields={PackagesFields} title="Package Details" /></ProtectedRoute>} /> */}
 
         {/* Bag Routes */}
         <Route path="/Bag" element={<ProtectedRoute><BagPage /></ProtectedRoute>} />
@@ -78,10 +81,9 @@ export default function App() {
         <Route path="/bags_categories/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="bags_categories" fields={BagsCategoryFields} mode="edit" title="Edit Category" /></ProtectedRoute>} />
         <Route path="/bags_categories/view/:id" element={<ProtectedRoute><GenericViewPage entityName="bags_categories" fields={BagsCategoryFields} title="Category Details" /></ProtectedRoute>} />
 
-        {/* Bag Items Routes (تم الإصلاح هنا) */}
-        <Route path="/bag_items" element={<ProtectedRoute><Bag_itemsPage /></ProtectedRoute>} />
-        <Route path="/bag_items/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="bag_items" fields={Bag_itemsFields} mode="edit" title="Edit Bag Item" /></ProtectedRoute>} />
-        <Route path="/bag_items/view/:id" element={<ProtectedRoute><GenericViewPage entityName="bag_items" fields={Bag_itemsFields} title="Bag Item Details" /></ProtectedRoute>} />
+         <Route path="/bag_items" element={<ProtectedRoute><Bag_itemsPage /></ProtectedRoute>} />
+        <Route path="/bag_items/edit/:id" element={<ProtectedRoute>< BagItemsFormPage mode="edit" /></ProtectedRoute>} />
+        <Route path="/bag_items/view/:id" element={<ProtectedRoute><BagItemsViewPage /></ProtectedRoute>} />
         
 
         {/* User  Routes */}
@@ -119,6 +121,12 @@ export default function App() {
         <Route path="/Subscribe" element={<ProtectedRoute><SubscribePage /></ProtectedRoute>} />
         <Route path="/Subscribe/edit/:id" element={<ProtectedRoute><GenericFormPage endpoint="postss" fields={UserPacakgesFields} mode="edit" title="Edit Subscribe Item" /></ProtectedRoute>} />
         <Route path="/Subscribe/view/:id" element={<ProtectedRoute><GenericViewPage entityName="postss" fields={UserPacakgesFields} title="Subscribe Item Details" /></ProtectedRoute>} />
+
+
+ {/* Packages Routes */}
+        <Route path="/Packages" element={<ProtectedRoute><PackagesPage /></ProtectedRoute>} />
+        <Route path="/Packages/edit/:id" element={<ProtectedRoute><PackagesFormPage mode="edit" /></ProtectedRoute>} />
+        <Route path="/Packages/view/:id" element={<ProtectedRoute><PackagesViewPage /></ProtectedRoute>} />
 
       </Routes>
     </BrowserRouter>

@@ -29,14 +29,15 @@ export const UserPacakgesFields  = [
     form_show: false,
     options: null
   },
-       { 
+ 
+{ 
     key: "user.image", 
-    label: "user Image", 
-      type: "file", 
+    label: "Image", 
+    type: "file", 
     cell_type: "image",
-    display_field: "user.image",
-    required: 0, 
-    placeholder: "Enter Id",
+    display_field: null,
+    required: 1, 
+    placeholder: "Enter Image",
     searchable: false,
     filterable: false,
     sortable: true,

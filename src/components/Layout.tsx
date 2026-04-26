@@ -200,7 +200,11 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
             <span className="text-base font-bold tracking-tight text-carbon-black">
               b2b
             </span>
+
+            
           </div>
+
+
 
           <div className="flex flex-1 items-center justify-end gap-2 lg:gap-4">
             <div className="relative">
