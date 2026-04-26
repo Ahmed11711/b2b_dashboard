@@ -1,16 +1,14 @@
-import ar from "../locales/ar";
-import en from "../locales/en";
-
-const locales = { ar, en };
+import { useTranslation as useI18nTranslation } from "react-i18next";
 
 export const useTranslation = () => {
-  const lang = localStorage.getItem("lang") || "ar";
-  const translations = locales[lang] || {};
+  const { t, i18n } = useI18nTranslation();
+  
+  const lang = i18n.language;
 
-  const t = (key) => {
+  const translate = (key) => {
     if (!key) return "";
-    return translations[key] || key;
+    return t(key);
   };
 
-  return { t, lang };
+  return { t: translate, lang };
 };

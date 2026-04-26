@@ -1,76 +1,44 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { 
-  LayoutDashboard, LogOut, Menu, X, Bell, 
-  User, Users, UserCheck, UserCog,
+  Home, LogOut, Menu, X, 
+  Users, UserCheck, UserCog,
   Package, Megaphone, ShoppingBag, 
-  LayoutGrid, BoxSelect, Palette ,Tag ,Wrench
+  LayoutGrid, BoxSelect, Palette ,Tag ,Wrench,
+  FileText, Briefcase, Layers, Settings, Mail, CreditCard
 } from "lucide-react";import { cn } from "../lib/utils";
 import { Button } from "./Button";
+import LanguageSelector from "./components/header/LanguageSelector";
 import { motion, AnimatePresence } from "motion/react";
-import { NotificationPopover } from "./NotificationPopover";
-import { Notification } from "../types";
 
 const adminNavItems = [
-   { icon: LayoutDashboard,  label: "Overview",        path: "/" },
-  { icon: Users,            label: "User",            path: "/User" },
-
-  { icon: UserCheck,        label: "Provider",        path: "/Provider" },
-  { icon: UserCog,          label: "Customer",        path: "/Customer" },
-  { icon: Tag  ,            label: "Category",        path: "/Category" },
-  { icon: Wrench,           label: "Service",         path: "/Service" },
-  { icon: Wrench,           label: "Posts",           path: "/Posts" },
-
-  { icon: Package,          label: "Packages",        path: "/Packages" },
-  { icon: Package,          label: "Subscribe",        path: "/Subscribe" },
-  { icon: Megaphone,        label: "Ads",             path: "/Ads" },
-  { icon: ShoppingBag,      label: "Bag",             path: "/Bag" },
-  { icon: LayoutGrid,       label: "Bags Categories", path: "/bags_categories" },
-  { icon: BoxSelect,        label: "Bag Items",       path: "/bag_items" },
-  { icon: Palette,          label: "Style Guide",     path: "/style-guide" },
+  { icon: Home,             label: "sidebar.overview",        path: "/" },
+  { icon: Users,            label: "sidebar.user",            path: "/User" },
+  { icon: Briefcase,        label: "sidebar.provider",        path: "/Provider" },
+  { icon: UserCog,          label: "sidebar.customer",        path: "/Customer" },
+  { icon: Tag,              label: "sidebar.category",        path: "/Category" },
+  { icon: Settings,         label: "sidebar.service",         path: "/Service" },
+  { icon: FileText,         label: "sidebar.posts",           path: "/Posts" },
+  { icon: Package,          label: "sidebar.packages",        path: "/Packages" },
+  { icon: CreditCard,       label: "sidebar.subscribe",       path: "/Subscribe" },
+  { icon: Megaphone,        label: "sidebar.ads",             path: "/Ads" },
+  { icon: ShoppingBag,      label: "sidebar.bag",             path: "/Bag" },
+  { icon: Layers,           label: "sidebar.bags_categories", path: "/bags_categories" },
+  {icon: BoxSelect,        label: "sidebar.bag_items",       path: "/bag_items" },
+  {icon: Palette,          label: "sidebar.style_guide",     path: "/style-guide" },
+  {icon: Settings,         label: "sidebar.settings",        path: "/profile" },
 ];
 
 const staffNavItems = [
-  { icon: LayoutDashboard, label: "My Tasks", path: "/" },
- ];
-
-const INITIAL_NOTIFICATIONS: Notification[] = [
-  {
-    id: 1,
-    title: "New Booking",
-    message:
-      "Ahmed Samir booked a Deep Cleaning service for tomorrow at 10:00 AM.",
-    time: "2 mins ago",
-    isRead: false,
-    type: "info",
-  },
-  {
-    id: 2,
-    title: "Payment Received",
-    message: "Payment of $120.00 received for Booking #1024.",
-    time: "1 hour ago",
-    isRead: false,
-    type: "success",
-  },
-  {
-    id: 3,
-    title: "Staff Alert",
-    message:
-      "Staff member John Doe is running late for his 2:00 PM appointment.",
-    time: "3 hours ago",
-    isRead: true,
-    type: "warning",
-  },
+  { icon: Home, label: "sidebar.my_tasks", path: "/" },
 ];
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const { t } = useTranslation();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
-  const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false);
-  const [notifications, setNotifications] = React.useState<Notification[]>(
-    INITIAL_NOTIFICATIONS,
-  );
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -82,18 +50,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
     localStorage.removeItem("role");
     navigate("/login");
   };
-
-  const handleMarkAsRead = (id: number) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
-    );
-  };
-
-  const handleClearAll = () => {
-    setNotifications([]);
-  };
-
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
     <div className="flex h-screen bg-bg-surface overflow-hidden">
@@ -152,7 +108,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
                       isActive ? "text-emerald-solid" : "text-slate-400",
                     )}
                   />
-                  {item.label}
+                  {t(item.label)}
                 </Link>
               );
             })}
@@ -165,7 +121,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
               onClick={handleSignOut}
             >
               <LogOut className="mr-3 h-5 w-5 text-slate-400" />
-              Sign Out
+              {t("Sign Out")}
             </Button>
           </div>
         </div>
@@ -207,39 +163,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
 
 
           <div className="flex flex-1 items-center justify-end gap-2 lg:gap-4">
-            <div className="relative">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                className={cn(
-                  "relative rounded-full p-2 transition-all duration-200",
-                  isNotificationsOpen
-                    ? "bg-emerald-tint text-emerald-text"
-                    : "hover:bg-slate-50",
-                )}
-              >
-                <Bell
-                  className={cn(
-                    "h-5 w-5",
-                    isNotificationsOpen
-                      ? "text-emerald-solid"
-                      : "text-slate-400",
-                  )}
-                />
-                {unreadCount > 0 && (
-                  <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-emerald-solid border-2 border-white" />
-                )}
-              </Button>
-
-              <NotificationPopover
-                isOpen={isNotificationsOpen}
-                onClose={() => setIsNotificationsOpen(false)}
-                notifications={notifications}
-                onMarkAsRead={handleMarkAsRead}
-                onClearAll={handleClearAll}
-              />
-            </div>
+            <LanguageSelector />
 
             <div className="flex items-center gap-2 lg:gap-3 pl-2">
               <div className="text-right hidden sm:block">

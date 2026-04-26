@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Users,
   DollarSign,
@@ -7,6 +9,8 @@ import {
   ArrowUpRight,
   Calendar as CalendarIcon,
   Loader2,
+  FileText,
+  Settings,
 } from "lucide-react";
 import { StatCard } from "../components/StatCard";
 import { DataTable } from "../components/DataTable";
@@ -14,6 +18,7 @@ import { Button } from "../components/Button";
 import { Booking } from "../types";
 import { formatCurrency } from "../lib/utils";
 import { Badge } from "../components/Badge";
+import { getAll } from "../service/services/apiService";
 import {
   AreaChart,
   Area,
@@ -25,106 +30,91 @@ import {
 } from "recharts";
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
   const [data, setData] = useState<{ stats: any; chartData: any[] } | null>(null);
-  const [recentBookings, setRecentBookings] = useState<Booking[]>([]);
+  const [recentPosts, setRecentPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const role = localStorage.getItem("role") || "admin";
 
   useEffect(() => {
-     const loadMockData = () => {
+    const fetchData = async () => {
       setIsLoading(true);
-      
-       const mockStats = {
-        totalRevenue: 154.3,
-        totalBookings: 124,
-        activeServices: 12,
-        pendingBookings: 8,
-      };
+      try {
+        // Fetch stats (mocked for now as we don't have a stats endpoint)
+        const mockStats = {
+          totalRevenue: 154.3,
+          totalBookings: 124,
+          activeServices: 12,
+          pendingBookings: 8,
+        };
 
-       const mockChartData = [
-        { name: "Mon", revenue: 4000 },
-        { name: "Tue", revenue: 3000 },
-        { name: "Wed", revenue: 5000 },
-        { name: "Thu", revenue: 2780 },
-        { name: "Fri", revenue: 1890 },
-        { name: "Sat", revenue: 2390 },
-        { name: "Sun", revenue: 3490 },
-      ];
+        const mockChartData = [
+          { name: t("dashboard.mon"), revenue: 4000 },
+          { name: t("dashboard.tue"), revenue: 3000 },
+          { name: t("dashboard.wed"), revenue: 5000 },
+          { name: t("dashboard.thu"), revenue: 2780 },
+          { name: t("dashboard.fri"), revenue: 1890 },
+          { name: t("dashboard.sat"), revenue: 2390 },
+          { name: t("dashboard.sun"), revenue: 3490 },
+        ];
 
-      // بيانات الحجوزات الوهمية
-      const mockBookings: any[] = [
-        {
-          id: "1",
-          customer_name: "Ahmed Ali",
-          service: { service_name: "Full Car Wash" },
-          booking_date: new Date().toISOString(),
-          status: "confirmed",
-          total_price: 150,
-        },
-        {
-          id: "2",
-          customer_name: "Sara Smith",
-          service: { service_name: "Engine Checkup" },
-          booking_date: new Date().toISOString(),
-          status: "pending",
-          total_price: 300,
-        },
-        {
-          id: "3",
-          customer_name: "John Doe",
-          service: { service_name: "Oil Change" },
-          booking_date: new Date().toISOString(),
-          status: "error",
-          total_price: 80,
-        }
-      ];
-
-      setTimeout(() => {
         setData({ stats: mockStats, chartData: mockChartData });
-        setRecentBookings(mockBookings);
+
+        // Fetch real posts data
+        const postsResponse = await getAll("postss", { limit: 5 });
+        if (postsResponse && postsResponse.data) {
+          setRecentPosts(postsResponse.data);
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
         setIsLoading(false);
-      }, 800); // تأخير بسيط لمحاكاة تجربة المستخدم
+      }
     };
 
-    loadMockData();
-  }, []);
+    fetchData();
+  }, [t]);
 
   const columns = [
     {
-      header: "Customer",
-      accessor: (b: any) => (
+      header: t("common.title"),
+      accessor: (p: any) => (
         <span className="font-semibold text-carbon-black">
-          {b.user?.user_name || b.customer_name || "Guest"}
+          {p.title || p.user_name || t("common.untitled_post")}
         </span>
       ),
     },
     {
-      header: "Service",
-      accessor: (b: any) => b.service?.service_name || "General Service",
+      header: t("common.author"),
+      accessor: (p: any) => p.author?.user_name || p.user?.user_name || t("common.admin"),
     },
     {
-      header: "Date",
-      accessor: (b: Booking) => new Date(b.booking_date).toLocaleDateString(),
+      header: t("common.date"),
+      accessor: (p: any) => p.created_at ? new Date(p.created_at).toLocaleDateString() : t("common.na"),
     },
     {
-      header: "Status",
-      accessor: (b: Booking) => (
-        <Badge
-          variant={
-            b.status === "confirmed"
-              ? "success"
-              : b.status === "pending"
-                ? "warning"
-                : "error"
-          }
-        >
-          {b.status}
-        </Badge>
-      ),
-    },
-    {
-      header: "Price",
-      accessor: (b: Booking) => formatCurrency(b.total_price),
+      header: t("common.status"),
+      accessor: (p: any) => {
+        const isActive = p.is_active !== undefined ? p.is_active : p.status;
+        return (
+          <Badge
+            variant={
+              isActive === 1 || isActive === "active"
+                ? "success"
+                : isActive === 0 || isActive === "inactive"
+                  ? "error"
+                  : "warning"
+            }
+          >
+            {isActive === 1 || isActive === "active" 
+              ? t("fields.active") 
+              : isActive === 0 || isActive === "inactive" 
+                ? t("fields.inactive") 
+                : t("common.undefined")}
+          </Badge>
+        );
+      },
     },
   ];
 
@@ -141,34 +131,34 @@ const Dashboard: React.FC = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-carbon-black">
-          {role === "admin" ? "Operations & Analytics" : "Staff Dashboard"}
+          {role === "admin" ? t("dashboard.operations_analytics") : t("dashboard.staff_dashboard")}
         </h1>
         <p className="text-text-description mt-1">
-          Real-time overview of your business performance.
+          {t("dashboard.performance_overview")}
         </p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Total Revenue"
+          label={t("dashboard.total_revenue")}
           value={formatCurrency(data?.stats?.totalRevenue || 0)}
           icon={DollarSign}
           trend={{ value: 12, isPositive: true }}
         />
         <StatCard
-          label="Total Bookings"
+          label={t("dashboard.total_bookings")}
           value={data?.stats?.totalBookings || 0}
           icon={CalendarIcon}
           trend={{ value: 8, isPositive: true }}
         />
         <StatCard
-          label="Active Services"
+          label={t("dashboard.active_services")}
           value={data?.stats?.activeServices || 0}
           icon={Briefcase}
         />
         <StatCard
-          label="Pending Bookings"
+          label={t("dashboard.pending_bookings")}
           value={data?.stats?.pendingBookings || 0}
           icon={Clock}
           trend={{ value: 4, isPositive: false }}
@@ -180,10 +170,10 @@ const Dashboard: React.FC = () => {
         <div className="lg:col-span-2 rounded-xl border border-border-light bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-base font-semibold text-carbon-black">
-              Weekly Revenue
+              {t("dashboard.weekly_revenue")}
             </h3>
             <Button variant="outline" size="sm" className="text-xs">
-              View Report <ArrowUpRight className="ml-2 h-3.5 w-3.5" />
+              {t("common.view_report")} <ArrowUpRight className="ml-2 h-3.5 w-3.5" />
             </Button>
           </div>
           <div className="h-[300px] w-full">
@@ -241,39 +231,47 @@ const Dashboard: React.FC = () => {
         {/* Quick Actions */}
         <div className="rounded-xl border border-border-light bg-white p-6 shadow-sm">
           <h3 className="text-base font-semibold text-carbon-black mb-6">
-            Quick Actions
+            {t("dashboard.quick_actions")}
           </h3>
           <div className="space-y-3">
             <Button
               className="w-full justify-start text-xs h-11"
               variant="outline"
+              onClick={() => navigate("/Service")}
             >
-              <Briefcase className="mr-3 h-4 w-4 text-slate-400" /> Add New
-              Service
+              <Briefcase className="mr-3 h-4 w-4 text-slate-400" /> {t("dashboard.add_new_service")}
             </Button>
             <Button
               className="w-full justify-start text-xs h-11"
               variant="outline"
+              onClick={() => navigate("/Posts")}
             >
-              <CalendarIcon className="mr-3 h-4 w-4 text-slate-400" /> Schedule
-              Availability
+              <FileText className="mr-3 h-4 w-4 text-slate-400" /> {t("dashboard.create_new_post")}
             </Button>
             <Button
               className="w-full justify-start text-xs h-11"
               variant="outline"
+              onClick={() => navigate("/User")}
             >
-              <Users className="mr-3 h-4 w-4 text-slate-400" /> Manage Staff
+              <Users className="mr-3 h-4 w-4 text-slate-400" /> {t("dashboard.manage_staff")}
+            </Button>
+            <Button
+              className="w-full justify-start text-xs h-11"
+              variant="outline"
+              onClick={() => navigate("/profile")}
+            >
+              <Settings className="mr-3 h-4 w-4 text-slate-400" /> {t("dashboard.settings")}
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Recent Bookings Table */}
+      {/* Recent Posts Table */}
       <div className="overflow-hidden rounded-2xl border border-border-light bg-white px-4 pb-3 pt-4 shadow-sm sm:px-6">
         <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-lg font-semibold text-carbon-black">
-              Recent Bookings
+              {t("dashboard.recent_posts")}
             </h3>
           </div>
           <div className="flex items-center gap-3">
@@ -283,20 +281,21 @@ const Dashboard: React.FC = () => {
               className="text-xs"
               onClick={() => window.location.reload()}
             >
-              Refresh
+              {t("common.refresh")}
             </Button>
             <Button
               variant="outline"
               size="sm"
               className="text-xs"
+              onClick={() => navigate("/Posts")}
             >
-              See all
+              {t("common.see_all")}
             </Button>
           </div>
         </div>
         <DataTable
           columns={columns}
-          data={recentBookings}
+          data={recentPosts}
           isLoading={isLoading}
         />
       </div>
