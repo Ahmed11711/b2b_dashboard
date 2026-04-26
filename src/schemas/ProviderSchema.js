@@ -145,6 +145,7 @@ export const ProviderFields = [
   label: "Services",
   cell_type: "relation_list",
   view_show: true,
+
   tab: true,
   headers: [
     { key: "title", label: "Title" },

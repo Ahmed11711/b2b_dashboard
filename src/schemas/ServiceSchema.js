@@ -143,6 +143,21 @@ export const ServiceFields = [
     options: null
   },
   { 
+    key: "is_active", 
+    label: "Is Active", 
+    type: "checkbox", 
+    cell_type: "badge",
+    display_field: null,
+    required: 1, 
+    placeholder: "Enter Is Active",
+    searchable: false,
+    filterable: true,
+    sortable: true,
+    table_show: true,
+    form_show: true,
+    options: [{ label: 'Active', value: 1, color: 'success' }, { label: 'Inactive', value: 0, color: 'danger' }]
+  },
+  { 
     key: "created_at", 
     label: "Created At", 
     type: "date", 
@@ -178,6 +193,7 @@ export const ServiceFields = [
   label: "my-reviews",
   cell_type: "relation_list",
   view_show: true,
+   form_show: false, 
   tab: true,  
   headers: [
 { key: "id", label: "ID", format: "short_id" },
@@ -195,6 +211,7 @@ export const ServiceFields = [
 },
  {
   key: "visits",
+   form_show: false, 
   label: "my-visits",
   cell_type: "relation_list",
   view_show: false,
