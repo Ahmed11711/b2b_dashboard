@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { getAll } from "../service/services/apiService";
+import { useNavigate } from "react-router-dom";
+
 import {
   Users,
   DollarSign,
@@ -29,66 +32,32 @@ const Dashboard: React.FC = () => {
   const [recentBookings, setRecentBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const role = localStorage.getItem("role") || "admin";
+const navigate = useNavigate();
 
-  useEffect(() => {
-     const loadMockData = () => {
-      setIsLoading(true);
-      
-       const mockStats = {
-        totalRevenue: 154.3,
-        totalBookings: 124,
-        activeServices: 12,
-        pendingBookings: 8,
-      };
+useEffect(() => {
+    async function loadData() {
+        setIsLoading(true);
+        try {
+            const [statsRes, bookingsRes, chartRes] = await Promise.all([
+                getAll('dashboard/stats'),
+                getAll('dashboard/recent-bookings'),
+                getAll('dashboard/weekly-revenue'),
+            ]);
 
-       const mockChartData = [
-        { name: "Mon", revenue: 4000 },
-        { name: "Tue", revenue: 3000 },
-        { name: "Wed", revenue: 5000 },
-        { name: "Thu", revenue: 2780 },
-        { name: "Fri", revenue: 1890 },
-        { name: "Sat", revenue: 2390 },
-        { name: "Sun", revenue: 3490 },
-      ];
-
-      // بيانات الحجوزات الوهمية
-      const mockBookings: any[] = [
-        {
-          id: "1",
-          customer_name: "Ahmed Ali",
-          service: { service_name: "Full Car Wash" },
-          booking_date: new Date().toISOString(),
-          status: "confirmed",
-          total_price: 150,
-        },
-        {
-          id: "2",
-          customer_name: "Sara Smith",
-          service: { service_name: "Engine Checkup" },
-          booking_date: new Date().toISOString(),
-          status: "pending",
-          total_price: 300,
-        },
-        {
-          id: "3",
-          customer_name: "John Doe",
-          service: { service_name: "Oil Change" },
-          booking_date: new Date().toISOString(),
-          status: "error",
-          total_price: 80,
+            setData({
+                stats:     statsRes.stats,
+                chartData: chartRes.data,
+            });
+            setRecentBookings(bookingsRes.data);
+        } catch (err) {
+            console.error('Dashboard load error:', err);
+        } finally {
+            setIsLoading(false);
         }
-      ];
+    }
 
-      setTimeout(() => {
-        setData({ stats: mockStats, chartData: mockChartData });
-        setRecentBookings(mockBookings);
-        setIsLoading(false);
-      }, 800); // تأخير بسيط لمحاكاة تجربة المستخدم
-    };
-
-    loadMockData();
-  }, []);
-
+    loadData();
+}, []);
   const columns = [
     {
       header: "Customer",
@@ -239,33 +208,35 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="rounded-xl border border-border-light bg-white p-6 shadow-sm">
-          <h3 className="text-base font-semibold text-carbon-black mb-6">
-            Quick Actions
-          </h3>
-          <div className="space-y-3">
-            <Button
-              className="w-full justify-start text-xs h-11"
-              variant="outline"
-            >
-              <Briefcase className="mr-3 h-4 w-4 text-slate-400" /> Add New
-              Service
-            </Button>
-            <Button
-              className="w-full justify-start text-xs h-11"
-              variant="outline"
-            >
-              <CalendarIcon className="mr-3 h-4 w-4 text-slate-400" /> Schedule
-              Availability
-            </Button>
-            <Button
-              className="w-full justify-start text-xs h-11"
-              variant="outline"
-            >
-              <Users className="mr-3 h-4 w-4 text-slate-400" /> Manage Staff
-            </Button>
-          </div>
-        </div>
+{/* Quick Actions */}
+<div className="rounded-xl border border-border-light bg-white p-6 shadow-sm">
+  <h3 className="text-base font-semibold text-carbon-black mb-6">
+    Quick Actions
+  </h3>
+  <div className="space-y-3">
+    <Button
+      className="w-full justify-start text-xs h-11"
+      variant="outline"
+      onClick={() => navigate('/Provider')}
+    >
+      <Briefcase className="mr-3 h-4 w-4 text-slate-400" /> Add New Provider
+    </Button>
+    <Button
+      className="w-full justify-start text-xs h-11"
+      variant="outline"
+      onClick={() => navigate('/Ads')}
+    >
+      <CalendarIcon className="mr-3 h-4 w-4 text-slate-400" /> Schedule Ads
+    </Button>
+    <Button
+      className="w-full justify-start text-xs h-11"
+      variant="outline"
+      onClick={() => navigate('/Packages')}
+    >
+      <Users className="mr-3 h-4 w-4 text-slate-400" /> Packages
+    </Button>
+  </div>
+</div>
       </div>
 
       {/* Recent Bookings Table */}
